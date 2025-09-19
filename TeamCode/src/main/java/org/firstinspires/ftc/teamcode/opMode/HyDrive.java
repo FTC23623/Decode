@@ -9,11 +9,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
+import org.firstinspires.ftc.teamcode.objects.HydraSubsystem;
 import org.firstinspires.ftc.teamcode.objects.OpmodeHeading;
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Drive_Manual;
 import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Config
@@ -24,6 +27,7 @@ public class HyDrive extends LinearOpMode {
   private Imu mImu;
   private Drive mDrive;
   private ElapsedTime mLoopSleep;
+  private ArrayList<HydraSubsystem> mSystems;
 
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
@@ -43,6 +47,7 @@ public class HyDrive extends LinearOpMode {
       }
     }
     mImu.SetYawOffset(OpmodeHeading.GetOffset());
+    mSystems.add(mDrive);
     telemetry.addData("Auto Yaw", OpmodeHeading.GetOffset());
     telemetry.update();
     List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -67,7 +72,9 @@ public class HyDrive extends LinearOpMode {
       mOpMode.mLoopTime = mLoopSleep.milliseconds();
       // Pass user input to the systems
       // System processes
-      mDrive.Process();
+      for (HydraSubsystem system : mSystems) {
+        system.Process();
+      }
       // Update telemetry once for all processes
       telemetry.update();
       mLoopSleep.reset();

@@ -1,33 +1,27 @@
 package org.firstinspires.ftc.teamcode.opMode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
+import org.firstinspires.ftc.teamcode.subsystems.LinearLaunchSystem;
 
 @Config
 @TeleOp(name = "LinearLaunch")
 public class LinearLaunch extends LinearOpMode {
-
-    private DcMotor left;
-    private DcMotor right;
-    public static double power=0.0;
     @Override
     public void runOpMode() throws InterruptedException
     {
-        left = hardwareMap.get(DcMotor.class, "left");
-        right= hardwareMap.get(DcMotor.class, "right");
-        left.setDirection(DcMotorSimple.Direction.REVERSE);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        HydraOpMode opMode = new HydraOpMode(telemetry, hardwareMap, null, null, null, null);
+        LinearLaunchSystem launcher = new LinearLaunchSystem(opMode, 0);
 
         waitForStart();
         while (opModeIsActive()) {
-            left.setPower(power);
-            right.setPower(power);
+            launcher.Process();
             idle();
         }
     }
