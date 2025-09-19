@@ -12,4 +12,5 @@ public final class Constants {
     public static final double joyStickDeadBand = 0.05;
     public static final int debounce = 3;
     public static final int debounceLong = 9;
+    public static final double motorRpmIntervalMs = 10;
 }
