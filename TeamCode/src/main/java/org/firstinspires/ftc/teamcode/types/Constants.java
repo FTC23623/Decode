@@ -13,6 +13,6 @@ public final class Constants {
     public static final int debounce = 3;
     public static final int debounceLong = 9;
     public static final double motorRpmIntervalMs = 10;
-    public static final double linearLaunchMotTicksPerRev = 1120;
+    public static final double linearLaunchMotTicksPerRev = 28;
     public static final double nsToMs = 1.0e-6;
 }

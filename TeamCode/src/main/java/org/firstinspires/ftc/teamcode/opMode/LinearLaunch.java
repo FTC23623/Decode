@@ -22,6 +22,7 @@ public class LinearLaunch extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             launcher.Process();
+            telemetry.update();
             idle();
         }
     }
