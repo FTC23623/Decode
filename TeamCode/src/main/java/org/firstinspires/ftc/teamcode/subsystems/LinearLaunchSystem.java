@@ -29,6 +29,9 @@ public class LinearLaunchSystem implements HydraSubsystem {
     private final PIDFController mainPid;
     private final PIDFController syncPid;
     private long lastTime;
+    public static boolean noPid = false;
+    public static double noPidPwr0 = 0;
+    public static double noPidPwr1 = 0;
 
     public LinearLaunchSystem(HydraOpMode Opmode, double targetRPM) {
         mOp = Opmode;
@@ -48,22 +51,25 @@ public class LinearLaunchSystem implements HydraSubsystem {
             return;
         }
         Tune();
-        // average the two motor RPMs
+        // get rpm of each motor
         double rpm0 = motors.get(0).GetRPM();
         double rpm1 = motors.get(1).GetRPM();
-        //double rpm = (rpm0 + rpm1) / 2;
-        // main PID calculated on the average RPM of the system
-        double power0 = mainPid.calculate(rpm0);
-        // sync PID calculated on the error
-        double power1 = syncPid.calculate(rpm1);
-        // set the main PID output to the first motor
-        motors.get(0).SetPower(power0);
-        // apply the error to the second motor to sync the system
-        motors.get(1).SetPower(power1);
+        // PID for each motor. Never reverse the motor
+        double power0 = Math.max(0, mainPid.calculate(rpm0));
+        double power1 = Math.max(0, syncPid.calculate(rpm1));
+        if (noPid) {
+            // Apply power directly for testing
+            motors.get(0).SetPower(noPidPwr0);
+            motors.get(1).SetPower(noPidPwr1);
+
+        } else {
+            // Apply power from PID
+            motors.get(0).SetPower(power0);
+            motors.get(1).SetPower(power1);
+        }
         lastTime = timeNow;
         mOp.mTelemetry.addData(motors.get(0).mName + " RPM", rpm0);
         mOp.mTelemetry.addData(motors.get(1).mName + " RPM", rpm1);
-        //mOp.mTelemetry.addData("RPM", rpm);
         mOp.mTelemetry.addData("Pwr0", power0);
         mOp.mTelemetry.addData("Pwr1", power1);
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
