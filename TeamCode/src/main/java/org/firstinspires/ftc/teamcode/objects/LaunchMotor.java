@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 public class LaunchMotor {
     public final String mName;
     private final HydraOpMode mOp;
@@ -26,6 +28,7 @@ public class LaunchMotor {
         motor.setPower(0);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ticksPerRev = motTicksPerRev;
     }
 
@@ -45,6 +48,7 @@ public class LaunchMotor {
         lastTime = timeNow;
         mOp.mTelemetry.addData(mName + " ticks", dif);
         mOp.mTelemetry.addData(mName + " time", timeDifMs);
+        mOp.mTelemetry.addData(mName + " current", motor.getCurrent(CurrentUnit.MILLIAMPS));
         return rpm;
     }
 
