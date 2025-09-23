@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.objects;
 
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class LaunchMotor {
@@ -17,8 +13,9 @@ public class LaunchMotor {
     private double lastPosition;
     private long lastTime;
     private final double nsToMs = 1.0e-6;
+    private final SampleAverage mAvgRpm;
 
-    public LaunchMotor(String name, HydraOpMode opMode, DcMotorEx mot, DcMotorSimple.Direction motorDir, double motTicksPerRev){
+    public LaunchMotor(String name, HydraOpMode opMode, DcMotorEx mot, DcMotorSimple.Direction motorDir, double motTicksPerRev, int samplesToAvg){
         mName = name;
         mOp = opMode;
         motor = mot;
@@ -30,6 +27,7 @@ public class LaunchMotor {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ticksPerRev = motTicksPerRev;
+        mAvgRpm = new SampleAverage(samplesToAvg);
     }
 
     public double GetRPM() {
@@ -49,7 +47,12 @@ public class LaunchMotor {
         mOp.mTelemetry.addData(mName + " ticks", dif);
         mOp.mTelemetry.addData(mName + " time", timeDifMs);
         mOp.mTelemetry.addData(mName + " current", motor.getCurrent(CurrentUnit.MILLIAMPS));
-        return rpm;
+        // pass into the average measurement and return the average if it has been calculated
+        mAvgRpm.AddSample(rpm);
+        if (mAvgRpm.Ready()) {
+            return mAvgRpm.GetAverage();
+        }
+        return 0;
     }
 
     public void SetPower(double power) {

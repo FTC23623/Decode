@@ -32,12 +32,13 @@ public class LinearLaunchSystem implements HydraSubsystem {
     public static boolean noPid = false;
     public static double noPidPwr0 = 0;
     public static double noPidPwr1 = 0;
+    public static int samplesToAverage = 5;
 
     public LinearLaunchSystem(HydraOpMode Opmode, double targetRPM) {
         mOp = Opmode;
         motors = new ArrayList<>(2);
-        motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev));
-        motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev));
+        motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
+        motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
         mainPid = new PIDFController(mainPid_p, mainPid_i, mainPid_d, 0);
         syncPid = new PIDFController(syncPid_p, syncPid_i, syncPid_d, 0);
     }
