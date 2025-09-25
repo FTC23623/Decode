@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes;
+package org.firstinspires.ftc.teamcode.opMode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.HydraSubsystem;
 import org.firstinspires.ftc.teamcode.objects.OpmodeHeading;
@@ -37,8 +36,7 @@ public class HyDrive extends LinearOpMode {
     // Initialization Routines
     mLoopSleep = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-    mOpMode = new HydraOpMode(telemetry, hardwareMap, null, null, gamepad1,
-            gamepad2);
+    mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     mImu = new Imu_Hub(mOpMode);
     mDrive = new Drive_Manual(mOpMode, mImu);
     while (!mImu.Connected() || mImu.Calibrating()) {

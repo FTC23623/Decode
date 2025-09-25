@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.datalogger.LaunchDatalogger;
 
 public class LaunchMotor {
     public final String mName;
@@ -14,6 +15,7 @@ public class LaunchMotor {
     private long lastTime;
     private final double nsToMs = 1.0e-6;
     private final SampleAverage mAvgRpm;
+    private final LaunchDatalogger mLogger;
 
     public LaunchMotor(String name, HydraOpMode opMode, DcMotorEx mot, DcMotorSimple.Direction motorDir, double motTicksPerRev, int samplesToAvg){
         mName = name;
@@ -28,6 +30,7 @@ public class LaunchMotor {
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ticksPerRev = motTicksPerRev;
         mAvgRpm = new SampleAverage(samplesToAvg);
+        mLogger = new LaunchDatalogger(mName + "-launch");
     }
 
     public double GetRPM() {
@@ -44,18 +47,25 @@ public class LaunchMotor {
         // capture present values for the next call
         lastPosition = position;
         lastTime = timeNow;
+        double current = motor.getCurrent(CurrentUnit.MILLIAMPS);
         mOp.mTelemetry.addData(mName + " ticks", dif);
         mOp.mTelemetry.addData(mName + " time", timeDifMs);
-        mOp.mTelemetry.addData(mName + " current", motor.getCurrent(CurrentUnit.MILLIAMPS));
+        mOp.mTelemetry.addData(mName + " current", current);
         // pass into the average measurement and return the average if it has been calculated
         mAvgRpm.AddSample(rpm);
+        double avgRpm = mAvgRpm.GetAverage();
+        mLogger.rpm.set(rpm);
+        mLogger.rpmAvg.set(avgRpm);
+        mLogger.current.set(current);
         if (mAvgRpm.Ready()) {
-            return mAvgRpm.GetAverage();
+            return avgRpm;
         }
         return 0;
     }
 
     public void SetPower(double power) {
         motor.setPower(power);
+        mLogger.power.set(power);
+        mLogger.writeLine();
     }
 }
