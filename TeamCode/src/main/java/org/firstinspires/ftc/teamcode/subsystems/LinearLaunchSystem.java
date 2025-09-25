@@ -22,9 +22,11 @@ public class LinearLaunchSystem implements HydraSubsystem {
     public static double mainPid_p = 0.0;
     public static double mainPid_i = 0.0;
     public static double mainPid_d = 0.0;
+    public static double mainPid_f = 0.0;
     public static double syncPid_p = 0.0;
     public static double syncPid_i = 0.0;
     public static double syncPid_d = 0.0;
+    public static double syncPid_f = 0.0;
     public static double targetRPMtune = 0;
     private final PIDFController mainPid;
     private final PIDFController syncPid;
@@ -39,8 +41,8 @@ public class LinearLaunchSystem implements HydraSubsystem {
         motors = new ArrayList<>(2);
         motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
         motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
-        mainPid = new PIDFController(mainPid_p, mainPid_i, mainPid_d, 0);
-        syncPid = new PIDFController(syncPid_p, syncPid_i, syncPid_d, 0);
+        mainPid = new PIDFController(mainPid_p, mainPid_i, mainPid_d, mainPid_f);
+        syncPid = new PIDFController(syncPid_p, syncPid_i, syncPid_d, syncPid_f);
     }
 
     @Override
@@ -77,8 +79,8 @@ public class LinearLaunchSystem implements HydraSubsystem {
     }
 
     public void Tune() {
-        mainPid.setPIDF(mainPid_p, mainPid_i, mainPid_d, 0);
-        syncPid.setPIDF(syncPid_p, syncPid_i, syncPid_d, 0);
+        mainPid.setPIDF(mainPid_p, mainPid_i, mainPid_d, mainPid_f);
+        syncPid.setPIDF(syncPid_p, syncPid_i, syncPid_d, syncPid_f);
         if (mainPid.getSetPoint() != targetRPMtune) {
             mainPid.setSetPoint(targetRPMtune);
             syncPid.setSetPoint(targetRPMtune);
