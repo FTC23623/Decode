@@ -38,8 +38,8 @@ public class LaunchMotor {
         long timeNow = System.nanoTime();
         double timeDifMs = (timeNow - lastTime) * nsToMs;
         // get the current position of the motor and calculate the difference since last time
-        double position = Math.abs(motor.getCurrentPosition());
-        double dif = position - lastPosition;
+        double position = motor.getCurrentPosition();
+        double dif = Math.abs(position - lastPosition);
         // convert difference in ticks to revolutions
         double rev = dif / ticksPerRev;
         // rpm
@@ -47,20 +47,21 @@ public class LaunchMotor {
         // capture present values for the next call
         lastPosition = position;
         lastTime = timeNow;
+        // calculate average of last few rpm values
+        mAvgRpm.AddSample(rpm);
+        double avgRpm = mAvgRpm.GetAverage();
+        // telemetry and datalogging
         double current = motor.getCurrent(CurrentUnit.MILLIAMPS);
         mOp.mTelemetry.addData(mName + " ticks", dif);
         mOp.mTelemetry.addData(mName + " time", timeDifMs);
         mOp.mTelemetry.addData(mName + " current", current);
-        // pass into the average measurement and return the average if it has been calculated
-        mAvgRpm.AddSample(rpm);
-        double avgRpm = mAvgRpm.GetAverage();
+        mOp.mTelemetry.addData(mName + " RPM", rpm);
+        mOp.mTelemetry.addData(mName + " RPM Avg", avgRpm);
         mLogger.rpm.set(rpm);
         mLogger.rpmAvg.set(avgRpm);
         mLogger.current.set(current);
-        if (mAvgRpm.Ready()) {
-            return avgRpm;
-        }
-        return 0;
+        // return rpm
+        return avgRpm;
     }
 
     public void SetPower(double power) {

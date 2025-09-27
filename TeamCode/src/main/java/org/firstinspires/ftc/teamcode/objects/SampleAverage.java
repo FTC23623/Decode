@@ -17,7 +17,7 @@ public class SampleAverage {
     }
 
     double GetAverage() {
-        if (mSamples.size() < mSamplesToAvg) {
+        if (mSamples.isEmpty()) {
             return 0;
         } else {
             double sum = 0;
