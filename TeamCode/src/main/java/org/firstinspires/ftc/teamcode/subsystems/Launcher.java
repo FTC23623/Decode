@@ -18,10 +18,10 @@ import java.util.ArrayList;
 public class Launcher implements HydraSubsystem {
     private final HydraOpMode mOp;
     private final ArrayList<LaunchMotor> motors;
-    public static double pidP = 0.0;
-    public static double pidI = 0.0;
+    public static double pidP = 0.0016;
+    public static double pidI = 0.0001;
     public static double pidD = 0.0;
-    public static double pidF = 0.0;
+    public static double pidF = 0.00025;
     private final PIDFController pid;
     private long lastTime;
     public static int samplesToAverage = 0;
@@ -32,8 +32,8 @@ public class Launcher implements HydraSubsystem {
     public Launcher(HydraOpMode Opmode, double targetRPM) {
         mOp = Opmode;
         motors = new ArrayList<>(2);
-        motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
-        motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
+        motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
+        motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
         pid = new PIDFController(pidP, pidI, pidD, pidF);
         pid.setSetPoint(targetRPM);
     }
