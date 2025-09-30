@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Config
-@Disabled
 @TeleOp(name = "HyDrive")
 public class HyDrive extends LinearOpMode {
   private HydraOpMode mOpMode;
@@ -32,13 +31,14 @@ public class HyDrive extends LinearOpMode {
    * This function is executed when this OpMode is selected from the Driver Station.
    */
   @Override
-  public void runOpMode() {
+  public void runOpMode() throws InterruptedException {
     // Initialization Routines
     mLoopSleep = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     mImu = new Imu_Hub(mOpMode);
     mDrive = new Drive_Manual(mOpMode, mImu);
+    mSystems = new ArrayList<>();
     while (!mImu.Connected() || mImu.Calibrating()) {
       if (isStopRequested() || !opModeIsActive()) {
         break;
@@ -53,15 +53,6 @@ public class HyDrive extends LinearOpMode {
       module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
     }
     waitForStart();
-    mLoopSleep.reset();
-    while (opModeIsActive()) {
-      for (LynxModule module : allHubs) {
-        module.clearBulkCache();
-      }
-      mOpMode.mLoopTime = mLoopSleep.milliseconds();
-      mLoopSleep.reset();
-      idle();
-    }
     mLoopSleep.reset();
     while (opModeIsActive()) {
       for (LynxModule module : allHubs) {
