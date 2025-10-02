@@ -7,8 +7,9 @@ import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
+import org.firstinspires.ftc.teamcode.objects.HydraSubsystem;
 
-public class Drive {
+public class Drive implements HydraSubsystem {
     protected boolean mGyroAssist = true;
     protected final DcMotorEx mMotDrFrLt;
     protected final DcMotorEx mMotDrFrRt;
@@ -100,7 +101,13 @@ public class Drive {
         return 0;
     }
 
+    @Override
     public void Process() {
+
+    }
+
+    @Override
+    public void HandleUserInput() {
 
     }
 
