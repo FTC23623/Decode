@@ -106,6 +106,11 @@ public class Drive implements HydraSubsystem {
 
     }
 
+    @Override
+    public void HandleUserInput() {
+
+    }
+
     /**
      * Sets the power to all motors
      * @param value the power to set to the motors

@@ -69,6 +69,11 @@ public class Launcher implements HydraSubsystem {
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
     }
 
+    @Override
+    public void HandleUserInput() {
+
+    }
+
     public void Tune() {
         pid.setPIDF(pidP, pidI, pidD, pidF);
         if (pid.getSetPoint() != targetRPMtune) {
