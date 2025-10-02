@@ -33,6 +33,24 @@ public class limelight extends LinearOpMode {
                     telemetry.addData("tx", result.getTx());
                     telemetry.addData("ty", result.getTy());
                     telemetry.addData("Botpose", botpose.toString());
+                    
+                    double targetOffsetAngle_Vertical = result.getTy();
+
+                    // how many degrees back is your limelight rotated from perfectly vertical?
+                    double limelightMountAngleDegrees = -1.34;
+
+                    // distance from the center of the Limelight lens to the floor
+                    double limelightLensHeightInches = 4.5;
+
+                    // distance from the target to the floor
+                    double goalHeightInches = 9.5;
+
+                    double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+                    double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+                    //calculate distance
+                    double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+                    telemetry.addData("GoalDistance", distanceFromLimelightToGoalInches);
                     telemetry.update();
                 }
             }
