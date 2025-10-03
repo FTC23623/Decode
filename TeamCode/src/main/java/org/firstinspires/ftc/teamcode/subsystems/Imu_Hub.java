@@ -18,8 +18,8 @@ public class Imu_Hub implements Imu {
         // Expansion Hub, specifying the hub's orientation on the robot via the direction that
         // the REV Robotics logo is facing and the direction that the USB ports are facing.
         imu = opMode.mHardwareMap.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT)));
         imu.resetYaw();
         mOffset = 0;
     }
