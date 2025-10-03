@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Drive_Manual;
 import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class HyDrive extends LinearOpMode {
   private HydraOpMode mOpMode;
   private Imu mImu;
   private Drive mDrive;
+  private Intake mIntake;
   private ElapsedTime mLoopSleep;
   private ArrayList<HydraSubsystem> mSystems;
 
@@ -38,6 +40,7 @@ public class HyDrive extends LinearOpMode {
     mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     mImu = new Imu_Hub(mOpMode);
     mDrive = new Drive_Manual(mOpMode, mImu);
+    mIntake = new Intake(mOpMode);
     mSystems = new ArrayList<>();
     while (!mImu.Connected() || mImu.Calibrating()) {
       if (isStopRequested() || !opModeIsActive()) {
@@ -46,6 +49,7 @@ public class HyDrive extends LinearOpMode {
     }
     mImu.SetYawOffset(OpmodeHeading.GetOffset());
     mSystems.add(mDrive);
+    mSystems.add(mIntake);
     telemetry.addData("Auto Yaw", OpmodeHeading.GetOffset());
     telemetry.update();
     List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -60,6 +64,9 @@ public class HyDrive extends LinearOpMode {
       }
       mOpMode.mLoopTime = mLoopSleep.milliseconds();
       // Pass user input to the systems
+      for (HydraSubsystem system : mSystems) {
+        system.HandleUserInput();
+      }
       // System processes
       for (HydraSubsystem system : mSystems) {
         system.Process();

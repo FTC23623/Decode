@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -11,26 +13,28 @@ import org.firstinspires.ftc.teamcode.types.IntakeStates;
 
 public class Intake implements HydraSubsystem {
     private final HydraOpMode mOp;
-    private final Servo mServo;
+    private final DcMotorEx mMotor;
     private final ElapsedTime mTimeSinceHaveElement;
-    private final ColorRangeSensor mSensor;
+    //private final ColorRangeSensor mSensor;
     private IntakeStates mState;
-    private double mServoPower;
+    private double mMotorPower;
     private boolean mRunIn;
     private boolean mRunOut;
     private double mRunOutSpeed;
+    private double mRunInSpeed;
     private final double mElementDetectionDistance = 0.7;
 
     public Intake(HydraOpMode opmode) {
         mOp = opmode;
-        mServo = mOp.mHardwareMap.get(Servo.class, "intakeServo");
-        mSensor = mOp.mHardwareMap.get(ColorRangeSensor.class, "intakeColorSensor");
-        mServoPower = Constants.contServoOff;
+        mMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakemMotor");
+        //mSensor = mOp.mHardwareMap.get(ColorRangeSensor.class, "intakeColorSensor");
+        mMotorPower = 0;
         mState = IntakeStates.Idle;
         mTimeSinceHaveElement = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         mRunIn = false;
         mRunOut = false;
-        mRunOutSpeed = Constants.contServoBackward;
+        mRunOutSpeed = 0;
+        mRunInSpeed = 0;
     }
 
     /**
@@ -38,9 +42,12 @@ public class Intake implements HydraSubsystem {
      */
     @Override
     public void HandleUserInput() {
-        mRunIn = mOp.mOperatorGamepad.right_trigger > Constants.trgBtnThresh;
-        mRunOut = mOp.mOperatorGamepad.left_trigger > Constants.trgBtnThresh;
-        mRunOutSpeed = 0.5 - mOp.mOperatorGamepad.left_trigger * 0.5;
+        double right = mOp.mOperatorGamepad.right_trigger;
+        double left = mOp.mOperatorGamepad.left_trigger;
+        mRunIn = right > Constants.trgBtnThresh;
+        mRunInSpeed = Constants.intakeMotorMaxIn * right;
+        mRunOut = left > Constants.trgBtnThresh;
+        mRunOutSpeed = Constants.intakeMotorMaxOut * left;
     }
 
     /**
@@ -83,14 +90,19 @@ public class Intake implements HydraSubsystem {
                 // otherwise keep the servo off
                 if (mRunIn) {
                     mState = IntakeStates.In;
+                } else if (mRunOut){
+                    mState = IntakeStates.Out;
                 } else {
-                    mServoPower = Constants.contServoOff;
+                    mMotorPower = 0;
                     break;
                 }
                 // fallthrough
             case In:
                 // keep the servo running
-                mServoPower = Constants.contServoForward;
+                mMotorPower = Constants.contServoForward;
+                if (!mRunIn) {
+                    mState = IntakeStates.Idle;
+                }
                 if (HaveElement()) {
                     // we have detected an element in the intake
                     // transition to the detected state and start our timer
@@ -113,25 +125,25 @@ public class Intake implements HydraSubsystem {
                 } else if (mRunOut) {
                     // score it!
                     mState = IntakeStates.Out;
-                    mServoPower = Constants.contServoBackward;
+                    mMotorPower = Constants.contServoBackward;
                 } else if (!HaveElement()) {
                     mState = IntakeStates.Idle;
                 } else {
-                    mServoPower = Constants.contServoOff;
+                    mMotorPower = Constants.contServoOff;
                 }
                 break;
             case Out:
-                mServoPower = mRunOutSpeed;
+                mMotorPower = mRunOutSpeed;
                 if (!mRunOut) {
                     mState = IntakeStates.Idle;
                 }
                 break;
         }
         // setting position on continuous rotation sets the power and direction
-        mServo.setPosition(mServoPower);
+        mMotor.setPower(mMotorPower);
         // get the distance from the distance sensor for telemetry
-        double distance = mSensor.getDistance(DistanceUnit.INCH);
-        mOp.mTelemetry.addData("Distance", distance);
+        //double distance = mSensor.getDistance(DistanceUnit.INCH);
+        //mOp.mTelemetry.addData("Distance", distance);
         // get the color from the distance sensor for telemetry
         //NormalizedRGBA color = mSensor.getNormalizedColors();
         //mOp.mTelemetry.addData("Red", color.red);
@@ -144,7 +156,8 @@ public class Intake implements HydraSubsystem {
      * @return true if an element is detected
      */
     public boolean HaveElement() {
-        double distance = mSensor.getDistance(DistanceUnit.INCH);
-        return distance < mElementDetectionDistance;
+        //double distance = mSensor.getDistance(DistanceUnit.INCH);
+        //return distance < mElementDetectionDistance;
+        return false;
     }
 }
