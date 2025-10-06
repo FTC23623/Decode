@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
@@ -10,6 +12,7 @@ public class Drive_Manual extends Drive {
     private final com.qualcomm.robotcore.hardware.Gamepad mGamepad;
     private final Debouncer mCircle;
     private final Debouncer mCross;
+    private final Limelight3A limelight;
     public Drive_Manual(HydraOpMode op, Imu imu) {
         super(op, imu);
         mGamepad = mOp.mDriverGamepad;
@@ -17,6 +20,8 @@ public class Drive_Manual extends Drive {
         SetAllMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mCircle = new Debouncer(Constants.debounce);
         mCross = new Debouncer(Constants.debounce);
+        limelight = mOp.mHardwareMap.get(Limelight3A.class, "limelight");
+        limelight.start();
     }
 
     @Override
@@ -46,23 +51,19 @@ public class Drive_Manual extends Drive {
         // Get driver controller input
         drive = mGamepad.left_stick_y;
         strafe = -mGamepad.left_stick_x * 1.1;
+        double targetx = 0;
+        boolean haveTarget = false;
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            if (result.isValid()) {
+                haveTarget = true;
+                targetx = result.getTx();
+            }
+        }
         // use the cross button to aid in squaring to the field
         mCross.In(mGamepad.cross);
         if (mCross.Out() && Constants.fieldCentricDrive) {
-            // snap to the nearest 90 deg
-            double snapHeading = yaw;
-            if (yaw >= -180 && yaw <= -135) {
-                snapHeading = -180;
-            } else if (yaw > -135 && yaw <= -45) {
-                snapHeading = -90;
-            } else if (yaw > -45 && yaw <= 45) {
-                snapHeading = 0;
-            } else if (yaw > 45 && yaw <= 135) {
-                snapHeading = 90;
-            } else if (yaw > 135 && yaw <= 180) {
-                snapHeading = 180;
-            }
-            rotate = -Math.sin((yaw - snapHeading) * Math.PI / 180) * 1.1;
+            rotate = -Math.sin(targetx * Math.PI / 180) * 1.1;
         } else {
             rotate = -mGamepad.right_stick_x;
         }
