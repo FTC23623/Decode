@@ -21,7 +21,7 @@ public class Launcher implements HydraSubsystem {
     public static double pidP = 0.0016;
     public static double pidI = 0.0001;
     public static double pidD = 0.0;
-    public static double pidF = 0.00028;
+    public static double pidF = 0.000242;
     private final PIDFController pid;
     private long lastTime;
     public static int samplesToAverage = 0;
