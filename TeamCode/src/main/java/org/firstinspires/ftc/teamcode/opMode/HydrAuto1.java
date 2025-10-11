@@ -1,18 +1,22 @@
-package com.example.meepmeeptesting;
+package org.firstinspires.ftc.teamcode.opMode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.noahbres.meepmeep.MeepMeep;
-import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
-import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
+import org.firstinspires.ftc.teamcode.types.IntakeActions;
 
-public class MeepMeepTesting {
-    public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(800);
+@Autonomous(name = "HydrAuto1", preselectTeleOp = "HyDrive_Red")
+public class HydrAuto1 extends HydrAuto {
 
-        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .build();
+    public HydrAuto1() {
+        mBeginPose = new Pose2d(60, 15, Math.toRadians(0));
+    }
+
+    @Override
+    protected SequentialAction CreateAuto() {
 
         Pose2d Launch=new Pose2d(55, 15, Math.toRadians(-20));
         Pose2d GPP_WP=new Pose2d(35, 30,Math.toRadians(90));
@@ -22,7 +26,7 @@ public class MeepMeepTesting {
         Pose2d PPG_WP=new Pose2d(-12, 30,Math.toRadians(90));
         Pose2d PPG=new Pose2d(-12,48,Math.toRadians(90));
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, 15, Math.toRadians(0)))
+        Action driveToLaunch1 = mDrive.actionBuilder(mBeginPose)
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(Launch, Math.toRadians(180))
                 .waitSeconds(1.5)
@@ -47,12 +51,8 @@ public class MeepMeepTesting {
                 .setTangent(Math.toRadians(-90))
                 .splineToLinearHeading(Launch, Math.toRadians(0))
                 .waitSeconds(1.5)
-                .build());
+                .build();
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_OFFICIAL)
-                .setDarkMode(true)
-                .setBackgroundAlpha(0.95f)
-                .addEntity(myBot)
-                .start();
+        return new SequentialAction(driveToLaunch1);
     }
 }
