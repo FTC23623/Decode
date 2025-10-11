@@ -41,11 +41,12 @@ public class HyDrive extends LinearOpMode {
     // Initialization Routines
     mLoopSleep = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-    mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2, mVision);
+    mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     mImu = new Imu_Hub(mOpMode);
     mDrive = new Drive_Manual(mOpMode, mImu);
     mIntake = new Intake(mOpMode);
     mVision = new LimelightVision(mOpMode);
+    mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
     while (!mImu.Connected() || mImu.Calibrating()) {
       if (isStopRequested() || !opModeIsActive()) {

@@ -15,7 +15,7 @@ public class LaunchTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException
     {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        HydraOpMode opMode = new HydraOpMode(telemetry, hardwareMap, null, null, null);
+        HydraOpMode opMode = new HydraOpMode(telemetry, hardwareMap, null, null);
         Launcher launcher = new Launcher(opMode, 0);
 
         waitForStart();

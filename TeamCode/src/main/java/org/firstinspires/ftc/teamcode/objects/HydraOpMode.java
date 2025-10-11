@@ -12,13 +12,12 @@ public class HydraOpMode {
     public double mLoopTime;
     public HydraOpMode(Telemetry telemetry, HardwareMap hardwareMap,
                        com.qualcomm.robotcore.hardware.Gamepad driverGamepad,
-                       com.qualcomm.robotcore.hardware.Gamepad operatorGamepad,
-                       Vision vision) {
+                       com.qualcomm.robotcore.hardware.Gamepad operatorGamepad) {
         mTelemetry = telemetry;
         mHardwareMap = hardwareMap;
         mDriverGamepad = driverGamepad;
         mOperatorGamepad = operatorGamepad;
-        mVision = vision;
+        mVision = null;
         mLoopTime = 0;
     }
 }
