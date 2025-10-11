@@ -19,12 +19,12 @@ public class HydrAuto1 extends HydrAuto {
     protected SequentialAction CreateAuto() {
 
         Pose2d Launch=new Pose2d(55, 15, Math.toRadians(-20));
-        Pose2d GPP_WP=new Pose2d(35, 30,Math.toRadians(90));
-        Pose2d GPP=new Pose2d(35,48,Math.toRadians(90));
-        Pose2d PGP_WP=new Pose2d(11, 30,Math.toRadians(90));
-        Pose2d PGP=new Pose2d(11,48,Math.toRadians(90));
-        Pose2d PPG_WP=new Pose2d(-12, 30,Math.toRadians(90));
-        Pose2d PPG=new Pose2d(-12,48,Math.toRadians(90));
+        Pose2d GPP_WP=new Pose2d(40, 30,Math.toRadians(90));
+        Pose2d GPP=new Pose2d(40,54,Math.toRadians(90));
+        Pose2d PGP_WP=new Pose2d(16, 30,Math.toRadians(90));
+        Pose2d PGP=new Pose2d(16,54,Math.toRadians(90));
+        Pose2d PPG_WP=new Pose2d(-7, 30,Math.toRadians(90));
+        Pose2d PPG=new Pose2d(-7,54,Math.toRadians(90));
 
         Action driveToLaunch1 = mDrive.actionBuilder(mBeginPose)
                 .setTangent(Math.toRadians(180))
