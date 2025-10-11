@@ -49,6 +49,7 @@ public class HydrAuto extends LinearOpMode {
         waitForStart();
         mTimeSinceStart.reset();
         TelemetryPacket packet = new TelemetryPacket();
+        mIntake.RunIn();
         while (opModeIsActive()) {
             for (LynxModule module : allHubs) {
                 module.clearBulkCache();
@@ -63,6 +64,7 @@ public class HydrAuto extends LinearOpMode {
             telemetry.update();
             idle();
         }
+        mIntake.Stop();
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }

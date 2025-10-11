@@ -22,7 +22,7 @@ public class MeepMeepTesting {
         Pose2d PPG_WP=new Pose2d(-12, 30,Math.toRadians(90));
         Pose2d PPG=new Pose2d(-12,48,Math.toRadians(90));
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, 15, Math.toRadians(0)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(63, 15, Math.toRadians(0)))
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(Launch, Math.toRadians(180))
                 .waitSeconds(1.5)
