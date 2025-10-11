@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
-import org.firstinspires.ftc.teamcode.objects.HydraSubsystem;
+import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.IntakeStates;
 
-public class Intake implements HydraSubsystem {
+public class Intake implements Subsystem {
     private final HydraOpMode mOp;
     private final DcMotorEx mMotor;
     private final ElapsedTime mTimeSinceHaveElement;
@@ -73,6 +69,11 @@ public class Intake implements HydraSubsystem {
         mRunIn = false;
         mRunOut = false;
         mState = IntakeStates.Idle;
+    }
+
+    @Override
+    public void Init() {
+
     }
 
     /**

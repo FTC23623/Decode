@@ -2,14 +2,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
-import org.firstinspires.ftc.teamcode.objects.HydraSubsystem;
+import org.firstinspires.ftc.teamcode.objects.Subsystem;
 
-public class Drive implements HydraSubsystem {
+public class Drive implements Subsystem {
     protected boolean mGyroAssist = true;
     protected final DcMotorEx mMotDrFrLt;
     protected final DcMotorEx mMotDrFrRt;
@@ -99,6 +97,11 @@ public class Drive implements HydraSubsystem {
             return mImu.GetYaw();
         }
         return 0;
+    }
+
+    @Override
+    public void Init() {
+
     }
 
     @Override

@@ -4,10 +4,10 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-@TeleOp(name = "limelight")
-public class limelight extends LinearOpMode {
+
+@TeleOp(name = "Limelight")
+public class LimelightTest extends LinearOpMode {
 
     private Limelight3A limelight;
 
@@ -33,7 +33,7 @@ public class limelight extends LinearOpMode {
                     telemetry.addData("tx", result.getTx());
                     telemetry.addData("ty", result.getTy());
                     telemetry.addData("Botpose", botpose.toString());
-                    
+
                     double targetOffsetAngle_Vertical = result.getTy();
 
                     // how many degrees back is your limelight rotated from perfectly vertical?

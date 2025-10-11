@@ -9,13 +9,12 @@ import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
-import org.firstinspires.ftc.teamcode.objects.HydraSubsystem;
+import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.LaunchMotor;
-
 import java.util.ArrayList;
 
 @Config
-public class Launcher implements HydraSubsystem {
+public class Launcher implements Subsystem {
     private final HydraOpMode mOp;
     private final ArrayList<LaunchMotor> motors;
     public static double pidP = 0.0016;
@@ -36,6 +35,11 @@ public class Launcher implements HydraSubsystem {
         motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
         pid = new PIDFController(pidP, pidI, pidD, pidF);
         pid.setSetPoint(targetRPM);
+    }
+
+    @Override
+    public void Init() {
+
     }
 
     @Override
