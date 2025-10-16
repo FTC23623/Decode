@@ -17,4 +17,9 @@ public final class Constants {
     public static final double nsToMs = 1.0e-6;
     public static final double intakeMotorMaxIn = -0.75;
     public static final double intakeMotorMaxOut = 1.0;
+    public static final double LauncherTopRPM = 3000;
+    public static final double LauncherMedRPM = 2600;
+    public static final double LauncherLowRPM = 2300;
+    public static final double LauncherIdleRPM = 500;
+    public static final double LaunchServoRun = 1;
 }

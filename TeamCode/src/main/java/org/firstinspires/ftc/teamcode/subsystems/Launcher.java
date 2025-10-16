@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.types.Constants.LaunchServoRun;
+import static org.firstinspires.ftc.teamcode.types.Constants.contServoOff;
 import static org.firstinspires.ftc.teamcode.types.Constants.linearLaunchMotTicksPerRev;
 import static org.firstinspires.ftc.teamcode.types.Constants.motorRpmIntervalMs;
 import static org.firstinspires.ftc.teamcode.types.Constants.nsToMs;
@@ -8,9 +10,13 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.LaunchMotor;
+import org.firstinspires.ftc.teamcode.types.Constants;
+
 import java.util.ArrayList;
 
 @Config
@@ -27,6 +33,8 @@ public class Launcher implements Subsystem {
     public static double targetRPMtune = 0;
     public static boolean noPid = false;
     public static double noPidPwr = 0;
+    private final Servo LaunchServoWheel;
+    private boolean RunLaunchServo = false;
 
     public Launcher(HydraOpMode Opmode, double targetRPM) {
         mOp = Opmode;
@@ -35,6 +43,7 @@ public class Launcher implements Subsystem {
         motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
         pid = new PIDFController(pidP, pidI, pidD, pidF);
         pid.setSetPoint(targetRPM);
+        LaunchServoWheel = mOp.mHardwareMap.get(Servo.class, "LaunchServoWheel");
     }
 
     @Override
@@ -69,12 +78,42 @@ public class Launcher implements Subsystem {
             motor.SetPower(power);
         }
         lastTime = timeNow;
+
+       if (RunLaunchServo){
+           LaunchServoWheel.setPosition(LaunchServoRun);
+       }
+       else{
+           LaunchServoWheel.setPosition(contServoOff);
+       }
+
         mOp.mTelemetry.addData("Pwr0", power);
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
     }
 
     @Override
     public void HandleUserInput() {
+        boolean D_pad_Up = mOp.mOperatorGamepad.dpad_up;
+        boolean D_pad_Left = mOp.mOperatorGamepad.dpad_left;
+        boolean D_pad_Right = mOp.mOperatorGamepad.dpad_right;
+        boolean D_pad_Down = mOp.mOperatorGamepad.dpad_down;
+        RunLaunchServo = mOp.mOperatorGamepad.right_bumper;
+        double R_stick = mOp.mOperatorGamepad.right_stick_x;
+        boolean Circle = mOp.mOperatorGamepad.circle;
+
+        if (D_pad_Up){
+            targetRPMtune = Constants.LauncherTopRPM;
+        }
+        else if (D_pad_Left){
+            targetRPMtune = Constants.LauncherMedRPM;
+        }
+        else if (D_pad_Right){
+            targetRPMtune = Constants.LauncherLowRPM;
+        }
+        else if (D_pad_Down){
+            targetRPMtune = Constants.LauncherIdleRPM;
+        }
+        //if (R_bumper){
+
 
     }
 
