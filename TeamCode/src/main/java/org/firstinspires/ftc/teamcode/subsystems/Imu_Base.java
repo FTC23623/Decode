@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import org.firstinspires.ftc.teamcode.objects.Subsystem;
-
-public abstract class Imu_Base implements Imu, Subsystem {
+public abstract class Imu_Base implements Imu {
     protected double mOffset;
 
     public Imu_Base() {
@@ -10,8 +8,7 @@ public abstract class Imu_Base implements Imu, Subsystem {
     }
 
     @Override
-    public void Init() {
-    }
+    public abstract boolean Init();
 
     @Override
     public void Process() {

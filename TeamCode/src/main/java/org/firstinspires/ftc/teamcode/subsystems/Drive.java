@@ -100,8 +100,8 @@ public class Drive implements Subsystem {
     }
 
     @Override
-    public void Init() {
-
+    public boolean Init() {
+        return true;
     }
 
     @Override

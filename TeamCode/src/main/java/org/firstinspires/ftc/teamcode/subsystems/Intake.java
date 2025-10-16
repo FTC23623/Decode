@@ -72,8 +72,8 @@ public class Intake implements Subsystem {
     }
 
     @Override
-    public void Init() {
-
+    public boolean Init() {
+        return true;
     }
 
     /**

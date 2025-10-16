@@ -11,15 +11,21 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 public class LimelightVision implements Vision {
     private Limelight3A ll;
     private LLResult result;
+    private boolean isInit;
 
     public LimelightVision(HydraOpMode mOp) {
         ll = mOp.mHardwareMap.get(Limelight3A.class, "limelight");
+        isInit = false;
     }
 
     @Override
-    public void Init() {
-        ll.setPollRateHz(50);
-        ll.start();
+    public boolean Init() {
+        if (!isInit) {
+            isInit = true;
+            ll.setPollRateHz(50);
+            ll.start();
+        }
+        return true;
     }
 
     @Override

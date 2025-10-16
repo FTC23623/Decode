@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 
 public class Imu_Hub extends Imu_Base {
     protected IMU imu;
+    private boolean isInit;
 
     public Imu_Hub(HydraOpMode opMode) {
         // Initialization Routines
@@ -17,16 +18,27 @@ public class Imu_Hub extends Imu_Base {
         // the REV Robotics logo is facing and the direction that the USB ports are facing.
         super();
         imu = opMode.mHardwareMap.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
-                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT)));
-        imu.resetYaw();
+        isInit = false;
     }
 
+    @Override
+    public boolean Init() {
+        if (!isInit) {
+            isInit = true;
+            imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
+                    RevHubOrientationOnRobot.UsbFacingDirection.RIGHT)));
+            imu.resetYaw();
+        }
+        return true;
+    }
+
+    @Override
     public void ResetYaw() {
         imu.resetYaw();
         mOffset = 0;
     }
 
+    @Override
     public double GetYaw() {
         double ret = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         return ret + mOffset;

@@ -11,7 +11,6 @@ import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.LaunchMotor;
@@ -47,8 +46,8 @@ public class Launcher implements Subsystem {
     }
 
     @Override
-    public void Init() {
-
+    public boolean Init() {
+        return true;
     }
 
     @Override

@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.opMode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
@@ -19,18 +17,15 @@ import org.firstinspires.ftc.teamcode.types.AprilTagClass;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Config
 //@TeleOp(name = "HyDrive")
-public class HyDrive extends LinearOpMode {
-  private HydraOpMode mOpMode;
+public class HyDrive extends OpMode_Base {
   private Imu mImu;
   private Drive mDrive;
   private Intake mIntake;
   private Vision mVision;
   private ElapsedTime mLoopSleep;
-  private ArrayList<Subsystem> mSystems;
   protected final AprilTagClass tagClass = AprilTagClass.AprilTagClass_Unknown;
 
   /**
@@ -48,26 +43,16 @@ public class HyDrive extends LinearOpMode {
     mVision = new LimelightVision(mOpMode);
     mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
-    while (!mImu.Connected() || mImu.Calibrating()) {
-      if (isStopRequested() || !opModeIsActive()) {
-        break;
-      }
-    }
-    mImu.SetYawOffset(OpmodeHeading.GetOffset());
     mSystems.add(mDrive);
     mSystems.add(mIntake);
     mSystems.add(mVision);
+    mSystems.add(mImu);
+    // manual bulk caching
+    SetLynxHubsManual();
+    InitializeAllSystems();
+    mImu.SetYawOffset(OpmodeHeading.GetOffset());
     telemetry.addData("Auto Yaw", OpmodeHeading.GetOffset());
     telemetry.update();
-    // manual bulk caching
-    List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
-    for (LynxModule module : allHubs) {
-      module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-    }
-    // intialize all subsystems
-    for (Subsystem system : mSystems) {
-      system.Init();
-    }
     // set the vision up for targeting
     switch (tagClass) {
       case AprilTagClass_BlueGoal:
@@ -84,9 +69,7 @@ public class HyDrive extends LinearOpMode {
     waitForStart();
     mLoopSleep.reset();
     while (opModeIsActive()) {
-      for (LynxModule module : allHubs) {
-        module.clearBulkCache();
-      }
+      ClearLynxHubCaches();
       mOpMode.mLoopTime = mLoopSleep.milliseconds();
       // Pass user input to the systems
       for (Subsystem system : mSystems) {
