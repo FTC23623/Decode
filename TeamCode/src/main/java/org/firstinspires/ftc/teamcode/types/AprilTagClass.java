@@ -8,17 +8,11 @@ public enum AprilTagClass {
     AprilTagClass_Obelisk_PPG(23),
     AprilTagClass_RedGoal(24);
 
-    private int id;
+    private final int id;
 
     AprilTagClass(int id)
     {
-        this.id = 0;
-        for (AprilTagClass val : AprilTagClass.values()) {
-            if (val.id == id) {
-                this.id = id;
-                break;
-            }
-        }
+        this.id = id;
     }
 
     public int GetValue() {
@@ -27,7 +21,7 @@ public enum AprilTagClass {
 
     public static AprilTagClass FromInt(int id) {
         for (AprilTagClass val : AprilTagClass.values()) {
-            if (val.id == id) {
+            if (val.GetValue() == id) {
                 return val;
             }
         }

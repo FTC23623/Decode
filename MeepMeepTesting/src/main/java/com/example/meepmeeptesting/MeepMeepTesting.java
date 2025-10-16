@@ -48,6 +48,7 @@ public class MeepMeepTesting {
                     .setTangent(Math.toRadians(-90))
                     .splineToLinearHeading(LaunchFar, Math.toRadians(0))
                     .waitSeconds(1.5)
+                    .splineToLinearHeading(new Pose2d(30,10,0),Math.toRadians(180))
                     .build());
         } else {
             Pose2d LaunchNear=new Pose2d(-25, 24, Math.toRadians(-40));
@@ -70,6 +71,7 @@ public class MeepMeepTesting {
                     .setTangent(Math.toRadians(225))
                     .splineToLinearHeading(LaunchNear, Math.toRadians(180))
                     .waitSeconds(1.5)
+                    .splineToLinearHeading(new Pose2d(10,20,0),Math.toRadians(0))
                     .build());
         }
         meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_OFFICIAL)

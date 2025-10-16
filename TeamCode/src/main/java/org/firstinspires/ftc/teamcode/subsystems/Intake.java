@@ -100,7 +100,7 @@ public class Intake implements Subsystem {
                 // fallthrough
             case In:
                 // keep the servo running
-                mMotorPower = Constants.contServoForward;
+                mMotorPower = mRunInSpeed;
                 if (!mRunIn) {
                     mState = IntakeStates.Idle;
                 }
@@ -126,11 +126,11 @@ public class Intake implements Subsystem {
                 } else if (mRunOut) {
                     // score it!
                     mState = IntakeStates.Out;
-                    mMotorPower = Constants.contServoBackward;
+                    mMotorPower = mRunOutSpeed;
                 } else if (!HaveElement()) {
                     mState = IntakeStates.Idle;
                 } else {
-                    mMotorPower = Constants.contServoOff;
+                    mMotorPower = 0;
                 }
                 break;
             case Out:

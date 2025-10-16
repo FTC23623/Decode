@@ -43,6 +43,7 @@ public class HydrAuto2 extends HydrAuto {
                 .setTangent(Math.toRadians(225))
                 .splineToLinearHeading(LaunchNear, Math.toRadians(180))
                 .waitSeconds(1.5)
+                .splineToLinearHeading(new Pose2d(10,20,0),Math.toRadians(0))
                 .build();
 
         return new SequentialAction(driveToLaunch1);

@@ -29,7 +29,7 @@ public class LimelightVision implements Vision {
 
     @Override
     public VisionResult GetResult() {
-        if (result.isValid()) {
+        if (result != null && result.isValid()) {
             return new LimelightVisionResult(result);
         } else {
             return null;
