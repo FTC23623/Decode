@@ -13,8 +13,8 @@ public class LimelightVision implements Vision {
     private LLResult result;
     private boolean isInit;
 
-    public LimelightVision(HydraOpMode mOp) {
-        ll = mOp.mHardwareMap.get(Limelight3A.class, "limelight");
+    public LimelightVision(HydraOpMode opMode) {
+        ll = opMode.mHardwareMap.get(Limelight3A.class, "limelight");
         isInit = false;
     }
 

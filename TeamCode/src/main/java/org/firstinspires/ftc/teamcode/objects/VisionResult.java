@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.objects;
 
-import org.firstinspires.ftc.teamcode.types.AprilTagClass;
+import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 
 public interface VisionResult {
     public abstract double GetXOffset();
     public abstract double GetYOffset();
-    public abstract AprilTagClass GetTagClass();
+    public abstract DecodeAprilTag GetTagClass();
 }

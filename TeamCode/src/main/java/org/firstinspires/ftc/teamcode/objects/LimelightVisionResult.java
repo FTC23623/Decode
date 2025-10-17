@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.objects;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import org.firstinspires.ftc.teamcode.types.AprilTagClass;
+import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import java.util.List;
 
 public class LimelightVisionResult implements VisionResult {
@@ -23,11 +23,11 @@ public class LimelightVisionResult implements VisionResult {
     }
 
     @Override
-    public AprilTagClass GetTagClass() {
+    public DecodeAprilTag GetTagClass() {
         List<LLResultTypes.FiducialResult> fid = result.getFiducialResults();
         if (!fid.isEmpty()) {
-            return AprilTagClass.FromInt(fid.get(0).getFiducialId());
+            return DecodeAprilTag.TagFromId(fid.get(0).getFiducialId());
         }
-        return AprilTagClass.AprilTagClass_Unknown;
+        return DecodeAprilTag.DecodeTag_Unknown;
     }
 }

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.types.Constants;
@@ -142,6 +144,7 @@ public class Intake implements Subsystem {
         }
         // setting position on continuous rotation sets the power and direction
         mMotor.setPower(mMotorPower);
+        mOp.mTelemetry.addData("Intake Current", mMotor.getCurrent(CurrentUnit.MILLIAMPS));
         // get the distance from the distance sensor for telemetry
         //double distance = mSensor.getDistance(DistanceUnit.INCH);
         //mOp.mTelemetry.addData("Distance", distance);

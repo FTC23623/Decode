@@ -13,20 +13,24 @@ import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
-import org.firstinspires.ftc.teamcode.types.AprilTagClass;
+import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
 
 @Config
 //@TeleOp(name = "HyDrive")
-public class HyDrive extends OpMode_Base {
+public abstract class HyDrive extends OpMode_Base {
   private Imu mImu;
   private Drive mDrive;
   private Intake mIntake;
   private Vision mVision;
   private ElapsedTime mLoopSleep;
-  protected final AprilTagClass tagClass = AprilTagClass.AprilTagClass_Unknown;
+  protected DecodeAprilTag tagClass;
+
+  public HyDrive(DecodeAprilTag tagClass) {
+    this.tagClass = tagClass;
+  }
 
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
@@ -55,10 +59,10 @@ public class HyDrive extends OpMode_Base {
     telemetry.update();
     // set the vision up for targeting
     switch (tagClass) {
-      case AprilTagClass_BlueGoal:
+      case DecodeTag_BlueGoal:
         mVision.SetMode(VisionMode.VisionMode_BlueGoal);
         break;
-      case AprilTagClass_RedGoal:
+      case DecodeTag_RedGoal:
         mVision.SetMode(VisionMode.VisionMode_RedGoal);
         break;
       default:

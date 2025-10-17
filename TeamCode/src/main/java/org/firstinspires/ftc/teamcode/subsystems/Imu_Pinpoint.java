@@ -5,7 +5,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
-import org.firstinspires.ftc.teamcode.types.AprilTagClass;
+import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 
 public class Imu_Pinpoint extends Imu_Base {
     protected HydraOpMode mOpMode;
@@ -13,15 +13,15 @@ public class Imu_Pinpoint extends Imu_Base {
     protected final double mAllianceOffsetDeg;
     private boolean isInit;
 
-    public Imu_Pinpoint(HydraOpMode opMode, Pose2d initialPose, AprilTagClass target) {
+    public Imu_Pinpoint(HydraOpMode opMode, Pose2d initialPose, DecodeAprilTag target) {
         super();
         mOpMode = opMode;
         mPinpoint = new PinpointLocalizer(opMode.mHardwareMap, 0, initialPose);
         switch (target) {
-            case AprilTagClass_RedGoal:
+            case DecodeTag_RedGoal:
                 mAllianceOffsetDeg = 90;
                 break;
-            case AprilTagClass_BlueGoal:
+            case DecodeTag_BlueGoal:
                 mAllianceOffsetDeg = -90;
                 break;
             default:

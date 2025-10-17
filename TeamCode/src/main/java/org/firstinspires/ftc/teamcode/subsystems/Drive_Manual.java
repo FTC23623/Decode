@@ -49,6 +49,10 @@ public class Drive_Manual extends Drive {
         // use the left bumper to use vision for targeting
         mLeftBumper.In(mGamepad.left_bumper);
         VisionResult vision = mOp.mVision.GetResult();
+        if (vision != null) {
+            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
+            mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
+        }
         // if the target is visible, turn towards it
         if (mLeftBumper.Out() && Constants.fieldCentricDrive && vision != null) {
             rotate = -Math.sin(vision.GetXOffset() * Math.PI / 180) * 1.1;
