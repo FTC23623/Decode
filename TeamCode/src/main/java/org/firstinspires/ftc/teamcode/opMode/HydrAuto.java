@@ -72,6 +72,7 @@ public abstract class HydrAuto extends OpMode_Base {
                     case DecodeTag_Obelisk_GPP:
                     case DecodeTag_Obelisk_PGP:
                     case DecodeTag_Obelisk_PPG:
+                        mOpMode.mTelemetry.addData("AprilTag", tag);
                         if (tag != mMotif) {
                             mAutoSeq = CreateAuto();
                             mMotif = tag;
@@ -81,6 +82,7 @@ public abstract class HydrAuto extends OpMode_Base {
                         break;
                 }
             }
+            telemetry.update();
             idle();
         }
         mTimeSinceStart.reset();
