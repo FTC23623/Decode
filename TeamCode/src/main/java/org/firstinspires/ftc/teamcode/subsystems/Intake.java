@@ -31,8 +31,8 @@ public class Intake implements Subsystem {
         mTimeSinceHaveElement = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         mRunIn = false;
         mRunOut = false;
-        mRunOutSpeed = 0;
-        mRunInSpeed = 0;
+        mRunOutSpeed = Constants.intakeMotorMaxOut;
+        mRunInSpeed = Constants.intakeMotorMaxIn;
     }
 
     /**

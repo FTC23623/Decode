@@ -15,7 +15,7 @@ public final class Constants {
     public static final double motorRpmIntervalMs = 50;
     public static final double linearLaunchMotTicksPerRev = 28;
     public static final double nsToMs = 1.0e-6;
-    public static final double intakeMotorMaxIn = -0.75;
+    public static final double intakeMotorMaxIn = -0.85;
     public static final double intakeMotorMaxOut = 1.0;
     public static final double LauncherTopRPM = 3000;
     public static final double LauncherMedRPM = 2600;
