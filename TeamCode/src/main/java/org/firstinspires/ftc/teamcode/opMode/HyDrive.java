@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
-import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
@@ -26,10 +25,9 @@ public abstract class HyDrive extends OpMode_Base {
   private Intake mIntake;
   private Vision mVision;
   private ElapsedTime mLoopSleep;
-  protected DecodeAprilTag tagClass;
 
-  public HyDrive(DecodeAprilTag tagClass) {
-    this.tagClass = tagClass;
+  public HyDrive(VisionMode target) {
+    super(target);
   }
 
   /**
@@ -58,17 +56,7 @@ public abstract class HyDrive extends OpMode_Base {
     telemetry.addData("Auto Yaw", OpmodeHeading.GetOffset());
     telemetry.update();
     // set the vision up for targeting
-    switch (tagClass) {
-      case DecodeTag_BlueGoal:
-        mVision.SetMode(VisionMode.VisionMode_BlueGoal);
-        break;
-      case DecodeTag_RedGoal:
-        mVision.SetMode(VisionMode.VisionMode_RedGoal);
-        break;
-      default:
-        mVision.SetMode(VisionMode.VisionMode_Disabled);
-        break;
-    }
+    mVision.SetMode(mVisionTarget);
     // wait for the operator to start the opmode
     waitForStart();
     mLoopSleep.reset();
