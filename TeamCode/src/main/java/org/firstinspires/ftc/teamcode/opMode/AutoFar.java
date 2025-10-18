@@ -23,7 +23,7 @@ public abstract class AutoFar extends HydrAuto {
         Pose2d PGP = FlipPose(16, 54, 90);
         Pose2d PPG_WP = FlipPose(-7, 30,90);
         Pose2d PPG = FlipPose(-7, 54, 90);
-        Pose2d End = FlipPose(30,10,0);
+        Pose2d End = FlipPose(30,15,0);
 
         Action driveToLaunch1 = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
@@ -50,6 +50,7 @@ public abstract class AutoFar extends HydrAuto {
                 .setTangent(FlipTangent(-90))
                 .splineToLinearHeading(Launch, FlipTangent(0))
                 .waitSeconds(1.5)
+                .setTangent(FlipTangent(180))
                 .splineToLinearHeading(End, FlipTangent(180))
                 .build();
 
