@@ -39,9 +39,10 @@ public class Launcher implements Subsystem {
         mOp = Opmode;
         motors = new ArrayList<>(2);
         motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
-        motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
+        //motors.add(new LaunchMotor("right", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "right"), DcMotorSimple.Direction.REVERSE, linearLaunchMotTicksPerRev, samplesToAverage));
         pid = new PIDFController(pidP, pidI, pidD, pidF);
         pid.setSetPoint(targetRPM);
+        targetRPMtune = targetRPM;
         LaunchServoWheel = mOp.mHardwareMap.get(Servo.class, "LaunchServoWheel");
     }
 
@@ -61,7 +62,7 @@ public class Launcher implements Subsystem {
         Tune();
         // get rpm of each motor
         double rpm0 = motors.get(0).GetRPM();
-        motors.get(1).GetRPM();
+        // motors.get(1).GetRPM();
         // PID for each motor. Never reverse the motor
         double power;
         if (noPid) {
@@ -87,6 +88,8 @@ public class Launcher implements Subsystem {
 
         mOp.mTelemetry.addData("Pwr0", power);
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
+        mOp.mTelemetry.addData("launchLoad", RunLaunchServo);
+        mOp.mTelemetry.addData("launchLoadSet", LaunchServoRun);
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drive_Manual;
 import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
@@ -26,6 +27,7 @@ public abstract class HyDrive extends OpMode_Base {
   protected Intake mIntake;
   protected Vision mVision;
   protected Turret mTurret;
+  protected Launcher mLauncher;
   protected ElapsedTime mLoopSleep;
 
   public HyDrive(VisionMode target) {
@@ -46,6 +48,7 @@ public abstract class HyDrive extends OpMode_Base {
     mIntake = new Intake(mOpMode);
     mTurret = new Turret(mOpMode);
     mVision = new LimelightVision(mOpMode);
+    mLauncher = new Launcher(mOpMode, 0);
     mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
     mSystems.add(mDrive);
@@ -53,6 +56,7 @@ public abstract class HyDrive extends OpMode_Base {
     mSystems.add(mVision);
     mSystems.add(mImu);
     mSystems.add(mTurret);
+    mSystems.add(mLauncher);
     // manual bulk caching
     SetLynxHubsManual();
     InitializeAllSystems();

@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.types.IntakeStates;
 public class Intake implements Subsystem {
     private final HydraOpMode mOp;
     private final DcMotorEx mMotor;
+    private final DcMotorEx mTransferMotor;
     private final ElapsedTime mTimeSinceHaveElement;
     //private final ColorRangeSensor mSensor;
     private IntakeStates mState;
@@ -24,7 +25,8 @@ public class Intake implements Subsystem {
 
     public Intake(HydraOpMode opmode) {
         mOp = opmode;
-        mMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakemMotor");
+        mMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
+        mTransferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
         //mSensor = mOp.mHardwareMap.get(ColorRangeSensor.class, "intakeColorSensor");
         mMotorPower = 0;
         mState = IntakeStates.Idle;
@@ -144,7 +146,9 @@ public class Intake implements Subsystem {
         }
         // setting position on continuous rotation sets the power and direction
         mMotor.setPower(mMotorPower);
+        mTransferMotor.setPower(mMotorPower);
         mOp.mTelemetry.addData("Intake Current", mMotor.getCurrent(CurrentUnit.MILLIAMPS));
+        mOp.mTelemetry.addData("Transfer Current", mTransferMotor.getCurrent(CurrentUnit.MILLIAMPS));
         // get the distance from the distance sensor for telemetry
         //double distance = mSensor.getDistance(DistanceUnit.INCH);
         //mOp.mTelemetry.addData("Distance", distance);
