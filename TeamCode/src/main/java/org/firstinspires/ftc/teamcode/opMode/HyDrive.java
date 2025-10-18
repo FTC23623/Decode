@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
@@ -20,11 +21,12 @@ import java.util.ArrayList;
 @Config
 //@TeleOp(name = "HyDrive")
 public abstract class HyDrive extends OpMode_Base {
-  private Imu mImu;
-  private Drive mDrive;
-  private Intake mIntake;
-  private Vision mVision;
-  private ElapsedTime mLoopSleep;
+  protected Imu mImu;
+  protected Drive mDrive;
+  protected Intake mIntake;
+  protected Vision mVision;
+  protected Turret mTurret;
+  protected ElapsedTime mLoopSleep;
 
   public HyDrive(VisionMode target) {
     super(target);
@@ -42,6 +44,7 @@ public abstract class HyDrive extends OpMode_Base {
     mImu = new Imu_Hub(mOpMode);
     mDrive = new Drive_Manual(mOpMode, mImu);
     mIntake = new Intake(mOpMode);
+    mTurret = new Turret(mOpMode);
     mVision = new LimelightVision(mOpMode);
     mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
@@ -49,6 +52,7 @@ public abstract class HyDrive extends OpMode_Base {
     mSystems.add(mIntake);
     mSystems.add(mVision);
     mSystems.add(mImu);
+    mSystems.add(mTurret);
     // manual bulk caching
     SetLynxHubsManual();
     InitializeAllSystems();

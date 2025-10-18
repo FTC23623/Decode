@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.objects.VisionResult;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
@@ -29,6 +30,7 @@ public abstract class HydrAuto extends OpMode_Base {
     protected Intake mIntake;
     protected Pose2d mBeginPose;
     protected Vision mVision;
+    protected Turret mTurret;
     protected ElapsedTime mTimeSinceStart;
     protected SequentialAction mAutoSeq;
     protected DecodeAprilTag mMotif;
@@ -47,9 +49,11 @@ public abstract class HydrAuto extends OpMode_Base {
         mIntake = new Intake(mOpMode);
         mDrive = new MecanumDrive(hardwareMap, mBeginPose);
         mSystems = new ArrayList<>();
+        mTurret = new Turret(mOpMode);
         mVision = new LimelightVision(mOpMode);
         mSystems.add(mIntake);
         mSystems.add(mVision);
+        mSystems.add(mTurret);
         mOpMode.mVision = mVision;
         mTimeSinceStart = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         mAutoSeq = CreateAuto();
@@ -68,6 +72,7 @@ public abstract class HydrAuto extends OpMode_Base {
                     case DecodeTag_Obelisk_GPP:
                     case DecodeTag_Obelisk_PGP:
                     case DecodeTag_Obelisk_PPG:
+                        mOpMode.mTelemetry.addData("AprilTag", tag);
                         if (tag != mMotif) {
                             mAutoSeq = CreateAuto();
                             mMotif = tag;
@@ -77,6 +82,7 @@ public abstract class HydrAuto extends OpMode_Base {
                         break;
                 }
             }
+            telemetry.update();
             idle();
         }
         mTimeSinceStart.reset();
