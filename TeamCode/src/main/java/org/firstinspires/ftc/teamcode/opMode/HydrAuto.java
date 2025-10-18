@@ -58,7 +58,7 @@ public abstract class HydrAuto extends OpMode_Base {
         InitializeRRPinpoint();
         mVision.SetMode(VisionMode_Obelisk);
         mMotif = DecodeAprilTag.DecodeTag_Unknown;
-        while (!isStarted() && opModeIsActive()) {
+        while (!isStarted() && !isStopRequested()) {
             ClearLynxHubCaches();
             mVision.Process();
             VisionResult result = mVision.GetResult();
@@ -104,13 +104,14 @@ public abstract class HydrAuto extends OpMode_Base {
     }
     
     protected void InitializeRRPinpoint() {
+        /*
         if (mDrive.localizer instanceof PinpointLocalizer) {
             PinpointLocalizer ppl = (PinpointLocalizer) mDrive.localizer;
             while (!Imu_Pinpoint.InitPinpoint(ppl, mOpMode.mTelemetry)) {
                 mOpMode.mTelemetry.update();
                 mOpMode.mTelemetry.addLine("Initializing pinpoint...");
             }
-        }
+        }*/
     }
 
     protected static double HeadingRad(double degrees) {
