@@ -86,11 +86,11 @@ public class MeepMeepTesting {
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, -20, flip);
         Pose2d GPP_WP = FlipPose(30, 30, 90, flip);
-        Pose2d GPP = FlipPose(40, 54, 0, flip);
+        Pose2d GPP = FlipPose(40, 54, 90, flip);
         Pose2d PGP_WP = FlipPose(8, 30, 90, flip);
         Pose2d PGP = FlipPose(16, 54, 90, flip);
         Pose2d PPG_WP = FlipPose(-15, 33,90, flip);
-        Pose2d PPG = FlipPose(-5, 54, 0, flip);
+        Pose2d PPG = FlipPose(-5, 54, 90, flip);
         Pose2d End = FlipPose(30,15,0, flip);
 
         Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
