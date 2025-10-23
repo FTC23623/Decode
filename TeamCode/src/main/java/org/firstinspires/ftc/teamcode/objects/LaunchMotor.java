@@ -52,11 +52,11 @@ public class LaunchMotor {
         double avgRpm = mAvgRpm.GetAverage();
         // telemetry and datalogging
         double current = motor.getCurrent(CurrentUnit.MILLIAMPS);
-        mOp.mTelemetry.addData(mName + " ticks", dif);
-        mOp.mTelemetry.addData(mName + " time", timeDifMs);
-        mOp.mTelemetry.addData(mName + " current", current);
-        mOp.mTelemetry.addData(mName + " RPM", rpm);
-        mOp.mTelemetry.addData(mName + " RPM Avg", avgRpm);
+        //mOp.mTelemetry.addData(mName + " ticks", dif);
+        //mOp.mTelemetry.addData(mName + " time", timeDifMs);
+        //mOp.mTelemetry.addData(mName + " current", current);
+        //mOp.mTelemetry.addData(mName + " RPM", rpm);
+        //mOp.mTelemetry.addData(mName + " RPM Avg", avgRpm);
         mLogger.rpm.set(rpm);
         mLogger.rpmAvg.set(avgRpm);
         mLogger.current.set(current);
@@ -68,5 +68,9 @@ public class LaunchMotor {
         motor.setPower(power);
         mLogger.power.set(power);
         mLogger.writeLine();
+    }
+
+    public double GetCurrent() {
+        return motor.getCurrent(CurrentUnit.MILLIAMPS);
     }
 }

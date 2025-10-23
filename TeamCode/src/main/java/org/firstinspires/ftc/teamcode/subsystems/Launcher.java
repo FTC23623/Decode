@@ -22,6 +22,8 @@ import java.util.ArrayList;
 public class Launcher implements Subsystem {
     private final HydraOpMode mOp;
     private final ArrayList<LaunchMotor> motors;
+    private final ArrayList<Double> lastRpmMeasure;
+    private final ArrayList<Double> lastPwrSetting;
     public static double pidP = 0.0016;
     public static double pidI = 0.0001;
     public static double pidD = 0.0;
@@ -44,6 +46,12 @@ public class Launcher implements Subsystem {
         pid.setSetPoint(targetRPM);
         targetRPMtune = targetRPM;
         LaunchServoWheel = mOp.mHardwareMap.get(Servo.class, "LaunchServoWheel");
+        lastRpmMeasure = new ArrayList<Double>(motors.size());
+        lastPwrSetting = new ArrayList<Double>(motors.size());
+        for (int i = 0; i < motors.size(); i++) {
+            lastRpmMeasure.add(0.0);
+            lastPwrSetting.add(0.0);
+        }
     }
 
     @Override
@@ -56,40 +64,42 @@ public class Launcher implements Subsystem {
         // calculate time since the last measurement
         long timeNow = System.nanoTime();
         double timeDifMs = (timeNow - lastTime) * nsToMs;
-        if (timeDifMs < motorRpmIntervalMs) {
-            return;
+        if (timeDifMs >= motorRpmIntervalMs) {
+            Tune();
+            // get rpm of each motor
+            double rpm0 = motors.get(0).GetRPM();
+            // motors.get(1).GetRPM();
+            // PID for each motor. Never reverse the motor
+            double power;
+            if (noPid) {
+                // apply power directly for testing
+                power = noPidPwr;
+            } else {
+                // apply power from PID
+                power = Math.max(0, pid.calculate(rpm0));
+            }
+            // set power to each motor
+            for (LaunchMotor motor : motors) {
+                motor.SetPower(power);
+                lastRpmMeasure.set(motors.indexOf(motor), rpm0);
+                lastPwrSetting.set(motors.indexOf(motor), power);
+            }
+            lastTime = timeNow;
         }
-        Tune();
-        // get rpm of each motor
-        double rpm0 = motors.get(0).GetRPM();
-        // motors.get(1).GetRPM();
-        // PID for each motor. Never reverse the motor
-        double power;
-        if (noPid) {
-            // apply power directly for testing
-            power = noPidPwr;
 
-        } else {
-            // apply power from PID
-            power = Math.max(0, pid.calculate(rpm0));
+        if (RunLaunchServo){
+            LaunchServoWheel.setPosition(LaunchServoRun);
         }
-        // set power to each motor
-        for (LaunchMotor motor : motors) {
-            motor.SetPower(power);
+        else{
+            LaunchServoWheel.setPosition(contServoOff);
         }
-        lastTime = timeNow;
 
-       if (RunLaunchServo){
-           LaunchServoWheel.setPosition(LaunchServoRun);
-       }
-       else{
-           LaunchServoWheel.setPosition(contServoOff);
-       }
-
-        mOp.mTelemetry.addData("Pwr0", power);
+        mOp.mTelemetry.addData("LaunchPwr", lastPwrSetting.get(0));
+        mOp.mTelemetry.addData("LaunchRPM", lastRpmMeasure.get(0));
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
         mOp.mTelemetry.addData("launchLoad", RunLaunchServo);
         mOp.mTelemetry.addData("launchLoadSet", LaunchServoRun);
+        mOp.mTelemetry.addData("launchCurrent", motors.get(0).GetCurrent());
     }
 
     @Override
