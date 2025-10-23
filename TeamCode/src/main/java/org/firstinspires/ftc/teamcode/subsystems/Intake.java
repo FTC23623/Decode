@@ -146,7 +146,7 @@ public class Intake implements Subsystem {
         }
         // setting position on continuous rotation sets the power and direction
         mMotor.setPower(mMotorPower);
-        mTransferMotor.setPower(mMotorPower);
+        mTransferMotor.setPower(-mMotorPower);
         mOp.mTelemetry.addData("Intake Current", mMotor.getCurrent(CurrentUnit.MILLIAMPS));
         mOp.mTelemetry.addData("Transfer Current", mTransferMotor.getCurrent(CurrentUnit.MILLIAMPS));
         // get the distance from the distance sensor for telemetry
