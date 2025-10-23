@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.objects.Subsystem;
 @Config
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
-    public static double mPosChangeRate = 0;
-    public static double mMaxPos = 0;
+    public static double mPosChangeRate = 0.15;
+    public static double mMaxPos = 1;
     public static double mMinPos = 0;
     private double UserInput = 0;
     private Servo TurretServo;
@@ -17,7 +17,7 @@ public class Turret implements Subsystem {
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
-        // TODO: get servo from hardware map
+        TurretServo.setPosition(0.5);
     }
 
     @Override
@@ -28,20 +28,20 @@ public class Turret implements Subsystem {
     @Override
     public void HandleUserInput() {
         UserInput = mOp.mOperatorGamepad.right_stick_x;
-        // TODO: capture operator control inputs and store for use in process
     }
 
     @Override
     public void Process() {
-        // TODO: process user input and set the servo position
-        // TODO: scale mPosChangeRate with control input value
-        double position_change = UserInput*mPosChangeRate;
-        // TODO: set position on servo based on scaled input
+        // scale user input with a constant rate
+        double position_change = UserInput * mPosChangeRate;
+        // get the last set position and calculate the new position
         double CurrentPos = TurretServo.getPosition();
         double NewPos = CurrentPos + position_change;
-        // TODO: clamp position to min and max values
+        // clamp the new position to the min and max
         NewPos = Math.min(mMaxPos, NewPos);
         NewPos = Math.max(mMinPos, NewPos);
+        // set the new position
         TurretServo.setPosition(NewPos);
+        mOp.mTelemetry.addData("Turret Position", NewPos);
     }
 }
