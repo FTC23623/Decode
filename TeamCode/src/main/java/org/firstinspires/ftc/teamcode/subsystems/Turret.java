@@ -2,9 +2,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
+import org.firstinspires.ftc.teamcode.objects.VisionResult;
+
 @Config
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
@@ -13,11 +16,15 @@ public class Turret implements Subsystem {
     public static double mMinPos = 0;
     private double UserInput = 0;
     private Servo TurretServo;
+    private final double TurretGearRatio = 6.3;
+    private final ElapsedTime servoWait;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
         TurretServo.setPosition(0.5);
+        servoWait = new ElapsedTime();
+        servoWait.reset();
     }
 
     @Override
@@ -41,6 +48,17 @@ public class Turret implements Subsystem {
         NewPos = Math.min(mMaxPos, NewPos);
         NewPos = Math.max(mMinPos, NewPos);
         // set the new position
+
+
+        VisionResult vision = mOp.mVision.GetResult();
+        if (vision != null && servoWait.milliseconds() > 1000) {
+            servoWait.reset();
+            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
+            mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
+            double rotate = vision.GetXOffset();
+            NewPos = CurrentPos + rotate * TurretGearRatio/355;
+
+        }
         TurretServo.setPosition(NewPos);
         mOp.mTelemetry.addData("Turret Position", NewPos);
     }
