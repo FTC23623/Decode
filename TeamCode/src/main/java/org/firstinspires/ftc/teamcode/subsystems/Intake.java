@@ -1,43 +1,31 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.types.Constants.TransferFromIntakePower;
-import static org.firstinspires.ftc.teamcode.types.Constants.TransferToIntakePower;
-import static org.firstinspires.ftc.teamcode.types.Constants.TransfertoLaunchPower;
-
+import androidx.annotation.NonNull;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.types.Constants;
-import org.firstinspires.ftc.teamcode.types.IntakeStates;
+import org.firstinspires.ftc.teamcode.types.IntakeActions;
 
 public class Intake implements Subsystem {
     private final HydraOpMode mOp;
     private final DcMotorEx mMotor;
     private final DcMotorEx mTransferMotor;
-    private final ElapsedTime mTimeSinceHaveElement;
-    //private final ColorRangeSensor mSensor;
-    private IntakeStates mState;
-    private double mMotorPower;
     private boolean mRunIn;
     private boolean mRunOut;
     private double mRunOutSpeed;
     private double mRunInSpeed;
-    private final double mElementDetectionDistance = 0.7;
     private boolean launching = false;
 
     public Intake(HydraOpMode opmode) {
         mOp = opmode;
         mMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
         mTransferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
-       mTransferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        //mSensor = mOp.mHardwareMap.get(ColorRangeSensor.class, "intakeColorSensor");
-        mMotorPower = 0;
-        mState = IntakeStates.Idle;
-        mTimeSinceHaveElement = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        mTransferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         mRunIn = false;
         mRunOut = false;
         mRunOutSpeed = Constants.intakeMotorMaxOut;
@@ -56,7 +44,6 @@ public class Intake implements Subsystem {
         mRunOut = left > Constants.trgBtnThresh;
         mRunOutSpeed = Constants.intakeMotorMaxOut * left;
         launching = mOp.mOperatorGamepad.right_bumper;
-
     }
 
     /**
@@ -81,7 +68,6 @@ public class Intake implements Subsystem {
     public void Stop() {
         mRunIn = false;
         mRunOut = false;
-        mState = IntakeStates.Idle;
     }
 
     @Override
@@ -94,98 +80,67 @@ public class Intake implements Subsystem {
      */
     @Override
     public void Process() {
-        // use this to exit directly to out regardless of the state
-        if (mRunOut && !mRunIn) {
-            mState = IntakeStates.Out;
+        // run the intake
+        if (mRunIn) {
+            mMotor.setPower(mRunInSpeed);
+        } else if (mRunOut) {
+            mMotor.setPower(mRunOutSpeed);
+        } else {
+            mMotor.setPower(0);
         }
-        switch (mState) {
-            case Idle:
-                // if we want to run in, start the servo and change state
-                // otherwise keep the servo off
-                if (mRunIn) {
-                    mState = IntakeStates.In;
-                } else if (mRunOut){
-                    mState = IntakeStates.Out;
-                } else {
-                    mMotorPower = 0;
-                    break;
-                }
-                // fallthrough
-            case In:
-                // keep the servo running
-                mMotorPower = mRunInSpeed;
-                if (!mRunIn) {
-                    mState = IntakeStates.Idle;
-                }
-                if (HaveElement()) {
-                    // we have detected an element in the intake
-                    // transition to the detected state and start our timer
-                    mState = IntakeStates.InDetected;
-                    mTimeSinceHaveElement.reset();
-                }
-                break;
-            case InDetected:
-                // keep running for a bit to make sure the element is fully grasped
-                if (mTimeSinceHaveElement.milliseconds() > 500) {
-                    // time has elapsed, go to hold
-                    mState = IntakeStates.Hold;
-                    mRunIn = false;
-                }
-                break;
-            case Hold:
-                // keep the servo off until it's time to release it
-                if (mRunIn) {
-                    mState = IntakeStates.In;
-                } else if (mRunOut) {
-                    // score it!
-                    mState = IntakeStates.Out;
-                    mMotorPower = mRunOutSpeed;
-                } else if (!HaveElement()) {
-                    mState = IntakeStates.Idle;
-                } else {
-                    mMotorPower = 0;
-                }
-                break;
-            case Out:
-                mMotorPower = mRunOutSpeed;
-                if (!mRunOut) {
-                    mState = IntakeStates.Idle;
-                }
-                break;
-        }
-        // setting position on continuous rotation sets the power and direction
-        mMotor.setPower(mMotorPower);
+        // run the transfer
         if(launching){
-            mTransferMotor.setPower(TransfertoLaunchPower);
+            mTransferMotor.setPower(Constants.TransfertoLaunchPower);
         }
         else if(mRunIn){
-            mTransferMotor.setPower(TransferFromIntakePower);
+            mTransferMotor.setPower(Constants.TransferFromIntakePower);
         }
        else if(mRunOut) {
-            mTransferMotor.setPower(TransferToIntakePower);
+            mTransferMotor.setPower(Constants.TransferToIntakePower);
         }
        else{
             mTransferMotor.setPower(0);
         }
         mOp.mTelemetry.addData("Intake Current", mMotor.getCurrent(CurrentUnit.MILLIAMPS));
         mOp.mTelemetry.addData("Transfer Current", mTransferMotor.getCurrent(CurrentUnit.MILLIAMPS));
-        // get the distance from the distance sensor for telemetry
-        //double distance = mSensor.getDistance(DistanceUnit.INCH);
-        //mOp.mTelemetry.addData("Distance", distance);
-        // get the color from the distance sensor for telemetry
-        //NormalizedRGBA color = mSensor.getNormalizedColors();
-        //mOp.mTelemetry.addData("Red", color.red);
-        //mOp.mTelemetry.addData("Green", color.green);
-        //mOp.mTelemetry.addData("Blue", color.blue);
     }
 
-    /**
-     * Returns whether we have an element in the intake
-     * @return true if an element is detected
+    /*
+     * ROAD RUNNER API
      */
-    public boolean HaveElement() {
-        //double distance = mSensor.getDistance(DistanceUnit.INCH);
-        //return distance < mElementDetectionDistance;
-        return false;
+    /**
+     * Get a new action object for Road Runner to run
+     * @param action: the action to run in this instance
+     * @return the action object for RR to use
+     */
+    public Action GetAction(IntakeActions action) {
+        return new RunAction(action);
+    }
+    /**
+     * Runs the supplied action until completion
+     */
+    public class RunAction implements Action {
+        // action this instance will run
+        private boolean started = false;
+        // run has been called once
+        private final IntakeActions mAction;
+
+        // construct on the supplied action
+        public RunAction(IntakeActions action) {
+            mAction = action;
+        }
+
+        /**
+         * Runs the desired action until completion
+         * @param packet: ??
+         * @return true while the action is running
+         */
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            switch (mAction) {
+                default:
+                    return false;
+            }
+        }
     }
 }

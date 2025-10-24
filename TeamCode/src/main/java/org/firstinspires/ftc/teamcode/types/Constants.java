@@ -25,5 +25,8 @@ public final class Constants {
     public static final double TransfertoLaunchPower = 0.75;
     public static final double TransferFromIntakePower = 0.75;
     public static final double TransferToIntakePower = -0.75;
+    public static final double TurretGearRatio = 6.3;
+    public static final double TurretRange = 355;
+    public static final double TurretVisionUpdate = 500;
 
 }

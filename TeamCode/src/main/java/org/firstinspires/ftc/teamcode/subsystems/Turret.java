@@ -1,22 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.acmerobotics.dashboard.config.Config;
+import androidx.annotation.NonNull;
+import org.firstinspires.ftc.teamcode.types.Constants;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
+import org.firstinspires.ftc.teamcode.types.TurretActions;
 
-@Config
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
-    public static double mPosChangeRate = 0.15;
-    public static double mMaxPos = 1;
-    public static double mMinPos = 0;
+    private final double mPosChangeRate = 0.15;
+    private final double mMaxPos = 1;
+    private final double mMinPos = 0;
     private double UserInput = 0;
     private Servo TurretServo;
-    private final double TurretGearRatio = 6.3;
     private final ElapsedTime servoWait;
 
     public Turret(HydraOpMode opMode) {
@@ -39,27 +40,72 @@ public class Turret implements Subsystem {
 
     @Override
     public void Process() {
-        // scale user input with a constant rate
-        double position_change = UserInput * mPosChangeRate;
-        // get the last set position and calculate the new position
-        double CurrentPos = TurretServo.getPosition();
-        double NewPos = CurrentPos + position_change;
-        // clamp the new position to the min and max
-        NewPos = Math.min(mMaxPos, NewPos);
-        NewPos = Math.max(mMinPos, NewPos);
-        // set the new position
-
-
         VisionResult vision = mOp.mVision.GetResult();
-        if (vision != null && servoWait.milliseconds() > 1000) {
-            servoWait.reset();
+        double CurrentPos = TurretServo.getPosition();
+        double NewPos = CurrentPos;
+        if (vision != null) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
-            double rotate = vision.GetXOffset();
-            NewPos = CurrentPos + rotate * TurretGearRatio/355;
-
+            if (servoWait.milliseconds() > Constants.TurretVisionUpdate) {
+                servoWait.reset();
+                double rotate = vision.GetXOffset();
+                NewPos = CurrentPos + rotate * Constants.TurretGearRatio / Constants.TurretRange;
+                // clamp the new position to the min and max
+                NewPos = Clamp(NewPos);
+                TurretServo.setPosition(NewPos);
+            }
+        } else {
+            // scale user input with a constant rate
+            double position_change = UserInput * mPosChangeRate;
+            // get the last set position and calculate the new position
+            NewPos = CurrentPos + position_change;
+            // clamp the new position to the min and max
+            NewPos = Clamp(NewPos);
+            TurretServo.setPosition(Clamp(NewPos));
         }
-        TurretServo.setPosition(NewPos);
         mOp.mTelemetry.addData("Turret Position", NewPos);
+    }
+
+    private double Clamp(double position) {
+        return Math.min(mMaxPos, Math.max(mMinPos, position));
+    }
+
+    /*
+     * ROAD RUNNER API
+     */
+    /**
+     * Get a new action object for Road Runner to run
+     * @param action: the action to run in this instance
+     * @return the action object for RR to use
+     */
+    public Action GetAction(TurretActions action) {
+        return new Turret.RunAction(action);
+    }
+    /**
+     * Runs the supplied action until completion
+     */
+    public class RunAction implements Action {
+        // action this instance will run
+        private boolean started = false;
+        // run has been called once
+        private final TurretActions mAction;
+
+        // construct on the supplied action
+        public RunAction(TurretActions action) {
+            mAction = action;
+        }
+
+        /**
+         * Runs the desired action until completion
+         * @param packet: ??
+         * @return true while the action is running
+         */
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            switch (mAction) {
+                default:
+                    return false;
+            }
+        }
     }
 }
