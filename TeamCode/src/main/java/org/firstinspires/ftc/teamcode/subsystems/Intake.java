@@ -1,6 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.types.Constants.TransferFromIntakePower;
+import static org.firstinspires.ftc.teamcode.types.Constants.TransferToIntakePower;
+import static org.firstinspires.ftc.teamcode.types.Constants.TransfertoLaunchPower;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -22,11 +27,13 @@ public class Intake implements Subsystem {
     private double mRunOutSpeed;
     private double mRunInSpeed;
     private final double mElementDetectionDistance = 0.7;
+    private boolean launching = false;
 
     public Intake(HydraOpMode opmode) {
         mOp = opmode;
         mMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
         mTransferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
+       mTransferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         //mSensor = mOp.mHardwareMap.get(ColorRangeSensor.class, "intakeColorSensor");
         mMotorPower = 0;
         mState = IntakeStates.Idle;
@@ -48,6 +55,8 @@ public class Intake implements Subsystem {
         mRunInSpeed = Constants.intakeMotorMaxIn * right;
         mRunOut = left > Constants.trgBtnThresh;
         mRunOutSpeed = Constants.intakeMotorMaxOut * left;
+        launching = mOp.mOperatorGamepad.right_bumper;
+
     }
 
     /**
@@ -146,7 +155,18 @@ public class Intake implements Subsystem {
         }
         // setting position on continuous rotation sets the power and direction
         mMotor.setPower(mMotorPower);
-        mTransferMotor.setPower(-mMotorPower);
+        if(launching){
+            mTransferMotor.setPower(TransfertoLaunchPower);
+        }
+        else if(mRunIn){
+            mTransferMotor.setPower(TransferFromIntakePower);
+        }
+       else if(mRunOut) {
+            mTransferMotor.setPower(TransferToIntakePower);
+        }
+       else{
+            mTransferMotor.setPower(0);
+        }
         mOp.mTelemetry.addData("Intake Current", mMotor.getCurrent(CurrentUnit.MILLIAMPS));
         mOp.mTelemetry.addData("Transfer Current", mTransferMotor.getCurrent(CurrentUnit.MILLIAMPS));
         // get the distance from the distance sensor for telemetry

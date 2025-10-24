@@ -22,4 +22,8 @@ public final class Constants {
     public static final double LauncherLowRPM = 2300;
     public static final double LauncherIdleRPM = 500;
     public static final double LaunchServoRun = 1;
+    public static final double TransfertoLaunchPower = 0.75;
+    public static final double TransferFromIntakePower = 0.75;
+    public static final double TransferToIntakePower = -0.75;
+
 }
