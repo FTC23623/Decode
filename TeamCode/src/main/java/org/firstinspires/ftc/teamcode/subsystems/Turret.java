@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
@@ -19,10 +20,12 @@ public class Turret implements Subsystem {
     private double UserInput = 0;
     private Servo TurretServo;
     private final ElapsedTime servoWait;
+    private final AnalogInput TurretServoFb;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
+        TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
         TurretServo.setPosition(0.5);
         servoWait = new ElapsedTime();
         servoWait.reset();
@@ -41,29 +44,30 @@ public class Turret implements Subsystem {
     @Override
     public void Process() {
         VisionResult vision = mOp.mVision.GetResult();
-        double CurrentPos = TurretServo.getPosition();
-        double NewPos = CurrentPos;
         if (vision != null) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             if (servoWait.milliseconds() > Constants.TurretVisionUpdate) {
                 servoWait.reset();
+                double CurrentPos = TurretServoFb.getVoltage() / 3.3;
                 double rotate = vision.GetXOffset();
-                NewPos = CurrentPos + rotate * Constants.TurretGearRatio / Constants.TurretRange;
+                double NewPos = CurrentPos + rotate * Constants.TurretGearRatio / Constants.TurretRange;
                 // clamp the new position to the min and max
                 NewPos = Clamp(NewPos);
                 TurretServo.setPosition(NewPos);
+                mOp.mTelemetry.addData("TurretPosition", NewPos);
             }
         } else {
             // scale user input with a constant rate
             double position_change = UserInput * mPosChangeRate;
             // get the last set position and calculate the new position
-            NewPos = CurrentPos + position_change;
+            double CurrentPos = TurretServo.getPosition();
+            double NewPos = CurrentPos + position_change;
             // clamp the new position to the min and max
             NewPos = Clamp(NewPos);
             TurretServo.setPosition(Clamp(NewPos));
+            mOp.mTelemetry.addData("Turret Position", NewPos);
         }
-        mOp.mTelemetry.addData("Turret Position", NewPos);
     }
 
     private double Clamp(double position) {
