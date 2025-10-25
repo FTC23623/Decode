@@ -6,15 +6,23 @@ import static org.firstinspires.ftc.teamcode.types.Constants.linearLaunchMotTick
 import static org.firstinspires.ftc.teamcode.types.Constants.motorRpmIntervalMs;
 import static org.firstinspires.ftc.teamcode.types.Constants.nsToMs;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.LaunchMotor;
 import org.firstinspires.ftc.teamcode.types.Constants;
+import org.firstinspires.ftc.teamcode.types.IntakeActions;
+import org.firstinspires.ftc.teamcode.types.LauncherActions;
 
 import java.util.ArrayList;
 
@@ -133,6 +141,86 @@ public class Launcher implements Subsystem {
         pid.setPIDF(pidP, pidI, pidD, pidF);
         if (pid.getSetPoint() != targetRPMtune) {
             pid.setSetPoint(targetRPMtune);
+        }
+    }
+
+    private boolean AtSpeed() {
+        return Math.abs(lastRpmMeasure.get(0) - targetRPMtune) < 150;
+    }
+
+    /*
+     * ROAD RUNNER API
+     */
+    /**
+     * Get a new action object for Road Runner to run
+     * @param action: the action to run in this instance
+     * @return the action object for RR to use
+     */
+    public Action GetAction(LauncherActions action) {
+        return new Launcher.RunAction(action);
+    }
+    /**
+     * Runs the supplied action until completion
+     */
+    public class RunAction implements Action {
+        // action this instance will run
+        private boolean started = false;
+        // run has been called once
+        private final LauncherActions mAction;
+        private final ElapsedTime launchTimer;
+
+
+        // construct on the supplied action
+        public RunAction(LauncherActions action) {
+            mAction = action;
+            launchTimer = new ElapsedTime();
+        }
+
+        /**
+         * Runs the desired action until completion
+         * @param packet: ??
+         * @return true while the action is running
+         */
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!started) {
+                started = true;
+
+                switch (mAction) {
+                    case LauncherRunOff:
+                        targetRPMtune = Constants.LauncherIdleRPM;
+                        break;
+                    case LauncherRunSlow:
+                        targetRPMtune = Constants.LauncherLowRPM;
+                        break;
+                    case LauncherRunMid:
+                        targetRPMtune = Constants.LauncherMedRPM;
+                        break;
+                    case LauncherRunFast:
+                        targetRPMtune = Constants.LauncherTopRPMAuto;
+                        break;
+                    case LauncherLaunch:
+                        RunLaunchServo = true;
+                        launchTimer.reset();
+                        break;
+                    default:
+                        return false;
+
+                }
+            }
+            switch (mAction) {
+                case LauncherRunOff:
+                case LauncherRunSlow:
+                case LauncherRunMid:
+                case LauncherRunFast:
+                    return !AtSpeed();
+                case LauncherLaunch:
+                    boolean launching = launchTimer.milliseconds() < 2000;
+                    RunLaunchServo = launching;
+                    return launching;
+                default:
+                    return false;
+            }
         }
     }
 }
