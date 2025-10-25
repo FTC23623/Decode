@@ -17,11 +17,11 @@ public abstract class AutoFar extends HydrAuto {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, -20);
-        Pose2d GPP_WP = FlipPose(30, 30, 90);
+        Pose2d GPP_WP = FlipPose(34, 30, 90);
         Pose2d GPP = FlipPose(40, 54, 90);
-        Pose2d PGP_WP = FlipPose(8, 30, 90);
+        Pose2d PGP_WP = FlipPose(12, 30, 90);
         Pose2d PGP = FlipPose(16, 54, 90);
-        Pose2d PPG_WP = FlipPose(-15, 33,90);
+        Pose2d PPG_WP = FlipPose(-11, 33,90);
         Pose2d PPG = FlipPose(-5, 54, 90);
         Pose2d End = FlipPose(30,15,0);
 
