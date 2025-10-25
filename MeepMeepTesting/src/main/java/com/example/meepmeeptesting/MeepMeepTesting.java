@@ -84,7 +84,7 @@ public class MeepMeepTesting {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch = FlipPose(55, 15, -20, flip);
+        Pose2d Launch = FlipPose(55, 15, 0, flip);
         Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
         Pose2d GPP = FlipPose(43, 54, 90, flip);
         Pose2d PGP_WP = FlipPose(9, 30, 90, flip);
@@ -134,7 +134,7 @@ public class MeepMeepTesting {
         Pose2d PGP = FlipPose(22, 54, 90, flip);
         Pose2d PPG_WP = FlipPose(-4, 30, 90, flip);
         Pose2d PPG = FlipPose(-4, 54, 90, flip);
-        Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
+        Pose2d LaunchNear = FlipPose(-25, 24, -30, flip);
         Pose2d End = FlipPose(10, 20, 0, flip);
 
         Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
@@ -143,19 +143,19 @@ public class MeepMeepTesting {
                 .waitSeconds(1.5)
                 .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(PPG, FlipTangent(90, flip))
-                .setTangent(FlipTangent(225, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-90, flip))
+                .setTangent(FlipTangent(-120, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-120, flip))
                 .waitSeconds(1.5)
                 .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(PGP, FlipTangent(90, flip))
-                .setTangent(FlipTangent(225, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(225, flip))
+                .setTangent(FlipTangent(210, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(210, flip))
                 .waitSeconds(1.5)
-                .setTangent(FlipTangent(25, flip))
+                .setTangent(FlipTangent(-10, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(GPP, FlipTangent(90, flip))
-                .setTangent(FlipTangent(225, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(180, flip))
+                .setTangent(FlipTangent(210, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(210, flip))
                 .waitSeconds(1.5)
                 .splineToSplineHeading(End, FlipTangent(0, flip))
                 .build();
