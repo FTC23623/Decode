@@ -18,7 +18,7 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed"};
+        String[] autos = {"AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed" , "AutoNearFasterRed"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a button to run the selected auto
@@ -67,6 +67,9 @@ public class MeepMeepTesting {
                     case "AutoNearRed":
                         myBot.runAction(BuildAutoNear(myBot, false));
                         break;
+                    case "AutoNearFasterRed":
+                        myBot.runAction(BuildAutoNearFaster(myBot, false));
+                        break;
                 }
 
                 // Add the new bot to the simulation and start it
@@ -84,19 +87,17 @@ public class MeepMeepTesting {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch = FlipPose(55, 15, -20, flip);
-        Pose2d GPP_WP = FlipPose(30, 30, 90, flip);
-        Pose2d GPP = FlipPose(40, 54, 90, flip);
-        Pose2d PGP_WP = FlipPose(8, 30, 90, flip);
-        Pose2d PGP = FlipPose(16, 54, 90, flip);
-        Pose2d PPG_WP = FlipPose(-15, 33,90, flip);
-        Pose2d PPG = FlipPose(-5, 54, 90, flip);
+        Pose2d Launch = FlipPose(55, 15, 0, flip);
+        Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
+        Pose2d GPP = FlipPose(43, 54, 90, flip);
+        Pose2d PGP_WP = FlipPose(9, 30, 90, flip);
+        Pose2d PGP = FlipPose(19, 54, 90, flip);
+        Pose2d PPG_WP = FlipPose(-11, 33,90, flip);
+        Pose2d PPG = FlipPose(-2, 54, 90, flip);
         Pose2d End = FlipPose(30,15,0, flip);
 
         Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
-                .setTangent(FlipTangent(180, flip))
-                .splineToSplineHeading(Launch, FlipTangent(180, flip))
-                .waitSeconds(1.5)
+                .waitSeconds(2)
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
@@ -136,7 +137,7 @@ public class MeepMeepTesting {
         Pose2d PGP = FlipPose(22, 54, 90, flip);
         Pose2d PPG_WP = FlipPose(-4, 30, 90, flip);
         Pose2d PPG = FlipPose(-4, 54, 90, flip);
-        Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
+        Pose2d LaunchNear = FlipPose(-25, 24, -30, flip);
         Pose2d End = FlipPose(10, 20, 0, flip);
 
         Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
@@ -145,19 +146,58 @@ public class MeepMeepTesting {
                 .waitSeconds(1.5)
                 .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(PPG, FlipTangent(90, flip))
-                .setTangent(FlipTangent(225, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-90, flip))
+                .setTangent(FlipTangent(-120, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-120, flip))
                 .waitSeconds(1.5)
                 .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(PGP, FlipTangent(90, flip))
-                .setTangent(FlipTangent(225, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(225, flip))
+                .setTangent(FlipTangent(210, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(210, flip))
                 .waitSeconds(1.5)
-                .setTangent(FlipTangent(25, flip))
+                .setTangent(FlipTangent(-10, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(GPP, FlipTangent(90, flip))
-                .setTangent(FlipTangent(225, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(180, flip))
+                .setTangent(FlipTangent(210, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(210, flip))
+                .waitSeconds(1.5)
+                .splineToSplineHeading(End, FlipTangent(0, flip))
+                .build();
+        return new SequentialAction(driveToLaunch1);
+    }
+
+    private static SequentialAction BuildAutoNearFaster(RoadRunnerBotEntity myBot, boolean flip) {
+        Pose2d beginPose = FlipPose(-54, 52, 310, flip);
+
+        // All poses defined for autos on the red side
+        // FlipPose and FlipTangent auto adjust for blue
+        Pose2d GPP_WP = FlipPose(46, 30, 90, flip);
+        Pose2d GPP = FlipPose(46, 54, 90, flip);
+        Pose2d PGP_WP = FlipPose(22, 30, 90, flip);
+        Pose2d PGP = FlipPose(22, 54, 90, flip);
+        Pose2d PPG_WP = FlipPose(-4, 30, 90, flip);
+        Pose2d PPG = FlipPose(-4, 54, 90, flip);
+        Pose2d LaunchNear = FlipPose(-25, 24, -30, flip);
+        Pose2d End = FlipPose(10, 20, 0, flip);
+
+        Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
+                .setTangent(FlipTangent(315, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(315, flip))
+                .waitSeconds(1.5)
+                .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
+                .splineToSplineHeading(PPG, FlipTangent(90, flip))
+                .setTangent(FlipTangent(-120, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-120, flip))
+                .waitSeconds(1.5)
+                .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
+                .splineToSplineHeading(PGP, FlipTangent(90, flip))
+                .setTangent(FlipTangent(210, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(210, flip))
+                .waitSeconds(1.5)
+                .setTangent(FlipTangent(-10, flip))
+                .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
+                .splineToSplineHeading(GPP, FlipTangent(90, flip))
+                .setTangent(FlipTangent(210, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(210, flip))
                 .waitSeconds(1.5)
                 .splineToSplineHeading(End, FlipTangent(0, flip))
                 .build();

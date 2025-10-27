@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.opMode;
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.types.LauncherActions;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class AutoNear extends HydrAuto {
@@ -29,26 +33,49 @@ public abstract class AutoNear extends HydrAuto {
         Action driveToLaunch1 = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(315))
                 .splineToSplineHeading(LaunchNear, FlipTangent(315))
-                .waitSeconds(1.5)
+                .waitSeconds(.75)
+                .build();
+
+        Action driveToLaunch2 = mDrive.actionBuilder(LaunchNear)
                 .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .splineToSplineHeading(PPG, FlipTangent(90))
                 .setTangent(FlipTangent(225))
                 .splineToSplineHeading(LaunchNear, FlipTangent(-90))
-                .waitSeconds(1.5)
+                .waitSeconds(.75)
+                .build();
+
+        Action driveToLaunch3 = mDrive.actionBuilder(LaunchNear)
                 .splineToSplineHeading(PGP_WP, FlipTangent(90))
                 .splineToSplineHeading(PGP, FlipTangent(90))
                 .setTangent(FlipTangent(225))
                 .splineToSplineHeading(LaunchNear, FlipTangent(225))
-                .waitSeconds(1.5)
+                .waitSeconds(.75)
+                .build();
+
+        Action driveToLaunch4 = mDrive.actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(25))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90))
                 .splineToSplineHeading(GPP, FlipTangent(90))
                 .setTangent(FlipTangent(225))
                 .splineToSplineHeading(LaunchNear, FlipTangent(180))
-                .waitSeconds(1.5)
+                .waitSeconds(.75)
+                .build();
+
+        Action driveToEnd = mDrive.actionBuilder(LaunchNear)
                 .splineToSplineHeading(End, FlipTangent(0))
                 .build();
 
-        return new SequentialAction(driveToLaunch1);
+        return new SequentialAction(
+                new ParallelAction(
+                    mLauncher.GetAction(LauncherActions.LauncherRunSlow),
+                    driveToLaunch1),
+                mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                driveToLaunch2,
+                mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                driveToLaunch3,
+                mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                driveToLaunch4,
+                mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                driveToEnd);
     }
 }
