@@ -30,4 +30,9 @@ public class LimelightVisionResult implements VisionResult {
         }
         return DecodeAprilTag.DecodeTag_Unknown;
     }
+
+    @Override
+    public long GetTimestamp() {
+        return result.getControlHubTimeStamp();
+    }
 }

@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Vision;
 import org.firstinspires.ftc.teamcode.objects.LimelightVisionResult;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
+import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public class LimelightVision implements Vision {
@@ -22,7 +23,7 @@ public class LimelightVision implements Vision {
     public boolean Init() {
         if (!isInit) {
             isInit = true;
-            ll.setPollRateHz(50);
+            ll.setPollRateHz(Constants.LimelightPollRateHz);
             ll.start();
         }
         return true;

@@ -19,16 +19,15 @@ public class Turret implements Subsystem {
     private final double mMinPos = 0;
     private double UserInput = 0;
     private Servo TurretServo;
-    private final ElapsedTime servoWait;
     private final AnalogInput TurretServoFb;
+    private long lastVisionTimestamp;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
         TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
         TurretServo.setPosition(0.5);
-        servoWait = new ElapsedTime();
-        servoWait.reset();
+        lastVisionTimestamp = 0;
     }
 
     @Override
@@ -47,8 +46,10 @@ public class Turret implements Subsystem {
         if (vision != null) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
-            if (servoWait.milliseconds() > Constants.TurretVisionUpdate) {
-                servoWait.reset();
+            mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
+            CalcDistanceToTag(vision);
+            if (vision.GetTimestamp() != lastVisionTimestamp) {
+                lastVisionTimestamp = vision.GetTimestamp();
                 double CurrentPos = TurretServoFb.getVoltage() / 3.3;
                 double rotate = vision.GetXOffset();
                 double NewPos = CurrentPos + rotate * Constants.TurretGearRatio / Constants.TurretRange;
@@ -72,6 +73,16 @@ public class Turret implements Subsystem {
 
     private double Clamp(double position) {
         return Math.min(mMaxPos, Math.max(mMinPos, position));
+    }
+
+    private double CalcDistanceToTag(VisionResult vision) {
+        double targetOffsetAngle_Vertical = vision.GetYOffset();
+        double angleToGoalDegrees = Constants.limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+        double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
+        //calculate distance
+        double distanceFromLimelightToGoalInches = (Constants.goalHeightInches - Constants.limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+        mOp.mTelemetry.addData("GoalDistance", distanceFromLimelightToGoalInches);
+        return distanceFromLimelightToGoalInches;
     }
 
     /*
