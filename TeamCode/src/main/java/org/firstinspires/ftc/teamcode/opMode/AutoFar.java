@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 
+import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
@@ -19,19 +20,14 @@ public abstract class AutoFar extends HydrAuto {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch = FlipPose(55, 15, -20);
-        Pose2d GPP_WP = FlipPose(34, 30, 90);
-        Pose2d GPP = FlipPose(43, 54, 90);
-        Pose2d PGP_WP = FlipPose(9, 30, 90);
-        Pose2d PGP = FlipPose(19, 54, 90);
+        Pose2d Launch = FlipPose(55, 15, 0);
+        Pose2d GPP_WP = FlipPose(38, 30, 90);
+        Pose2d GPP = FlipPose(48, 54, 90);
+        Pose2d PGP_WP = FlipPose(13, 30, 90);
+        Pose2d PGP = FlipPose(23, 54, 90);
         Pose2d PPG_WP = FlipPose(-11, 33, 90);
-        Pose2d PPG = FlipPose(-2, 54, 90);
+        Pose2d PPG = FlipPose(-2, 52, 90);
         Pose2d End = FlipPose(30, 15, 0);
-
-        /*Action driveToLaunch1 = mDrive.actionBuilder(mBeginPose)
-                .setTangent(FlipTangent(180))
-                .splineToSplineHeading(Launch, FlipTangent(180))
-                .build();*/
 
         Action driveToLaunch2 = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
@@ -69,14 +65,28 @@ public abstract class AutoFar extends HydrAuto {
                 .build();
 
         return new SequentialAction(
+                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherRunFast),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 driveToLaunch2,
+
+                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 driveToLaunch3,
+
+                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 driveToLaunch4,
+
+                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mIntake.GetAction(IntakeActions.IntakeStop),
                 driveToEnd
                 );
     }

@@ -138,9 +138,31 @@ public class Intake implements Subsystem {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             switch (mAction) {
+                case IntakeLoadArtifacts:
+                    mRunIn = true;
+                    mRunOut = false;
+                    launching = false;
+                    break;
+                case IntakePushToLauncher:
+                    mRunIn = false;
+                    mRunOut = false;
+                    launching = true;
+                    break;
+                case IntakeReject:
+                    mRunIn = false;
+                    mRunOut = true;
+                    launching = false;
+                    break;
+                case IntakeStop:
+                    mRunIn = false;
+                    mRunOut = false;
+                    launching = false;
+                    break;
                 default:
-                    return false;
+                    break;
             }
+            Process();
+            return false;
         }
     }
 }

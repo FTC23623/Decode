@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
@@ -67,15 +68,23 @@ public abstract class AutoNear extends HydrAuto {
 
         return new SequentialAction(
                 new ParallelAction(
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunSlow),
                     driveToLaunch1),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 driveToLaunch2,
+                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 driveToLaunch3,
+                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 driveToLaunch4,
+                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mIntake.GetAction(IntakeActions.IntakeStop),
                 driveToEnd);
     }
 }

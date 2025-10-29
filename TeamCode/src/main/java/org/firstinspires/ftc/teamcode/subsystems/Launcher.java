@@ -132,9 +132,6 @@ public class Launcher implements Subsystem {
         else if (D_pad_Down){
             targetRPMtune = Constants.LauncherIdleRPM;
         }
-        //if (R_bumper){
-
-
     }
 
     public void Tune() {
@@ -145,7 +142,7 @@ public class Launcher implements Subsystem {
     }
 
     private boolean AtSpeed() {
-        return Math.abs(lastRpmMeasure.get(0) - targetRPMtune) < 150;
+        return Math.abs(lastRpmMeasure.get(0) - targetRPMtune) < Constants.LaunchWheelRpmDeadband;
     }
 
     /*
@@ -215,7 +212,7 @@ public class Launcher implements Subsystem {
                 case LauncherRunFast:
                     return !AtSpeed();
                 case LauncherLaunch:
-                    boolean launching = launchTimer.milliseconds() < 2000;
+                    boolean launching = launchTimer.milliseconds() < Constants.LauncherAutoLaunchTimeMs;
                     RunLaunchServo = launching;
                     return launching;
                 default:
