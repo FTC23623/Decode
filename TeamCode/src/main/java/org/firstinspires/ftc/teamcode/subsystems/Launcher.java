@@ -107,7 +107,6 @@ public class Launcher implements Subsystem {
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
         mOp.mTelemetry.addData("launchLoad", RunLaunchServo);
         mOp.mTelemetry.addData("launchLoadSet", LaunchServoRun);
-        mOp.mTelemetry.addData("launchCurrent", motors.get(0).GetCurrent());
     }
 
     @Override

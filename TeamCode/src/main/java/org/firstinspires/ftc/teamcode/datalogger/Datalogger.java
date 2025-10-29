@@ -144,6 +144,10 @@ public class Datalogger
         }
 
         public abstract void writeToBuffer(StringBuilder out);
+
+        public String GetName() {
+            return name;
+        }
     }
 
     public static class GenericField extends LoggableField

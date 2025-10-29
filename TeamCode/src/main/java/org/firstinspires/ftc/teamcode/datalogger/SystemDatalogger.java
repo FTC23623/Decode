@@ -24,9 +24,17 @@ public class SystemDatalogger extends HydraDatalogger
     // Note that order here is NOT important. The order is important in the setFields() call below
     public Datalogger.GenericField voltage = new Datalogger.GenericField("Voltage");
     public Datalogger.GenericField current = new Datalogger.GenericField("Current");
+    public Datalogger.GenericField driveLF = new Datalogger.GenericField("DriveLF");
+    public Datalogger.GenericField driveRF = new Datalogger.GenericField("DriveRF");
+    public Datalogger.GenericField driveLB = new Datalogger.GenericField("DriveLB");
+    public Datalogger.GenericField driveRB = new Datalogger.GenericField("DriveRB");
+    public Datalogger.GenericField launch = new Datalogger.GenericField("Launch");
+    public Datalogger.GenericField transfer = new Datalogger.GenericField("Transfer");
+    public Datalogger.GenericField intake = new Datalogger.GenericField("Intake");
+
 
     public SystemDatalogger(String name) {
         super(name);
-        Builder(voltage, current);
+        Builder(voltage, current, driveLF, driveRF, driveLB, driveRB, launch, transfer, intake);
     }
 }

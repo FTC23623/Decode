@@ -101,8 +101,6 @@ public class Intake implements Subsystem {
        else{
             mTransferMotor.setPower(0);
         }
-        mOp.mTelemetry.addData("Intake Current", mMotor.getCurrent(CurrentUnit.MILLIAMPS));
-        mOp.mTelemetry.addData("Transfer Current", mTransferMotor.getCurrent(CurrentUnit.MILLIAMPS));
     }
 
     /*
