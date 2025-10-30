@@ -29,13 +29,13 @@ public final class Constants {
     public static final double TurretGearRatio = 6.3;
     public static final double TurretRange = 355;
     // how many degrees back is your limelight rotated from perfectly vertical?
-    public static double limelightMountAngleDegrees = -1.34;
+    public static double limelightMountAngleDegrees = 22;
 
     // distance from the center of the Limelight lens to the floor
-    public static double limelightLensHeightInches = 4.5;
+    public static double limelightLensHeightInches = 9.5;
 
     // distance from the target to the floor
-    public static double goalHeightInches = 9.5;
+    public static double goalHeightInches = 38.5;
     public static int LimelightPollRateHz = 20;
     public static double TurretDeadbandDegrees = 1;
     public static double LaunchWheelRpmDeadband = 150;
