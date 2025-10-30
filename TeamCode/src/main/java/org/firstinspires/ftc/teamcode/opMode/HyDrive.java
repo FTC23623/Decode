@@ -47,20 +47,20 @@ public abstract class HyDrive extends OpMode_Base {
     mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     mImu = new Imu_Hub(mOpMode);
     mDrive = new Drive_Manual(mOpMode, mImu);
-    mIntake = new Intake(mOpMode);
-    mTurret = new Turret(mOpMode);
-    mVision = new LimelightVision(mOpMode);
-    mLauncher = new Launcher(mOpMode, 0);
-    mSysMon = new SystemMonitor(mOpMode);
-    mOpMode.mVision = mVision;
+    //mIntake = new Intake(mOpMode);
+    //mTurret = new Turret(mOpMode);
+    //mVision = new LimelightVision(mOpMode);
+    //mLauncher = new Launcher(mOpMode, 0);
+    //mSysMon = new SystemMonitor(mOpMode);
+    //mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
     mSystems.add(mDrive);
-    mSystems.add(mIntake);
-    mSystems.add(mVision);
+    //mSystems.add(mIntake);
+    //mSystems.add(mVision);
     mSystems.add(mImu);
-    mSystems.add(mTurret);
-    mSystems.add(mLauncher);
-    mSystems.add(mSysMon);
+    //mSystems.add(mTurret);
+    //mSystems.add(mLauncher);
+    //mSystems.add(mSysMon);
     // manual bulk caching
     SetLynxHubsManual();
     InitializeAllSystems();
@@ -68,7 +68,7 @@ public abstract class HyDrive extends OpMode_Base {
     telemetry.addData("Auto Yaw", OpmodeHeading.GetOffset());
     telemetry.update();
     // set the vision up for targeting
-    mVision.SetMode(mVisionTarget);
+   // mVision.SetMode(mVisionTarget);
     // wait for the operator to start the opmode
     waitForStart();
     mLoopSleep.reset();

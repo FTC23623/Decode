@@ -25,8 +25,8 @@ public class Imu_Hub extends Imu_Base {
     public boolean Init() {
         if (!isInit) {
             isInit = true;
-            imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
-                    RevHubOrientationOnRobot.UsbFacingDirection.RIGHT)));
+            imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, //Changed for Interference Bot
+                    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD)));
             imu.resetYaw();
         }
         return true;

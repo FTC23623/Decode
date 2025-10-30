@@ -44,23 +44,26 @@ public class Drive_Manual extends Drive {
             mOp.mTelemetry.addData("Yaw", yaw);
         }
         // Get driver controller input
-        //drive = mGamepad.left_stick_y;
-        drive = -mGamepad.left_stick_y; // Inverted for Logitech controllers
-        //strafe = -mGamepad.left_stick_x * 1.1;
-        strafe = mGamepad.left_stick_x * 1.1; // Inverted for Logitech controllers
+        drive = mGamepad.left_stick_y;
+        //drive = -mGamepad.left_stick_y; // Inverted for Logitech controllers
+        strafe = -mGamepad.left_stick_x * 1.1;
+        //strafe = mGamepad.left_stick_x * 1.1; // Inverted for Logitech controllers
         // use the left bumper to use vision for targeting
         mLeftBumper.In(mGamepad.left_bumper);
-        VisionResult vision = mOp.mVision.GetResult();
-        if (vision != null) {
-            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
-            mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
+        VisionResult vision = null;
+        if (mOp.mVision != null) {
+            vision = mOp.mVision.GetResult();
+            if (vision != null) {
+                mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
+                mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
+            }
         }
         // if the target is visible, turn towards it
         if (mLeftBumper.Out() && Constants.fieldCentricDrive && vision != null) {
             rotate = -Math.sin(vision.GetXOffset() * Math.PI / 180) * 1.1;
         } else {
-            //rotate = -mGamepad.right_stick_x;
-            rotate = mGamepad.right_stick_x; // Inverted for Logitech controllers
+            rotate = -mGamepad.right_stick_x;
+            //rotate = mGamepad.right_stick_x; // Inverted for Logitech controllers
         }
         rotX = strafe * Math.cos(-yaw / 180 * Math.PI) - drive * Math.sin(-yaw / 180 * Math.PI);
         rotY = strafe * Math.sin(-yaw / 180 * Math.PI) + drive * Math.cos(-yaw / 180 * Math.PI);
