@@ -24,10 +24,10 @@ public abstract class AutoNearFast extends HydrAuto {
         Pose2d GPP_WP = FlipPose(46, 30, 90);
         Pose2d GPP = FlipPose(36, 54, 90);
         Pose2d PGP_WP = FlipPose(22, 30, 90);
-        Pose2d PGP = FlipPose(12, 54, 90);
+        Pose2d PGP = FlipPose(12, 52, 90);
         Pose2d PPG_WP = FlipPose(-4, 30, 90);
         Pose2d PPG = FlipPose(-14, 52, 90);
-        Pose2d LaunchNear = FlipPose(-25, 24, -30);
+        Pose2d LaunchNear = FlipPose(-25, 24, -40);
         Pose2d End = FlipPose(-2, 52, 90);
 
         Action driveToLaunch1 = mDrive.actionBuilder(mBeginPose)
