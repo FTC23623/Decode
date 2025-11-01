@@ -116,20 +116,15 @@ public class Launcher implements Subsystem {
         boolean D_pad_Right = mOp.mOperatorGamepad.dpad_right;
         boolean D_pad_Down = mOp.mOperatorGamepad.dpad_down;
         RunLaunchServo = mOp.mOperatorGamepad.right_bumper;
-        double R_stick = mOp.mOperatorGamepad.right_stick_x;
-        boolean Circle = mOp.mOperatorGamepad.circle;
 
         if (D_pad_Up){
             targetRPMtune = Constants.LauncherTopRPM;
         }
-        else if (D_pad_Left){
+        else if (D_pad_Left || D_pad_Right) {
             targetRPMtune = Constants.LauncherMedRPM;
         }
-        else if (D_pad_Right){
-            targetRPMtune = Constants.LauncherLowRPM;
-        }
         else if (D_pad_Down){
-            targetRPMtune = Constants.LauncherIdleRPM;
+            targetRPMtune = Constants.LauncherLowRPM;
         }
     }
 

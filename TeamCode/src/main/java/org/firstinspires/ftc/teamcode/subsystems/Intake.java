@@ -5,7 +5,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.types.Constants;
@@ -13,23 +12,26 @@ import org.firstinspires.ftc.teamcode.types.IntakeActions;
 
 public class Intake implements Subsystem {
     private final HydraOpMode mOp;
-    private final DcMotorEx mMotor;
-    private final DcMotorEx mTransferMotor;
-    private boolean mRunIn;
-    private boolean mRunOut;
-    private double mRunOutSpeed;
-    private double mRunInSpeed;
-    private boolean launching = false;
+    private final DcMotorEx intakeMotor;
+    private final DcMotorEx transferMotor;
+    private boolean intakeIn;
+    private boolean intakeOut;
+    private double intakeOutSpeed;
+    private double intakeInSpeed;
+    private boolean transferForward;
+    private boolean transferReverse;
 
     public Intake(HydraOpMode opmode) {
         mOp = opmode;
-        mMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
-        mTransferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
-        mTransferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        mRunIn = false;
-        mRunOut = false;
-        mRunOutSpeed = Constants.intakeMotorMaxOut;
-        mRunInSpeed = Constants.intakeMotorMaxIn;
+        intakeMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
+        transferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
+        transferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeIn = false;
+        intakeOut = false;
+        intakeOutSpeed = Constants.intakeMotorMaxOut;
+        intakeInSpeed = Constants.intakeMotorMaxIn;
+        transferForward = false;
+        transferReverse = false;
     }
 
     /**
@@ -39,35 +41,36 @@ public class Intake implements Subsystem {
     public void HandleUserInput() {
         double right = mOp.mOperatorGamepad.right_trigger;
         double left = mOp.mOperatorGamepad.left_trigger;
-        mRunIn = right > Constants.trgBtnThresh;
-        mRunInSpeed = Constants.intakeMotorMaxIn * right;
-        mRunOut = left > Constants.trgBtnThresh;
-        mRunOutSpeed = Constants.intakeMotorMaxOut * left;
-        launching = mOp.mOperatorGamepad.right_bumper;
+        intakeIn = right > Constants.trgBtnThresh;
+        intakeInSpeed = Constants.intakeMotorMaxIn * right;
+        intakeOut = left > Constants.trgBtnThresh;
+        intakeOutSpeed = Constants.intakeMotorMaxOut * left;
+        transferForward = mOp.mOperatorGamepad.right_bumper;
+        transferReverse = mOp.mOperatorGamepad.left_bumper;
     }
 
     /**
      * Start running the intake in
      */
     public void RunIn() {
-        mRunIn = true;
-        mRunOut = false;
+        intakeIn = true;
+        intakeOut = false;
     }
 
     /**
      * Start running the intake out
      */
     public void RunOut() {
-        mRunIn = false;
-        mRunOut = true;
+        intakeIn = false;
+        intakeOut = true;
     }
 
     /**
      * Stop running the intake
      */
     public void Stop() {
-        mRunIn = false;
-        mRunOut = false;
+        intakeIn = false;
+        intakeOut = false;
     }
 
     @Override
@@ -81,25 +84,22 @@ public class Intake implements Subsystem {
     @Override
     public void Process() {
         // run the intake
-        if (mRunIn) {
-            mMotor.setPower(mRunInSpeed);
-        } else if (mRunOut) {
-            mMotor.setPower(mRunOutSpeed);
+        if (intakeIn) {
+            intakeMotor.setPower(intakeInSpeed);
+        } else if (intakeOut) {
+            intakeMotor.setPower(intakeOutSpeed);
         } else {
-            mMotor.setPower(0);
+            intakeMotor.setPower(0);
         }
         // run the transfer
-        if(launching){
-            mTransferMotor.setPower(Constants.TransfertoLaunchPower);
-        }
-        else if(mRunIn){
-            mTransferMotor.setPower(Constants.TransferFromIntakePower);
-        }
-       else if(mRunOut) {
-            mTransferMotor.setPower(Constants.TransferToIntakePower);
-        }
-       else{
-            mTransferMotor.setPower(0);
+        if (transferForward) {
+            transferMotor.setPower(Constants.TransfertoLaunchPower);
+        } else if (intakeIn) {
+            transferMotor.setPower(Constants.TransferFromIntakePower);
+        } else if (transferReverse) {
+            transferMotor.setPower(Constants.TransferToIntakePower);
+        } else {
+            transferMotor.setPower(0);
         }
     }
 
@@ -135,27 +135,22 @@ public class Intake implements Subsystem {
          */
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intakeIn = false;
+            intakeOut = false;
+            transferForward = false;
+            transferReverse = false;
             switch (mAction) {
                 case IntakeLoadArtifacts:
-                    mRunIn = true;
-                    mRunOut = false;
-                    launching = false;
+                    intakeIn = true;
+                    transferForward = true;
                     break;
                 case IntakePushToLauncher:
-                    mRunIn = false;
-                    mRunOut = false;
-                    launching = true;
+                    transferForward = true;
                     break;
                 case IntakeReject:
-                    mRunIn = false;
-                    mRunOut = true;
-                    launching = false;
+                    intakeOut = true;
                     break;
                 case IntakeStop:
-                    mRunIn = false;
-                    mRunOut = false;
-                    launching = false;
-                    break;
                 default:
                     break;
             }

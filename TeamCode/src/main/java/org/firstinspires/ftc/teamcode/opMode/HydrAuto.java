@@ -92,7 +92,6 @@ public abstract class HydrAuto extends OpMode_Base {
         mTimeSinceStart.reset();
         mVision.SetMode(mVisionTarget);
         TelemetryPacket packet = new TelemetryPacket();
-        mIntake.RunIn();
         while (opModeIsActive()) {
             ClearLynxHubCaches();
             for (Subsystem system : mSystems) {
@@ -105,7 +104,6 @@ public abstract class HydrAuto extends OpMode_Base {
             telemetry.update();
             idle();
         }
-        mIntake.Stop();
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
