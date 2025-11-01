@@ -21,12 +21,12 @@ public abstract class AutoFar extends HydrAuto {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, 0);
-        Pose2d GPP_WP = FlipPose(38, 30, 90);
-        Pose2d GPP = FlipPose(48, 54, 90);
-        Pose2d PGP_WP = FlipPose(13, 30, 90);
-        Pose2d PGP = FlipPose(23, 54, 90);
-        Pose2d PPG_WP = FlipPose(-11, 33, 90);
-        Pose2d PPG = FlipPose(-2, 52, 90);
+        Pose2d GPP_WP = FlipPose(34, 30, 90);
+        Pose2d GPP = FlipPose(44, 51, 90);
+        Pose2d PGP_WP = FlipPose(11, 30, 90);
+        Pose2d PGP = FlipPose(21, 51, 90);
+        Pose2d PPG_WP = FlipPose(-12, 35, 90);
+        Pose2d PPG = FlipPose(-12, 48, 90);
         Pose2d End = FlipPose(30, 15, 0);
 
         Action driveToLaunch2 = mDrive.actionBuilder(mBeginPose)
@@ -53,10 +53,10 @@ public abstract class AutoFar extends HydrAuto {
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
-                .splineToSplineHeading(PPG, FlipTangent(0))
-                .setTangent(FlipTangent(0))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
-                .waitSeconds(.75)
+                .splineToSplineHeading(PPG, FlipTangent(90))
+                //.setTangent(FlipTangent(0))
+                //.splineToSplineHeading(Launch, FlipTangent(-90))
+                //.waitSeconds(.75)
                 .build();
 
         Action driveToEnd = mDrive.actionBuilder(Launch)
@@ -66,6 +66,7 @@ public abstract class AutoFar extends HydrAuto {
 
         return new SequentialAction(
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                mTurret.GetSetAction(FlipTurret(-20)),
                 mLauncher.GetAction(LauncherActions.LauncherRunFast),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
 
@@ -82,12 +83,12 @@ public abstract class AutoFar extends HydrAuto {
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
 
                 mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                driveToLaunch4,
+                driveToLaunch4/*,
 
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mIntake.GetAction(IntakeActions.IntakeStop),
-                driveToEnd
+                driveToEnd*/
                 );
     }
 }

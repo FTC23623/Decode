@@ -71,7 +71,7 @@ public class Turret implements Subsystem {
                 }
             }
         } else if (autoSetAction) {
-            TurretServo.setPosition(autoSetPos);
+            TurretServo.setPosition(CalcAbsolutePositionFromAngle(autoSetPos));
         } else {
             // scale user input with a constant rate
             double position_change = UserInput * mPosChangeRate;
@@ -113,9 +113,7 @@ public class Turret implements Subsystem {
 
     private double CalcAbsolutePositionFromAngle(double degrees) {
         // convert the angle to 0 to max since servo is 0 to 1
-        if (degrees < 0) {
-            degrees = degrees + Constants.TurretRange / 2;
-        }
+        degrees = degrees + Constants.TurretRange / 2;
         // clamp the value to the range
         degrees = Math.max(0, Math.min(Constants.TurretRange, degrees));
         return degrees / Constants.TurretRange;

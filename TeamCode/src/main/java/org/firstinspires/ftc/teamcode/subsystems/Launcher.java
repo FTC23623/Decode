@@ -144,6 +144,10 @@ public class Launcher implements Subsystem {
         return Math.abs(lastRpmMeasure.get(0) - targetRPMtune) < Constants.LaunchWheelRpmDeadband;
     }
 
+    public void SetSpeed(double speed) {
+        targetRPMtune = speed;
+    }
+
     /*
      * ROAD RUNNER API
      */

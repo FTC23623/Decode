@@ -88,12 +88,12 @@ public class MeepMeepTesting {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, 0, flip);
-        Pose2d GPP_WP = FlipPose(38, 30, 90, flip);
-        Pose2d GPP = FlipPose(48, 54, 90, flip);
-        Pose2d PGP_WP = FlipPose(13, 30, 90, flip);
-        Pose2d PGP = FlipPose(23, 54, 90, flip);
-        Pose2d PPG_WP = FlipPose(-11, 33,90, flip);
-        Pose2d PPG = FlipPose(-2, 52, 90, flip);
+        Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
+        Pose2d GPP = FlipPose(44, 51, 90, flip);
+        Pose2d PGP_WP = FlipPose(11, 30, 90, flip);
+        Pose2d PGP = FlipPose(21, 51, 90, flip);
+        Pose2d PPG_WP = FlipPose(-12, 35,90, flip);
+        Pose2d PPG = FlipPose(-12, 48, 90, flip);
         Pose2d End = FlipPose(30,15,0, flip);
 
         Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
@@ -110,17 +110,17 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(PGP, FlipTangent(0, flip))
                 .setTangent(FlipTangent(0, flip))
-                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
+                .splineToSplineHeading(Launch, FlipTangent(-60, flip))
                 .waitSeconds(1.5)
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(PPG, FlipTangent(0, flip))
+                .splineToSplineHeading(PPG, FlipTangent(90, flip))/*
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(Launch, FlipTangent(-90, flip))
                 .waitSeconds(1.5)
                 .setTangent(FlipTangent(180, flip))
-                .splineToSplineHeading(End, FlipTangent(180, flip))
+                .splineToSplineHeading(End, FlipTangent(180, flip))*/
                 .build();
 
         return new SequentialAction(driveToLaunch1);

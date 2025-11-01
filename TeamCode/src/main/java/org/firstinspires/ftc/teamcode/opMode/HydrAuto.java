@@ -147,4 +147,12 @@ public abstract class HydrAuto extends OpMode_Base {
             return Math.toRadians(degrees);
         }
     }
+
+    protected Double FlipTurret(double degrees) {
+        if (mFlip) {
+            return -degrees;
+        } else {
+            return degrees;
+        }
+    }
 }

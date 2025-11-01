@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
 import org.firstinspires.ftc.teamcode.subsystems.SystemMonitor;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public abstract class HyDrive extends OpMode_Base {
     mVision.SetMode(mVisionTarget);
     // wait for the operator to start the opmode
     waitForStart();
+    mLauncher.SetSpeed(Constants.LauncherMedRPM);
     mLoopSleep.reset();
     while (opModeIsActive()) {
       ClearLynxHubCaches();
