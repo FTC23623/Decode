@@ -4,7 +4,7 @@ public final class Constants {
     public static final boolean fieldCentricDrive = true;
     public static final double trgBtnThresh = 0.05;
     public static final double driveBoosted = 1;
-    public static final double driveNormal = 0.95;
+    public static final double driveNormal = 0.95; // Steve - I suggest we change this to 0.85 and the Driver uses the Boosted Button when needed.
     public static final double driveSlow = 0.5;
     public static final double contServoOff = 0.5;
     public static final double contServoForward = 1.0;
@@ -25,20 +25,21 @@ public final class Constants {
     public static final double LaunchServoRun = 1;
     public static final double TransfertoLaunchPower = 0.8;
     public static final double TransferFromIntakePower = 0.8;
-    public static final double TransferToIntakePower = -0.75;
+    public static final double TransferToIntakePower = -0.75; // Steve - I suggest making this 0.4. If an artifact is in the Transfer then its likely not an extra
     public static final double TurretGearRatio = 6.3;
     public static final double TurretRange = 355;
     // how many degrees back is your limelight rotated from perfectly vertical?
-    public static double limelightMountAngleDegrees = -1.34;
+    public static double limelightMountAngleDegrees = -1.34; // Steve - Based on CAD, it should be 22deg
 
     // distance from the center of the Limelight lens to the floor
-    public static double limelightLensHeightInches = 4.5;
+    public static double limelightLensHeightInches = 4.5; // Steve - Based on CAD, it should be 9.5in
 
     // distance from the target to the floor
-    public static double goalHeightInches = 9.5;
+    public static double goalHeightInches = 9.5; // Steve - Based on CAD, it should be 38.5
+
     public static int LimelightPollRateHz = 20;
     public static double TurretDeadbandDegrees = 1;
-    public static double LaunchWheelRpmDeadband = 150;
+    public static double LaunchWheelRpmDeadband = 150; // Steve - we make adjustments that are smaller than this
     public static double LauncherAutoLaunchTimeMs = 2000;
     public static double TurretServoAnalogRangeVolts = 3.3;
     public static int TurretVisionLockTimeoutMs = 100;
