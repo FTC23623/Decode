@@ -29,31 +29,37 @@ public abstract class AutoFar extends HydrAuto {
         Pose2d PPG = FlipPose(-12, 48, 90);
         Pose2d End = FlipPose(30, 15, 0);
 
-        Action driveToLaunch2 = mDrive.actionBuilder(mBeginPose)
+        Action fetchGPP = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(GPP, FlipTangent(0))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                .afterTime(1.5, mIntake.GetAction(IntakeActions.IntakeStop))
                 .setTangent(FlipTangent(0))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
                 .waitSeconds(.75)
                 .build();
 
-        Action driveToLaunch3 = mDrive.actionBuilder(Launch)
+        Action fetchPGP = mDrive.actionBuilder(Launch)
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(PGP_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PGP, FlipTangent(0))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                .afterTime(1.5, mIntake.GetAction(IntakeActions.IntakeStop))
                 .setTangent(FlipTangent(0))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
                 .waitSeconds(.75)
                 .build();
 
-        Action driveToLaunch4 = mDrive.actionBuilder(Launch)
+        Action pickupPPG = mDrive.actionBuilder(Launch)
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PPG, FlipTangent(90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                .afterTime(1.5, mIntake.GetAction(IntakeActions.IntakeStop))
                 //.setTangent(FlipTangent(0))
                 //.splineToSplineHeading(Launch, FlipTangent(-90))
                 //.waitSeconds(.75)
@@ -71,19 +77,19 @@ public abstract class AutoFar extends HydrAuto {
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
 
                 mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                driveToLaunch2,
+                fetchGPP,
 
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
 
                 mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                driveToLaunch3,
+                fetchPGP,
 
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
 
                 mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                driveToLaunch4/*,
+                pickupPPG/*,
 
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
