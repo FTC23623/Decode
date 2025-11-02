@@ -11,12 +11,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Drive_Manual;
 import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
+import org.firstinspires.ftc.teamcode.subsystems.Indicator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
 import org.firstinspires.ftc.teamcode.subsystems.SystemMonitor;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.types.Constants;
+import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public abstract class HyDrive extends OpMode_Base {
   protected Vision mVision;
   protected Turret mTurret;
   protected Launcher mLauncher;
+  protected Indicator mIndicator;
   protected SystemMonitor mSysMon;
   protected ElapsedTime mLoopSleep;
 
@@ -53,6 +56,7 @@ public abstract class HyDrive extends OpMode_Base {
     mVision = new LimelightVision(mOpMode);
     mLauncher = new Launcher(mOpMode, 0);
     mSysMon = new SystemMonitor(mOpMode);
+    mIndicator = new Indicator(mOpMode, mLauncher, mTurret);
     mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
     mSystems.add(mDrive);
@@ -62,6 +66,7 @@ public abstract class HyDrive extends OpMode_Base {
     mSystems.add(mTurret);
     mSystems.add(mLauncher);
     mSystems.add(mSysMon);
+    mSystems.add(mIndicator);
     // manual bulk caching
     SetLynxHubsManual();
     InitializeAllSystems();
@@ -70,8 +75,12 @@ public abstract class HyDrive extends OpMode_Base {
     telemetry.update();
     // set the vision up for targeting
     mVision.SetMode(mVisionTarget);
-    // wait for the operator to start the opmode
-    waitForStart();
+    while (!isStarted() && !isStopRequested()) {
+      ClearLynxHubCaches();
+      mIndicator.WaitForStart(mVisionTarget, DecodeAprilTag.DecodeTag_Unknown);
+      telemetry.update();
+      idle();
+    }
     mLauncher.SetSpeed(Constants.LauncherMedRPM);
     mLoopSleep.reset();
     while (opModeIsActive()) {

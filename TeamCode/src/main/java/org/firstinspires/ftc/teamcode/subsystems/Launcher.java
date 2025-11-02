@@ -135,7 +135,7 @@ public class Launcher implements Subsystem {
         }
     }
 
-    private boolean AtSpeed() {
+    public boolean AtSpeed() {
         return Math.abs(lastRpmMeasure.get(0) - targetRPMtune) < Constants.LaunchWheelRpmDeadband;
     }
 

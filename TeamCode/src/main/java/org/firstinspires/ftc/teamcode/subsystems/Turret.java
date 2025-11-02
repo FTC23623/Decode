@@ -89,6 +89,10 @@ public class Turret implements Subsystem {
         }
     }
 
+    public boolean Locked() {
+        return visionLocked;
+    }
+
     private double Clamp(double position) {
         return Math.min(mMaxPos, Math.max(mMinPos, position));
     }

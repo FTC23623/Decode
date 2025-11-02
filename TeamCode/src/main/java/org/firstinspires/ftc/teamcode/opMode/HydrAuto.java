@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.Vision;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Pinpoint;
+import org.firstinspires.ftc.teamcode.subsystems.Indicator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
@@ -33,6 +34,7 @@ public abstract class HydrAuto extends OpMode_Base {
     protected Vision mVision;
     protected Turret mTurret;
     protected Launcher mLauncher;
+    protected Indicator mIndicator;
     protected ElapsedTime mTimeSinceStart;
     protected SequentialAction mAutoSeq;
     protected DecodeAprilTag mMotif;
@@ -54,10 +56,12 @@ public abstract class HydrAuto extends OpMode_Base {
         mTurret = new Turret(mOpMode);
         mVision = new LimelightVision(mOpMode);
         mLauncher = new Launcher(mOpMode, 0);
+        mIndicator = new Indicator(mOpMode, mLauncher, mTurret);
         mSystems.add(mIntake);
         mSystems.add(mVision);
         mSystems.add(mTurret);
         mSystems.add(mLauncher);
+        mSystems.add(mIndicator);
         mOpMode.mVision = mVision;
         mTimeSinceStart = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         mAutoSeq = CreateAuto();
@@ -69,6 +73,7 @@ public abstract class HydrAuto extends OpMode_Base {
         while (!isStarted() && !isStopRequested()) {
             ClearLynxHubCaches();
             mVision.Process();
+            mIndicator.WaitForStart(mVisionTarget, mMotif);
             VisionResult result = mVision.GetResult();
             if (result != null) {
                 DecodeAprilTag tag = result.GetTagClass();
