@@ -18,15 +18,22 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed" };
+        String[] autos = {"AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
+
+        // Create a dropdown for selecting the spike count
+        Integer[] spikeCounts = {1, 2, 3};
+        JComboBox<Integer> spikeSelector = new JComboBox<>(spikeCounts);
 
         // Create a button to run the selected auto
         JButton runButton = new JButton("Run");
 
         // Create a panel to hold the controls
         JPanel panel = new JPanel();
+        panel.add(new JLabel("Auto:"));
         panel.add(autoSelector);
+        panel.add(new JLabel("Spikes:"));
+        panel.add(spikeSelector);
         panel.add(runButton);
 
         // Create a separate frame for the controls
@@ -46,6 +53,7 @@ public class MeepMeepTesting {
                 // Get the selected auto from the dropdown
                 String selectedAuto = (String) autoSelector.getSelectedItem();
                 boolean isBlue = selectedAuto.contains("Blue");
+                int spikeCount = (Integer) spikeSelector.getSelectedItem();
 
                 // Create a new bot entity for the simulation, setting the color
                 RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
@@ -56,16 +64,16 @@ public class MeepMeepTesting {
                 // Run the selected auto
                 switch (selectedAuto) {
                     case "AutoFarBlue":
-                        myBot.runAction(BuildAutoFar(myBot, true));
+                        myBot.runAction(BuildAutoFar(myBot, true, spikeCount));
                         break;
                     case "AutoFarRed":
-                        myBot.runAction(BuildAutoFar(myBot, false));
+                        myBot.runAction(BuildAutoFar(myBot, false, spikeCount));
                         break;
                     case "AutoNearBlue":
-                        myBot.runAction(BuildAutoNear(myBot, true));
+                        myBot.runAction(BuildAutoNear(myBot, true, spikeCount));
                         break;
                     case "AutoNearRed":
-                        myBot.runAction(BuildAutoNear(myBot, false));
+                        myBot.runAction(BuildAutoNear(myBot, false, spikeCount));
                         break;
                 }
 
@@ -79,7 +87,7 @@ public class MeepMeepTesting {
         });
     }
 
-    private static SequentialAction BuildAutoFar(RoadRunnerBotEntity myBot, boolean flip) {
+    private static SequentialAction BuildAutoFar(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
         Pose2d beginPose = FlipPose(60.0, 15.0, 0.0, flip);
 
         // All poses defined for autos on the red side
@@ -89,11 +97,11 @@ public class MeepMeepTesting {
         Pose2d GPP = FlipPose(44, 51, 90, flip);
         Pose2d PGP_WP = FlipPose(11, 30, 90, flip);
         Pose2d PGP = FlipPose(21, 51, 90, flip);
-        Pose2d PPG_WP = FlipPose(-12, 35,90, flip);
+        Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
         Pose2d PPG = FlipPose(-12, 48, 90, flip);
-        Pose2d End = FlipPose(30,15,0, flip);
+        Pose2d End = FlipPose(30, 15, 0, flip);
 
-        Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
+        Action fetchGPP = myBot.getDrive().actionBuilder(beginPose)
                 .waitSeconds(2)
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
@@ -102,6 +110,9 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(Launch, FlipTangent(-90, flip))
                 .waitSeconds(1.5)
+                .build();
+
+        Action fetchPGP = myBot.getDrive().actionBuilder(Launch)
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
@@ -109,21 +120,35 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(Launch, FlipTangent(-60, flip))
                 .waitSeconds(1.5)
+                .build();
+
+        Action pickupPPG = myBot.getDrive().actionBuilder(Launch)
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(PPG, FlipTangent(90, flip))/*
-                .setTangent(FlipTangent(0, flip))
-                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
-                .waitSeconds(1.5)
-                .setTangent(FlipTangent(180, flip))
-                .splineToSplineHeading(End, FlipTangent(180, flip))*/
+                .splineToSplineHeading(PPG, FlipTangent(90, flip))
                 .build();
 
-        return new SequentialAction(driveToLaunch1);
+        Action driveToEnd = myBot.getDrive().actionBuilder(Launch)
+                .setTangent(FlipTangent(180, flip))
+                .splineToSplineHeading(End, FlipTangent(180, flip))
+                .build();
+
+        // This logic mirrors the construction in your AutoFar.java
+        SequentialAction ret =  new SequentialAction(fetchGPP);
+        if (spikeCount > 1) {
+            ret = new SequentialAction(ret, fetchPGP);
+        }
+        if (spikeCount > 2) {
+            ret = new SequentialAction(ret, pickupPPG);
+        }
+        if (spikeCount < 3) {
+            ret = new SequentialAction(ret, driveToEnd);
+        }
+        return ret;
     }
 
-    private static SequentialAction BuildAutoNear(RoadRunnerBotEntity myBot, boolean flip) {
+    private static SequentialAction BuildAutoNear(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
         Pose2d beginPose = FlipPose(-54, 52, 310, flip);
 
         // All poses defined for autos on the red side
@@ -137,20 +162,29 @@ public class MeepMeepTesting {
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
         Pose2d End = FlipPose(-2, 52, 90, flip);
 
-        Action driveToLaunch1 = myBot.getDrive().actionBuilder(beginPose)
+        Action driveToLaunchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .setTangent(FlipTangent(315, flip))
                 .splineToSplineHeading(LaunchNear, FlipTangent(315, flip))
                 .waitSeconds(1.5)
+                .build();
+
+        Action fetchPPG = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(PPG, FlipTangent(180, flip))
                 .splineToSplineHeading(LaunchNear, FlipTangent(-90, flip))
                 .waitSeconds(1.5)
+                .build();
+
+        Action fetchPGP = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(PGP, FlipTangent(180, flip))
                 .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
                 .waitSeconds(1.5)
+                .build();
+
+        Action pickupGPP = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(GPP, FlipTangent(90, flip))
@@ -158,7 +192,23 @@ public class MeepMeepTesting {
                 //.waitSeconds(1.5)
                 //.splineToSplineHeading(End, FlipTangent(90, flip))
                 .build();
-        return new SequentialAction(driveToLaunch1);
+
+        Action driveToEnd = myBot.getDrive().actionBuilder(LaunchNear)
+                .splineToSplineHeading(End, FlipTangent(90, flip))
+                .build();
+
+        // This logic mirrors the construction in your AutoNear.java
+        SequentialAction ret = new SequentialAction(driveToLaunchPreload, fetchPPG);
+        if (spikeCount > 1) {
+            ret = new SequentialAction(ret, fetchPGP);
+        }
+        if (spikeCount > 2) {
+            ret = new SequentialAction(ret, pickupGPP);
+        }
+        if (spikeCount < 3) {
+            ret = new SequentialAction(ret, driveToEnd);
+        }
+        return ret;
     }
 
     private static Pose2d FlipPose(double x, double y, double heading, boolean flip) {
