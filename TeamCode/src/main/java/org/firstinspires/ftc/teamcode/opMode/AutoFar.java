@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.types.LauncherActions;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class AutoFar extends HydrAuto {
-    public AutoFar(VisionMode target, boolean flip) {
-        super(target, flip);
+    public AutoFar(VisionMode target, boolean flip, int spikeCount) {
+        super(target, flip, spikeCount);
         mBeginPose = FlipPose(60.0, 15.0, 0.0);
     }
 
@@ -29,40 +29,39 @@ public abstract class AutoFar extends HydrAuto {
         Pose2d PPG = FlipPose(-12, 48, 90);
         Pose2d End = FlipPose(30, 15, 0);
 
+        // Action to fetch artifacts from first spike and launch
         Action fetchGPP = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(GPP, FlipTangent(0))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .afterTime(1.5, mIntake.GetAction(IntakeActions.IntakeStop))
                 .setTangent(FlipTangent(0))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .waitSeconds(.75)
                 .build();
 
+        // Action to fetch artifacts from second spike and launch
         Action fetchPGP = mDrive.actionBuilder(Launch)
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(PGP_WP, FlipTangent(90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PGP, FlipTangent(0))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .afterTime(1.5, mIntake.GetAction(IntakeActions.IntakeStop))
                 .setTangent(FlipTangent(0))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .waitSeconds(.75)
                 .build();
 
+        // Action to pick up artifacts from third spike and stop
         Action pickupPPG = mDrive.actionBuilder(Launch)
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PPG, FlipTangent(90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .afterTime(1.5, mIntake.GetAction(IntakeActions.IntakeStop))
-                //.setTangent(FlipTangent(0))
-                //.splineToSplineHeading(Launch, FlipTangent(-90))
-                //.waitSeconds(.75)
                 .build();
 
         Action driveToEnd = mDrive.actionBuilder(Launch)
@@ -70,31 +69,43 @@ public abstract class AutoFar extends HydrAuto {
                 .splineToSplineHeading(End, FlipTangent(180))
                 .build();
 
-        return new SequentialAction(
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
-                mTurret.GetSetAction(FlipTurret(-20)),
-                mLauncher.GetAction(LauncherActions.LauncherRunFast),
+        // Build the auto for launching preloads, fetching artifacts from the first spike and launching
+        SequentialAction ret =  new SequentialAction(
+                new ParallelAction(
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                    mTurret.GetSetAction(FlipTurret(-20)),
+                    mLauncher.GetAction(LauncherActions.LauncherRunFast)
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-
-                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 fetchGPP,
-
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch),
-
-                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
+                mLauncher.GetAction(LauncherActions.LauncherLaunch)
+        );
+        // If more than one spike, add another fetch from the second spike and launch
+        if (mSpikeCount > 1) {
+            ret = new SequentialAction(
+                ret,
                 fetchPGP,
-
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch),
-
-                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                pickupPPG/*,
-
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mLauncher.GetAction(LauncherActions.LauncherLaunch)
+            );
+        }
+        // Add pickup of artifacts from final spike
+        if (mSpikeCount > 2) {
+            ret = new SequentialAction(
+                ret,
+                pickupPPG,
+                mIntake.GetAction(IntakeActions.IntakeReject)
+            );
+        }
+        // when there are 3 spikes we don't launch. If there are less, we need to move off the launch line
+        if (mSpikeCount < 3) {
+            ret = new SequentialAction(
+                ret,
                 mIntake.GetAction(IntakeActions.IntakeStop),
-                driveToEnd*/
-                );
+                driveToEnd
+            );
+        }
+        return ret;
     }
 }

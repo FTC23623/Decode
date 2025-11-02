@@ -1,0 +1,11 @@
+package org.firstinspires.ftc.teamcode.opMode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.teamcode.types.VisionMode;
+
+@Autonomous(name = "NearRed3", preselectTeleOp = "TeleRed")
+public class AutoNearRed3 extends AutoNear {
+    public AutoNearRed3() {
+        super(VisionMode.VisionMode_RedGoal, false, 3);
+    }
+}

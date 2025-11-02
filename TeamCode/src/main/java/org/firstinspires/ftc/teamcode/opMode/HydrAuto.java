@@ -39,10 +39,12 @@ public abstract class HydrAuto extends OpMode_Base {
     protected SequentialAction mAutoSeq;
     protected DecodeAprilTag mMotif;
     protected boolean mFlip;
+    protected int mSpikeCount;
 
-    public HydrAuto(VisionMode tagToTarget, boolean flip) {
+    public HydrAuto(VisionMode tagToTarget, boolean flip, int spikeCount) {
         super(tagToTarget);
         mFlip = flip;
+        mSpikeCount = spikeCount;
     }
 
     @Override

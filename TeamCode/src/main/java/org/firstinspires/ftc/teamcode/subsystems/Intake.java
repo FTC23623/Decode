@@ -5,6 +5,8 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.types.Constants;
@@ -122,10 +124,12 @@ public class Intake implements Subsystem {
         private boolean started = false;
         // run has been called once
         private final IntakeActions mAction;
+        private final ElapsedTime timer;
 
         // construct on the supplied action
         public RunAction(IntakeActions action) {
             mAction = action;
+            timer = new ElapsedTime();
         }
 
         /**
@@ -135,26 +139,39 @@ public class Intake implements Subsystem {
          */
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intakeIn = false;
-            intakeOut = false;
-            transferForward = false;
-            transferReverse = false;
-            switch (mAction) {
-                case IntakeLoadArtifacts:
-                    intakeIn = true;
-                    transferForward = true;
-                    break;
-                case IntakePushToLauncher:
-                    transferForward = true;
-                    break;
-                case IntakeReject:
-                    intakeOut = true;
-                    break;
-                case IntakeStop:
-                default:
-                    break;
+            if (!started) {
+                started = true;
+                intakeIn = false;
+                intakeOut = false;
+                transferForward = false;
+                transferReverse = false;
+                switch (mAction) {
+                    case IntakeLoadArtifacts:
+                        intakeIn = true;
+                        transferForward = true;
+                        break;
+                    case IntakePushToLauncher:
+                        transferForward = true;
+                        break;
+                    case IntakeReject:
+                        intakeOut = true;
+                        timer.reset();
+                        break;
+                    case IntakeStop:
+                    default:
+                        break;
+                }
             }
             Process();
+            if (mAction == IntakeActions.IntakeReject) {
+                if (timer.milliseconds() >= 500) {
+                    intakeOut = false;
+                    Process();
+                    return false;
+                } else {
+                    return true;
+                }
+            }
             return false;
         }
     }
