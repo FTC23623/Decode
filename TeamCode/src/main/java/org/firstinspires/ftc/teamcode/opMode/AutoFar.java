@@ -50,7 +50,7 @@ public abstract class AutoFar extends HydrAuto {
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PGP, FlipTangent(0))
                 .setTangent(FlipTangent(0))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
+                .splineToSplineHeading(Launch, FlipTangent(-60))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .waitSeconds(.75)
                 .build();
