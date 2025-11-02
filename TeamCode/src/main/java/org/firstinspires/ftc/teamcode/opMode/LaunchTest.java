@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 
-@Config
-@TeleOp(name = "LaunchTest")
+//@Config
+//@TeleOp(name = "LaunchTest")
 public class LaunchTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException
