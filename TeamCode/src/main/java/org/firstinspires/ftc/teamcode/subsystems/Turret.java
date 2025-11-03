@@ -48,7 +48,10 @@ public class Turret implements Subsystem {
 
     @Override
     public void Process() {
-        VisionResult vision = mOp.mVision.GetResult();
+        VisionResult vision = null;
+        if (mOp.mVision != null) {
+            vision = mOp.mVision.GetResult();
+        }
         double servoFbPosition = GetPositionFromFb();
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
         if (vision != null) {
