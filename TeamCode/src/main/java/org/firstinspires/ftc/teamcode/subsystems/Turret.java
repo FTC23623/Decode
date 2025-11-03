@@ -66,8 +66,10 @@ public class Turret implements Subsystem {
                     // clamp the new position to the min and max
                     NewPos = Clamp(NewPos);
                     TurretServo.setPosition(NewPos);
-                    visionLocked = true;
+                    visionLocked = false;
                     mOp.mTelemetry.addData("Turret Pos V", NewPos);
+                } else {
+                    visionLocked = true;
                 }
             }
         } else if (autoSetAction) {
@@ -171,8 +173,8 @@ public class Turret implements Subsystem {
                 started = true;
                 autoSetAction = true;
                 autoSetPos = position;
-                Process();
             }
+            Process();
             if (visionLocked) {
                 autoSetAction = false;
                 return false;
