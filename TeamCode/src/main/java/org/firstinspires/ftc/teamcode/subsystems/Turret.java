@@ -24,6 +24,8 @@ public class Turret implements Subsystem {
     private boolean autoSetAction;
     private double autoSetPos;
     private boolean visionLocked;
+    private int aimState;
+    private double aimPosition;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
@@ -34,6 +36,8 @@ public class Turret implements Subsystem {
         autoSetAction = false;
         autoSetPos = 0;
         visionLocked = false;
+        aimState = 0;
+        aimPosition = 0.5;
     }
 
     @Override
@@ -48,46 +52,59 @@ public class Turret implements Subsystem {
 
     @Override
     public void Process() {
-        VisionResult vision = mOp.mVision.GetResult();
-        double servoFbPosition = GetPositionFromFb();
-        mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
-        if (vision != null) {
-            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
-            mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
-            mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
-            CalcDistanceToTag(vision);
-            if (vision.GetTimestamp() > lastVisionTimestamp + 250) {
-                mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
-                double rotate = vision.GetXOffset();
-                mOp.mTelemetry.addData("rotate", rotate);
-                lastVisionTimestamp = vision.GetTimestamp();
-                if (Math.abs(rotate) > 1) {
-                    double NewPos = servoFbPosition + CalcPositionOffsetAngle(rotate);
-                    // clamp the new position to the min and max
-                    NewPos = Clamp(NewPos);
-                    TurretServo.setPosition(NewPos);
-                    visionLocked = false;
-                    mOp.mTelemetry.addData("Turret Pos V", NewPos);
+        switch (aimState) {
+            case 0:
+                VisionResult vision = mOp.mVision.GetResult();
+                double servoFbPosition = GetPositionFromFb();
+                mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
+                if (vision != null) {
+                    mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
+                    mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
+                    mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
+                    CalcDistanceToTag(vision);
+                    if (vision.GetTimestamp() != lastVisionTimestamp) {
+                        mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
+                        double rotate = vision.GetXOffset();
+                        mOp.mTelemetry.addData("rotate", rotate);
+                        lastVisionTimestamp = vision.GetTimestamp();
+                        if (Math.abs(rotate) > Constants.TurretDeadbandDegrees) {
+                            double NewPos = servoFbPosition + CalcPositionOffsetAngle(rotate);
+                            // clamp the new position to the min and max
+                            NewPos = Clamp(NewPos);
+                            TurretServo.setPosition(NewPos);
+                            visionLocked = false;
+                            mOp.mTelemetry.addData("Turret Pos V", NewPos);
+                            aimPosition = NewPos;
+                            aimState = 1;
+                        } else {
+                            visionLocked = true;
+                        }
+                    }
+                } else if (autoSetAction) {
+                    TurretServo.setPosition(CalcAbsolutePositionFromAngle(autoSetPos));
+                    aimPosition = autoSetPos;
+                    aimState = 1;
                 } else {
-                    visionLocked = true;
+                    // scale user input with a constant rate
+                    double position_change = UserInput * mPosChangeRate;
+                    if (position_change != 0) {
+                        // get the last set position and calculate the new position
+                        double NewPos = servoFbPosition + position_change;
+                        // clamp the new position to the min and max
+                        NewPos = Clamp(NewPos);
+                        TurretServo.setPosition(Clamp(NewPos));
+                        mOp.mTelemetry.addData("Turret Pos U", NewPos);
+                    }
                 }
-            }
-        } else if (autoSetAction) {
-            TurretServo.setPosition(CalcAbsolutePositionFromAngle(autoSetPos));
-        } else {
-            // scale user input with a constant rate
-            double position_change = UserInput * mPosChangeRate;
-            if (position_change != 0) {
-                // get the last set position and calculate the new position
-                double NewPos = servoFbPosition + position_change;
-                // clamp the new position to the min and max
-                NewPos = Clamp(NewPos);
-                TurretServo.setPosition(Clamp(NewPos));
-                mOp.mTelemetry.addData("Turret Pos U", NewPos);
-            }
-        }
-        if (System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
-            visionLocked = false;
+                if (System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
+                    visionLocked = false;
+                }
+                break;
+            case 1:
+                if (Math.abs(GetPositionFromFb() - aimPosition) < CalcPositionOffsetAngle(Constants.TurretDeadbandDegrees)) {
+                    aimState = 0;
+                }
+                break;
         }
     }
 
