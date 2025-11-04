@@ -68,17 +68,17 @@ public class Drive_Manual extends Drive {
         rotX = strafe * Math.cos(-yaw / 180 * Math.PI) - drive * Math.sin(-yaw / 180 * Math.PI);
         rotY = strafe * Math.sin(-yaw / 180 * Math.PI) + drive * Math.cos(-yaw / 180 * Math.PI);
         // use the circle button to reset the yaw
-        mCircle.In(mGamepad.circle);
+        mCircle.In(mGamepad.b);
         if (mCircle.Out() && Constants.fieldCentricDrive) {
             mCircle.Used();
             mGamepad.rumbleBlips(1);
             mImu.ResetYaw();
         }
         // Set max drive power based on driver input
-        if (mGamepad.left_trigger > Constants.trgBtnThresh) {
+        if (false) {//mGamepad.left_trigger > Constants.trgBtnThresh) {
             // Drive slower for better control
             driveMaxPower = Constants.driveSlow;
-        } else if (mGamepad.right_trigger > Constants.trgBtnThresh) {
+        } else if (false){//(mGamepad.right_trigger > Constants.trgBtnThresh) {
             // Drive faster for fun
             driveMaxPower = Constants.driveBoosted;
         } else {

@@ -47,7 +47,7 @@ public abstract class HyDrive extends OpMode_Base {
     mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     mImu = new Imu_Hub(mOpMode);
     mDrive = new Drive_Manual(mOpMode, mImu);
-    //mIntake = new Intake(mOpMode);
+    mIntake = new Intake(mOpMode);
     //mTurret = new Turret(mOpMode);
     //mVision = new LimelightVision(mOpMode);
     //mLauncher = new Launcher(mOpMode, 0);
@@ -55,7 +55,7 @@ public abstract class HyDrive extends OpMode_Base {
     //mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
     mSystems.add(mDrive);
-    //mSystems.add(mIntake);
+    mSystems.add(mIntake);
     //mSystems.add(mVision);
     mSystems.add(mImu);
     //mSystems.add(mTurret);

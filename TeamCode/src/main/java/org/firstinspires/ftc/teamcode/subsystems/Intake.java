@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.types.IntakeActions;
 public class Intake implements Subsystem {
     private final HydraOpMode mOp;
     private final DcMotorEx mMotor;
-    private final DcMotorEx mTransferMotor;
+  //  private final DcMotorEx mTransferMotor;
     private boolean mRunIn;
     private boolean mRunOut;
     private double mRunOutSpeed;
@@ -24,8 +24,8 @@ public class Intake implements Subsystem {
     public Intake(HydraOpMode opmode) {
         mOp = opmode;
         mMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
-        mTransferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
-        mTransferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+       // mTransferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
+       // mTransferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         mRunIn = false;
         mRunOut = false;
         mRunOutSpeed = Constants.intakeMotorMaxOut;
@@ -37,8 +37,8 @@ public class Intake implements Subsystem {
      */
     @Override
     public void HandleUserInput() {
-        double right = mOp.mOperatorGamepad.right_trigger;
-        double left = mOp.mOperatorGamepad.left_trigger;
+        double right = mOp.mDriverGamepad.right_trigger;
+        double left = mOp.mDriverGamepad.left_trigger;
         mRunIn = right > Constants.trgBtnThresh;
         mRunInSpeed = Constants.intakeMotorMaxIn * right;
         mRunOut = left > Constants.trgBtnThresh;
@@ -89,6 +89,7 @@ public class Intake implements Subsystem {
             mMotor.setPower(0);
         }
         // run the transfer
+        /*
         if(launching){
             mTransferMotor.setPower(Constants.TransfertoLaunchPower);
         }
@@ -100,7 +101,7 @@ public class Intake implements Subsystem {
         }
        else{
             mTransferMotor.setPower(0);
-        }
+        }*/
     }
 
     /*
