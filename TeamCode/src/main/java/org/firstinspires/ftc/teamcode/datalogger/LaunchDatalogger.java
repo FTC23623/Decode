@@ -23,12 +23,12 @@ public class LaunchDatalogger extends HydraDatalogger
     // These are all of the fields that we want in the datalog.
     // Note that order here is NOT important. The order is important in the setFields() call below
     public Datalogger.GenericField rpm = new Datalogger.GenericField("RPM");
-    public Datalogger.GenericField rpmAvg = new Datalogger.GenericField("RPM Avg");
+    public Datalogger.GenericField rpmTgt = new Datalogger.GenericField("RPM Tgt");
     public Datalogger.GenericField power = new Datalogger.GenericField("Pwr");
     public Datalogger.GenericField current = new Datalogger.GenericField("Current");
 
     public LaunchDatalogger(String name) {
         super(name);
-        Builder(rpm, rpmAvg, power);
+        Builder(rpm, rpmTgt, power);
     }
 }

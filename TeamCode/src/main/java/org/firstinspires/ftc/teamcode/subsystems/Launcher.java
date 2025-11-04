@@ -132,6 +132,9 @@ public class Launcher implements Subsystem {
         pid.setPIDF(pidP, pidI, pidD, pidF);
         if (pid.getSetPoint() != targetRPMtune) {
             pid.setSetPoint(targetRPMtune);
+            for (LaunchMotor motor : motors) {
+                motor.mLogger.rpmTgt.set(targetRPMtune);
+            }
         }
     }
 

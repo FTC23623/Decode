@@ -7,7 +7,10 @@ public class HydraDatalogger {
     HydraDatalogger(String name) {
         // append the date to the filename
         java.util.Date now = new java.util.Date(System.currentTimeMillis());
-        mName = name + "-" + now;
+        String nowString = "";
+        nowString += now;
+        nowString.replace(":", "-");
+        mName = name + "-" + nowString;
     }
 
     protected void Builder(Datalogger.LoggableField... fields) {

@@ -15,7 +15,7 @@ public class LaunchMotor {
     private long lastTime;
     private final double nsToMs = 1.0e-6;
     private final SampleAverage mAvgRpm;
-    private final LaunchDatalogger mLogger;
+    public final LaunchDatalogger mLogger;
 
     public LaunchMotor(String name, HydraOpMode opMode, DcMotorEx mot, DcMotorSimple.Direction motorDir, double motTicksPerRev, int samplesToAvg){
         mName = name;
@@ -58,7 +58,6 @@ public class LaunchMotor {
         //mOp.mTelemetry.addData(mName + " RPM", rpm);
         //mOp.mTelemetry.addData(mName + " RPM Avg", avgRpm);
         mLogger.rpm.set(rpm);
-        mLogger.rpmAvg.set(avgRpm);
         mLogger.current.set(current);
         // return rpm
         return avgRpm;
