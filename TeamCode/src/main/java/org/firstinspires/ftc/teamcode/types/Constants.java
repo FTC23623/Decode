@@ -41,6 +41,6 @@ public final class Constants {
     public static double LaunchWheelRpmDeadband = 150;
     public static double LauncherAutoLaunchTimeMs = 2000;
     public static double TurretServoAnalogRangeVolts = 3.3;
-    public static int TurretVisionLockTimeoutMs = 100;
+    public static int TurretVisionLockTimeoutMs = 500;
 
 }

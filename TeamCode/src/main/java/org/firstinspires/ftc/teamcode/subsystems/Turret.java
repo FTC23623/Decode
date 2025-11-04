@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
-import org.firstinspires.ftc.teamcode.types.TurretActions;
 
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
@@ -54,7 +53,10 @@ public class Turret implements Subsystem {
         }
         double servoFbPosition = GetPositionFromFb();
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
-        if (vision != null) {
+        if (autoSetAction) {
+            TurretServo.setPosition(autoSetPos);
+        }
+        else if (vision != null) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
@@ -75,8 +77,6 @@ public class Turret implements Subsystem {
                     visionLocked = true;
                 }
             }
-        } else if (autoSetAction) {
-            TurretServo.setPosition(CalcAbsolutePositionFromAngle(autoSetPos));
         } else {
             // scale user input with a constant rate
             double position_change = UserInput * mPosChangeRate;
@@ -92,6 +92,9 @@ public class Turret implements Subsystem {
         if (System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
             visionLocked = false;
         }
+        mOp.mTelemetry.addData("AutoPos", autoSetPos);
+        mOp.mTelemetry.addData("AutoAction", autoSetAction);
+        mOp.mTelemetry.addData("VisionLocked", visionLocked);
     }
 
     public boolean Locked() {
@@ -122,7 +125,7 @@ public class Turret implements Subsystem {
 
     private double CalcAbsolutePositionFromAngle(double degrees) {
         // convert the angle to 0 to max since servo is 0 to 1
-        degrees = degrees + Constants.TurretRange / 2;
+        degrees = degrees * Constants.TurretGearRatio + Constants.TurretRange / 2;
         // clamp the value to the range
         degrees = Math.max(0, Math.min(Constants.TurretRange, degrees));
         return degrees / Constants.TurretRange;
@@ -165,9 +168,9 @@ public class Turret implements Subsystem {
 
     public class RunSetAction implements Action {
         private boolean started = false;
-        private final double position;
-        public RunSetAction(double positionToSet) {
-            position = positionToSet;
+        private final double angleToSet;
+        public RunSetAction(double angleToSet) {
+            this.angleToSet = angleToSet;
         }
 
         @Override
@@ -175,17 +178,19 @@ public class Turret implements Subsystem {
             if (!started) {
                 started = true;
                 autoSetAction = true;
-                autoSetPos = position;
+                autoSetPos = CalcAbsolutePositionFromAngle(angleToSet);
             }
             Process();
-            if (visionLocked) {
+            autoSetAction = false;
+            /*if (visionLocked) {
                 autoSetAction = false;
                 return false;
-            } else if (Math.abs(GetPositionFromFb() - position) < CalcPositionOffsetAngle(Constants.TurretDeadbandDegrees)) {
+            } else
+            if (Math.abs(GetPositionFromFb() - autoSetPos) < CalcPositionOffsetAngle(Constants.TurretDeadbandDegrees)) {
                 autoSetAction = false;
                 return false;
-            }
-            return true;
+            }*/
+            return false;
         }
     }
 }

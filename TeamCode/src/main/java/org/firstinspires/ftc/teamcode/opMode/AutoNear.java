@@ -24,9 +24,9 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d GPP_WP = FlipPose(35, 40, 90);
         Pose2d GPP = FlipPose(35, 54, 90);
         Pose2d PGP_WP = FlipPose(12, 36, 90);
-        Pose2d PGP = FlipPose(6, 51, 90);
-        Pose2d PPG_WP = FlipPose(-11, 32, 90);
-        Pose2d PPG = FlipPose(-18, 48, 90);
+        Pose2d PGP = FlipPose(6, 49, 90);
+        Pose2d PPG_WP = FlipPose(-12, 32, 90);
+        Pose2d PPG = FlipPose(-20, 51, 90);
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
         Pose2d End = FlipPose(-2, 52, 90);
 
@@ -40,30 +40,30 @@ public abstract class AutoNear extends HydrAuto {
         // Action to fetch first spike, return to launch position and launch
         Action fetchPPG = mDrive.actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0))
-                .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .splineToSplineHeading(PPG, FlipTangent(180))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-90))
                 .waitSeconds(.75)
                 .build();
 
         // Action to fetch second spike, return to launch position and launch
         Action fetchPGP = mDrive.actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0))
-                .splineToSplineHeading(PGP_WP, FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(PGP_WP, FlipTangent(90))
                 .splineToSplineHeading(PGP, FlipTangent(180))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-135))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-135))
                 .waitSeconds(.75)
                 .build();
 
         // Action to pick up artifacts from third spike and stop
         Action pickupGPP = mDrive.actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0))
-                .splineToSplineHeading(GPP_WP, FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(GPP_WP, FlipTangent(90))
                 .splineToSplineHeading(GPP, FlipTangent(90))
                 // wait here and then reject / stop intake
                 .waitSeconds(1)

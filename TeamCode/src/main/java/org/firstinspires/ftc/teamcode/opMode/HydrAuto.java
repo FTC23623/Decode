@@ -155,9 +155,9 @@ public abstract class HydrAuto extends OpMode_Base {
 
     protected Double FlipTurret(double degrees) {
         if (mFlip) {
-            return -degrees;
-        } else {
             return degrees;
+        } else {
+            return -degrees;
         }
     }
 }

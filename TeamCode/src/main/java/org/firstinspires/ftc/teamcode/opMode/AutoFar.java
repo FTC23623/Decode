@@ -21,8 +21,8 @@ public abstract class AutoFar extends HydrAuto {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, 0);
-        Pose2d GPP_WP = FlipPose(34, 30, 90);
-        Pose2d GPP = FlipPose(44, 51, 90);
+        Pose2d GPP_WP = FlipPose(32, 30, 90);
+        Pose2d GPP = FlipPose(42, 51, 90);
         Pose2d PGP_WP = FlipPose(11, 30, 90);
         Pose2d PGP = FlipPose(21, 51, 90);
         Pose2d PPG_WP = FlipPose(-12, 35, 90);
@@ -32,34 +32,34 @@ public abstract class AutoFar extends HydrAuto {
         // Action to fetch artifacts from first spike and launch
         Action fetchGPP = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
-                .splineToSplineHeading(GPP_WP, FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(GPP_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(GPP, FlipTangent(0))
                 .setTangent(FlipTangent(0))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(Launch, FlipTangent(-90))
                 .waitSeconds(.75)
                 .build();
 
         // Action to fetch artifacts from second spike and launch
         Action fetchPGP = mDrive.actionBuilder(Launch)
                 .setTangent(FlipTangent(180))
-                .splineToSplineHeading(PGP_WP, FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(PGP_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PGP, FlipTangent(0))
                 .setTangent(FlipTangent(0))
-                .splineToSplineHeading(Launch, FlipTangent(-60))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(Launch, FlipTangent(-60))
                 .waitSeconds(.75)
                 .build();
 
         // Action to pick up artifacts from third spike and stop
         Action pickupPPG = mDrive.actionBuilder(Launch)
                 .setTangent(FlipTangent(180))
-                .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PPG, FlipTangent(90))
                 .build();

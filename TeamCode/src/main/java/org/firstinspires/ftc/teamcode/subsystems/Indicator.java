@@ -15,9 +15,9 @@ public class Indicator implements Subsystem {
     private final Launcher launcher;
     private final Turret turret;
     private final ElapsedTime timer;
-    private final int onTimeMs = 100;
-    private final int offTimeMs = 50;
-    private final int onTimeIdle = 250;
+    private final int onTimeMs = 300;
+    private final int offTimeMs = 100;
+    private final int onTimeIdle = 600;
     private boolean on;
     private int idleState;
 
