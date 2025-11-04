@@ -97,6 +97,7 @@ public abstract class HydrAuto extends OpMode_Base {
             idle();
         }
         mTimeSinceStart.reset();
+        mTurret.GoHome();
         mVision.SetMode(mVisionTarget);
         TelemetryPacket packet = new TelemetryPacket();
         while (opModeIsActive()) {

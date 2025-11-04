@@ -82,6 +82,7 @@ public abstract class HyDrive extends OpMode_Base {
       idle();
     }
     mLauncher.SetSpeed(Constants.LauncherMedRPM);
+    mTurret.GoHome();
     mLoopSleep.reset();
     while (opModeIsActive()) {
       ClearLynxHubCaches();

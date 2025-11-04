@@ -28,7 +28,6 @@ public class Turret implements Subsystem {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
         TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
-        TurretServo.setPosition(0.5);
         lastVisionTimestamp = 0;
         autoSetAction = false;
         autoSetPos = 0;
@@ -99,6 +98,13 @@ public class Turret implements Subsystem {
 
     public boolean Locked() {
         return visionLocked;
+    }
+
+    public void GoHome() {
+        autoSetAction = true;
+        autoSetPos = 0.5;
+        Process();
+        autoSetAction = false;
     }
 
     private double Clamp(double position) {
