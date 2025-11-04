@@ -24,7 +24,7 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d GPP_WP = FlipPose(35, 40, 90);
         Pose2d GPP = FlipPose(35, 54, 90);
         Pose2d PGP_WP = FlipPose(12, 36, 90);
-        Pose2d PGP = FlipPose(6, 49, 90);
+        Pose2d PGP = FlipPose(12, 51, 90);
         Pose2d PPG_WP = FlipPose(-12, 32, 90);
         Pose2d PPG = FlipPose(-20, 51, 90);
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
@@ -53,7 +53,8 @@ public abstract class AutoNear extends HydrAuto {
                 .setTangent(FlipTangent(0))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(PGP_WP, FlipTangent(90))
-                .splineToSplineHeading(PGP, FlipTangent(180))
+                .splineToSplineHeading(PGP, FlipTangent(90))
+                .setTangent(FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(LaunchNear, FlipTangent(-135))
                 .waitSeconds(.75)

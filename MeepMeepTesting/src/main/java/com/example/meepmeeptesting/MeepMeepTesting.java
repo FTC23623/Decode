@@ -156,7 +156,7 @@ public class MeepMeepTesting {
         Pose2d GPP_WP = FlipPose(35, 40, 90, flip);
         Pose2d GPP = FlipPose(35, 54, 90, flip);
         Pose2d PGP_WP = FlipPose(12, 36, 90, flip);
-        Pose2d PGP = FlipPose(6, 49, 90, flip);
+        Pose2d PGP = FlipPose(12, 51, 90, flip);
         Pose2d PPG_WP = FlipPose(-12, 32, 90, flip);
         Pose2d PPG = FlipPose(-20, 51, 90, flip);
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
@@ -179,7 +179,8 @@ public class MeepMeepTesting {
         Action fetchPGP = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
-                .splineToSplineHeading(PGP, FlipTangent(180, flip))
+                .splineToSplineHeading(PGP, FlipTangent(90, flip))
+                .setTangent(FlipTangent(-90, flip))
                 .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
                 .waitSeconds(1.5)
                 .build();

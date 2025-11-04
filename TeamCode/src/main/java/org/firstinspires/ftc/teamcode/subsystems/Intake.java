@@ -155,6 +155,7 @@ public class Intake implements Subsystem {
                         break;
                     case IntakeReject:
                         intakeOut = true;
+                        transferForward = true;
                         timer.reset();
                         break;
                     case IntakeStop:
