@@ -15,9 +15,9 @@ public class Indicator implements Subsystem {
     private final Launcher launcher;
     private final Turret turret;
     private final ElapsedTime timer;
-    private final int onTimeMs = 300;
-    private final int offTimeMs = 100;
-    private final int onTimeIdle = 600;
+    private final int onTimeMs = 600;
+    private final int offTimeMs = 200;
+    private final int onTimeIdle = 1000;
     private boolean on;
     private int idleState;
 
@@ -175,7 +175,7 @@ public class Indicator implements Subsystem {
     private static double GetValueForColor(IndicatorColor color) {
         switch (color) {
             case INDICATOR_RED:
-                return 0.277;
+                return 0.280;
             case INDICATOR_ORANGE:
                 return 0.333;
             case INDICATOR_YELLOW:
