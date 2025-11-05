@@ -158,14 +158,14 @@ public class MeepMeepTesting {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d GPP_WP = FlipPose(35, 40, 90, flip);
-        Pose2d GPP = FlipPose(35, 54, 90, flip);
-        Pose2d PGP_WP = FlipPose(12, 36, 90, flip);
-        Pose2d PGP = FlipPose(12, 51, 90, flip);
-        Pose2d PPG_WP = FlipPose(-12, 32, 90, flip);
-        Pose2d PPG = FlipPose(-20, 51, 90, flip);
+        Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
+        Pose2d GPP = FlipPose(34, 56, 90, flip);
+        Pose2d PGP_WP = FlipPose(12, 30, 90, flip);
+        Pose2d PGP = FlipPose(12, 56, 90, flip);
+        Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
+        Pose2d PPG = FlipPose(-12, 52, 90, flip);
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
-        Pose2d End = FlipPose(-2, 52, 90, flip);
+        Pose2d End = FlipPose(-25, 52, -90, flip);
 
         Action driveToLaunchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .setTangent(FlipTangent(315, flip))
@@ -176,8 +176,9 @@ public class MeepMeepTesting {
         Action fetchPPG = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
-                .splineToSplineHeading(PPG, FlipTangent(180, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-90, flip))
+                .splineToSplineHeading(PPG, FlipTangent(90, flip))
+                .setTangent(FlipTangent(-90, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-180, flip))
                 .waitSeconds(1.5)
                 .build();
 
@@ -200,6 +201,7 @@ public class MeepMeepTesting {
                 .build();
 
         Action driveToEnd = myBot.getDrive().actionBuilder(LaunchNear)
+                .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(End, FlipTangent(90, flip))
                 .build();
 

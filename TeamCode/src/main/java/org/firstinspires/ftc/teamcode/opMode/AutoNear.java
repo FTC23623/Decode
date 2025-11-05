@@ -21,14 +21,14 @@ public abstract class AutoNear extends HydrAuto {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d GPP_WP = FlipPose(35, 40, 90);
-        Pose2d GPP = FlipPose(35, 54, 90);
-        Pose2d PGP_WP = FlipPose(12, 36, 90);
-        Pose2d PGP = FlipPose(12, 51, 90);
-        Pose2d PPG_WP = FlipPose(-12, 32, 90);
-        Pose2d PPG = FlipPose(-20, 51, 90);
+        Pose2d GPP_WP = FlipPose(34, 30, 90);
+        Pose2d GPP = FlipPose(34, 56, 90);
+        Pose2d PGP_WP = FlipPose(12, 30, 90);
+        Pose2d PGP = FlipPose(12, 56, 90);
+        Pose2d PPG_WP = FlipPose(-12, 35, 90);
+        Pose2d PPG = FlipPose(-12, 52, 90);
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
-        Pose2d End = FlipPose(-2, 52, 90);
+        Pose2d End = FlipPose(-25, 52, -90);
 
         // Action to launch preloaded artifacts
         Action driveToLaunchPreload = mDrive.actionBuilder(mBeginPose)
@@ -42,9 +42,10 @@ public abstract class AutoNear extends HydrAuto {
                 .setTangent(FlipTangent(0))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(PPG_WP, FlipTangent(90))
-                .splineToSplineHeading(PPG, FlipTangent(180))
+                .splineToSplineHeading(PPG, FlipTangent(90))
+                .setTangent(FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-90))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-180))
                 .waitSeconds(.75)
                 .build();
 
@@ -72,6 +73,7 @@ public abstract class AutoNear extends HydrAuto {
 
         // Action to drive from launch position to end position
         Action driveToEnd = mDrive.actionBuilder(LaunchNear)
+                .setTangent(FlipTangent(90))
                 .splineToSplineHeading(End, FlipTangent(90))
                 .build();
 

@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
-@Autonomous(name = "NearRed2", preselectTeleOp = "TeleRed")
+@Autonomous(name = "RedNear2", preselectTeleOp = "TeleRed")
 public class AutoNearRed2 extends AutoNear {
     public AutoNearRed2() {
         super(VisionMode.VisionMode_RedGoal, false, 2);
