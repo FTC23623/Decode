@@ -17,10 +17,10 @@ public final class Constants {
     public static final double nsToMs = 1.0e-6;
     public static final double intakeMotorMaxIn = -0.85;
     public static final double intakeMotorMaxOut = .6;
-    public static final double LauncherTopRPM = 3050;
-    public static final double LauncherTopRPMAuto = 2950;
-    public static final double LauncherMedRPM = 2550;
-    public static final double LauncherLowRPM = 2300;
+    public static final double LauncherTopRPM = 2950;
+    public static final double LauncherTopRPMAuto = 2850;
+    public static final double LauncherMedRPM = 2475;
+    public static final double LauncherLowRPM = 2200;
     public static final double LauncherIdleRPM = 500;
     public static final double LaunchServoRun = 1;
     public static final double TransfertoLaunchPower = 0.9;
@@ -38,7 +38,7 @@ public final class Constants {
     public static double goalHeightInches = 38.5;
     public static int LimelightPollRateHz = 20;
     public static double TurretDeadbandDegrees = 1;
-    public static double LaunchWheelRpmDeadband = 150;
+    public static double LaunchWheelRpmDeadband = 100;
     public static double LauncherAutoLaunchTimeMs = 2000;
     public static double TurretServoAnalogRangeVolts = 3.3;
     public static int TurretVisionLockTimeoutMs = 500;
