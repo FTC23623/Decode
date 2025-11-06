@@ -92,7 +92,7 @@ public class MeepMeepTesting {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch = FlipPose(55, 15, 0, flip);
+        Pose2d Launch = FlipPose(55, 15, -20, flip);
         Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
         Pose2d GPP = FlipPose(34, 56, 90, flip);
         Pose2d PGP_WP = FlipPose(12, 30, 90, flip);

@@ -20,7 +20,7 @@ public abstract class AutoFar extends HydrAuto {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch = FlipPose(55, 15, 0);
+        Pose2d Launch = FlipPose(55, 15, -20);
         Pose2d GPP_WP = FlipPose(34, 30, 90);
         Pose2d GPP = FlipPose(34, 56, 90);
         Pose2d PGP_WP = FlipPose(12, 30, 90);
@@ -78,7 +78,6 @@ public abstract class AutoFar extends HydrAuto {
         SequentialAction ret =  new SequentialAction(
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
-                    mTurret.GetSetAction(FlipTurret(-20)),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
                     launchPreload
                 ),
