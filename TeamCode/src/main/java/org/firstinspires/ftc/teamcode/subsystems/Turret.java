@@ -50,8 +50,8 @@ public class Turret implements Subsystem {
         if (mOp.mVision != null) {
             vision = mOp.mVision.GetResult();
         }
-        double servoFbPosition = GetPositionFromFb();
-        mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
+        //double servoFbPosition = GetPositionFromFb();
+        //mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
         if (autoSetAction) {
             TurretServo.setPosition(autoSetPos);
         }
@@ -66,7 +66,7 @@ public class Turret implements Subsystem {
                 mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
                 if (Math.abs(rotate) > 1) {
-                    double NewPos = servoFbPosition + CalcPositionOffsetAngle(rotate);
+                    double NewPos = TurretServo.getPosition() + CalcPositionOffsetAngle(rotate);
                     // clamp the new position to the min and max
                     NewPos = Clamp(NewPos);
                     TurretServo.setPosition(NewPos);
@@ -81,7 +81,7 @@ public class Turret implements Subsystem {
             double position_change = UserInput * mPosChangeRate;
             if (position_change != 0) {
                 // get the last set position and calculate the new position
-                double NewPos = servoFbPosition + position_change;
+                double NewPos = TurretServo.getPosition() + position_change;
                 // clamp the new position to the min and max
                 NewPos = Clamp(NewPos);
                 TurretServo.setPosition(Clamp(NewPos));
