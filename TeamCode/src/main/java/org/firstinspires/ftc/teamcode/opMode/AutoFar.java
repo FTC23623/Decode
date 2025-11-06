@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 
 import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
+import org.firstinspires.ftc.teamcode.types.TurretActions;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class AutoFar extends HydrAuto {
@@ -82,7 +83,9 @@ public abstract class AutoFar extends HydrAuto {
                     launchPreload
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mTurret.GetDisableAction(true),
                 fetchGPP,
+                mTurret.GetDisableAction(false),
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
         );
@@ -90,7 +93,9 @@ public abstract class AutoFar extends HydrAuto {
         if (mSpikeCount > 1) {
             ret = new SequentialAction(
                 ret,
+                mTurret.GetDisableAction(true),
                 fetchPGP,
+                mTurret.GetDisableAction(false),
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );

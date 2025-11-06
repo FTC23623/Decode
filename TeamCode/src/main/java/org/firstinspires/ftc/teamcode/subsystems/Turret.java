@@ -23,6 +23,8 @@ public class Turret implements Subsystem {
     private boolean autoSetAction;
     private double autoSetPos;
     private boolean visionLocked;
+    private boolean disableAutoTrack;
+
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
@@ -32,6 +34,7 @@ public class Turret implements Subsystem {
         autoSetAction = false;
         autoSetPos = 0;
         visionLocked = false;
+        disableAutoTrack = false;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class Turret implements Subsystem {
                 double rotate = vision.GetXOffset();
                 mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
-                if (Math.abs(rotate) > 1) {
+                if (Math.abs(rotate) > 1 && !disableAutoTrack) {
                     double NewPos = TurretServo.getPosition() + CalcPositionOffsetAngle(rotate);
                     // clamp the new position to the min and max
                     NewPos = Clamp(NewPos);
@@ -152,6 +155,10 @@ public class Turret implements Subsystem {
     public Action GetSetAction(double position) {
         return new Turret.RunSetAction(position);
     }
+
+    public Action GetDisableAction(boolean disable) {
+        return new Turret.RunDisableAction(disable);
+    }
     /**
      * Runs the supplied action until completion
      */
@@ -199,4 +206,19 @@ public class Turret implements Subsystem {
             return false;
         }
     }
+
+    public class RunDisableAction implements Action {
+        boolean disable;
+
+        public RunDisableAction(boolean disable) {
+            this.disable = disable;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            disableAutoTrack = disable;
+            return false;
+        }
+    }
+
 }
