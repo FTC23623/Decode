@@ -84,7 +84,9 @@ public abstract class AutoNear extends HydrAuto {
                     mLauncher.GetAction(LauncherActions.LauncherRunSlow),
                     driveToLaunchPreload),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mTurret.GetDisableAction(true),
                 fetchPPG,
+                mTurret.GetDisableAction(false),
                 mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
         );
@@ -92,7 +94,9 @@ public abstract class AutoNear extends HydrAuto {
         if (mSpikeCount > 1) {
             ret = new SequentialAction(
                     ret,
+                    mTurret.GetDisableAction(true),
                     fetchPGP,
+                    mTurret.GetDisableAction(false),
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
