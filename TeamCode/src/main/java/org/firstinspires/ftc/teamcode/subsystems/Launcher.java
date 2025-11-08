@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.LaunchMotor;
 import org.firstinspires.ftc.teamcode.types.Constants;
-import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
 
 import java.util.ArrayList;
@@ -118,13 +117,13 @@ public class Launcher implements Subsystem {
         RunLaunchServo = mOp.mOperatorGamepad.right_bumper;
 
         if (D_pad_Up){
-            targetRPMtune = Constants.LauncherTopRPM;
+            targetRPMtune = Constants.LauncherTopRPMTele;
         }
         else if (D_pad_Left || D_pad_Right) {
-            targetRPMtune = Constants.LauncherMedRPM;
+            targetRPMtune = Constants.LauncherMedRPMTele;
         }
         else if (D_pad_Down){
-            targetRPMtune = Constants.LauncherLowRPM;
+            targetRPMtune = Constants.LauncherLowRPMTele;
         }
     }
 
@@ -190,10 +189,10 @@ public class Launcher implements Subsystem {
                         targetRPMtune = Constants.LauncherIdleRPM;
                         break;
                     case LauncherRunSlow:
-                        targetRPMtune = Constants.LauncherLowRPM;
+                        targetRPMtune = Constants.LauncherLowRPMAuto;
                         break;
                     case LauncherRunMid:
-                        targetRPMtune = Constants.LauncherMedRPM;
+                        targetRPMtune = Constants.LauncherMedRPMAuto;
                         break;
                     case LauncherRunFast:
                         targetRPMtune = Constants.LauncherTopRPMAuto;

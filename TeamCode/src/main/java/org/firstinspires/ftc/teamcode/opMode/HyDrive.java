@@ -81,7 +81,7 @@ public abstract class HyDrive extends OpMode_Base {
       telemetry.update();
       idle();
     }
-    mLauncher.SetSpeed(Constants.LauncherMedRPM);
+    mLauncher.SetSpeed(Constants.LauncherMedRPMTele);
     mTurret.GoHome();
     mLoopSleep.reset();
     while (opModeIsActive()) {
