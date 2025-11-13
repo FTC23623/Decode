@@ -47,7 +47,7 @@ public class Intake implements Subsystem {
         intakeInSpeed = Constants.intakeMotorMaxIn * right;
         intakeOut = left > Constants.trgBtnThresh;
         intakeOutSpeed = Constants.intakeMotorMaxOut * left;
-        transferForward = mOp.mOperatorGamepad.right_bumper || mOp.mOperatorGamepad.circle;
+        transferForward = mOp.mOperatorGamepad.right_bumper || mOp.mOperatorGamepad.square;
         transferReverse = mOp.mOperatorGamepad.left_bumper;
     }
 

@@ -18,7 +18,7 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed"};
+        String[] autos = {"AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
@@ -59,6 +59,7 @@ public class MeepMeepTesting {
                 RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                         .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                         .setColorScheme(isBlue ? new ColorSchemeBlueDark() : new ColorSchemeRedDark())
+                        .setDimensions(16.2, 17.7)
                         .build();
 
                 // Run the selected auto
@@ -70,10 +71,16 @@ public class MeepMeepTesting {
                         myBot.runAction(BuildAutoFar(myBot, false, spikeCount));
                         break;
                     case "AutoNearBlue":
-                        myBot.runAction(BuildAutoNear(myBot, true, spikeCount));
+                        myBot.runAction(BuildAutoNear(myBot, true, spikeCount, false));
                         break;
                     case "AutoNearRed":
-                        myBot.runAction(BuildAutoNear(myBot, false, spikeCount));
+                        myBot.runAction(BuildAutoNear(myBot, false, spikeCount, false));
+                        break;
+                    case "AutoNearBlueGate":
+                        myBot.runAction(BuildAutoNear(myBot, true, spikeCount, true));
+                        break;
+                    case "AutoNearRedGate":
+                        myBot.runAction(BuildAutoNear(myBot, false, spikeCount, true));
                         break;
                 }
 
@@ -153,7 +160,7 @@ public class MeepMeepTesting {
         return ret;
     }
 
-    private static SequentialAction BuildAutoNear(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
+    private static SequentialAction BuildAutoNear(RoadRunnerBotEntity myBot, boolean flip, int spikeCount, boolean gate) {
         Pose2d beginPose = FlipPose(-54, 52, 310, flip);
 
         // All poses defined for autos on the red side
@@ -166,6 +173,8 @@ public class MeepMeepTesting {
         Pose2d PPG = FlipPose(-12, 52, 90, flip);
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
         Pose2d End = FlipPose(-25, 52, -90, flip);
+        Pose2d GateWP = FlipPose(-6, 46, 180, flip);
+        Pose2d Gate = FlipPose(-6, 58, 180, flip);
 
         Action driveToLaunchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .setTangent(FlipTangent(315, flip))
@@ -173,14 +182,30 @@ public class MeepMeepTesting {
                 .waitSeconds(1.5)
                 .build();
 
-        Action fetchPPG = myBot.getDrive().actionBuilder(LaunchNear)
-                .setTangent(FlipTangent(0, flip))
-                .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
-                .splineToSplineHeading(PPG, FlipTangent(90, flip))
-                .setTangent(FlipTangent(-90, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-180, flip))
-                .waitSeconds(1.5)
-                .build();
+        Action fetchPPG;
+        if (gate) {
+            fetchPPG = myBot.getDrive().actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0, flip))
+                    .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
+                    .splineToSplineHeading(PPG, FlipTangent(90, flip))
+                    .setTangent(FlipTangent(-30, flip))
+                    .splineToSplineHeading(GateWP, FlipTangent(-90, flip))
+                    .splineToSplineHeading(Gate, FlipTangent(-90, flip))
+                    .waitSeconds(1.5)
+                    .setTangent(FlipTangent(-90,flip))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-180, flip))
+                    .waitSeconds(1.5)
+                    .build();
+        } else {
+            fetchPPG = myBot.getDrive().actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0, flip))
+                    .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
+                    .splineToSplineHeading(PPG, FlipTangent(90, flip))
+                    .setTangent(FlipTangent(-90, flip))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-180, flip))
+                    .waitSeconds(1.5)
+                    .build();
+        }
 
         Action fetchPGP = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0, flip))

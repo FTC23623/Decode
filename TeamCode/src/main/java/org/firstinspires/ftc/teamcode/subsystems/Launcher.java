@@ -130,7 +130,7 @@ public class Launcher implements Subsystem {
         boolean D_pad_Left = mOp.mOperatorGamepad.dpad_left;
         boolean D_pad_Right = mOp.mOperatorGamepad.dpad_right;
         boolean D_pad_Down = mOp.mOperatorGamepad.dpad_down;
-        Circle = mOp.mOperatorGamepad.circle;
+        Circle = mOp.mOperatorGamepad.square;
         CircleDebounce.In(Circle);
         RunLaunchServo = mOp.mOperatorGamepad.right_bumper;
 

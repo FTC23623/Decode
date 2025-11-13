@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.objects.VisionResult;
 
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
-    private final double mPosChangeRate = 0.15;
+    private final double mPosChangeRate = 0.2;
     private final double mMaxPos = 1;
     private final double mMinPos = 0;
     private double UserInput = 0;
@@ -24,6 +24,7 @@ public class Turret implements Subsystem {
     private double autoSetPos;
     private boolean visionLocked;
     private boolean disableAutoTrack;
+    public static int VisionRefreshTimeMs = 250;
 
 
     public Turret(HydraOpMode opMode) {
@@ -63,7 +64,7 @@ public class Turret implements Subsystem {
             mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
             CalcDistanceToTag(vision);
-            if (vision.GetTimestamp() > lastVisionTimestamp + 250) {
+            if (vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) {
                 mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
                 double rotate = vision.GetXOffset();
                 mOp.mTelemetry.addData("rotate", rotate);
