@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.LaunchMotor;
@@ -43,8 +44,11 @@ public class Launcher implements Subsystem {
     public static double noPidPwr = 0;
     private final Servo LaunchServoWheel;
     private boolean RunLaunchServo = false;
+    private boolean Circle;
+    private Debouncer CircleDebounce;
+    private Turret turret;
 
-    public Launcher(HydraOpMode Opmode, double targetRPM) {
+    public Launcher(HydraOpMode Opmode, Turret turret, double targetRPM) {
         mOp = Opmode;
         motors = new ArrayList<>(2);
         motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
@@ -55,6 +59,9 @@ public class Launcher implements Subsystem {
         LaunchServoWheel = mOp.mHardwareMap.get(Servo.class, "LaunchServoWheel");
         lastRpmMeasure = new ArrayList<Double>(motors.size());
         lastPwrSetting = new ArrayList<Double>(motors.size());
+        Circle = false;
+        CircleDebounce = new Debouncer(1);
+        this.turret = turret;
         for (int i = 0; i < motors.size(); i++) {
             lastRpmMeasure.add(0.0);
             lastPwrSetting.add(0.0);
@@ -93,8 +100,17 @@ public class Launcher implements Subsystem {
             }
             lastTime = timeNow;
         }
+        boolean AutoLaunch = false;
+        if(turret != null) {
 
-        if (RunLaunchServo){
+
+            if (CircleDebounce.Out()) {
+                turret.ForceUnlock();
+                CircleDebounce.Used();
+            }
+            AutoLaunch = Circle && turret.Locked();
+        }
+        if (RunLaunchServo || AutoLaunch){
             LaunchServoWheel.setPosition(LaunchServoRun);
         }
         else{
@@ -114,6 +130,8 @@ public class Launcher implements Subsystem {
         boolean D_pad_Left = mOp.mOperatorGamepad.dpad_left;
         boolean D_pad_Right = mOp.mOperatorGamepad.dpad_right;
         boolean D_pad_Down = mOp.mOperatorGamepad.dpad_down;
+        Circle = mOp.mOperatorGamepad.circle;
+        CircleDebounce.In(Circle);
         RunLaunchServo = mOp.mOperatorGamepad.right_bumper;
 
         if (D_pad_Up){

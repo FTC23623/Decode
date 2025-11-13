@@ -16,7 +16,7 @@ public class LaunchTest extends LinearOpMode {
     {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         HydraOpMode opMode = new HydraOpMode(telemetry, hardwareMap, null, null);
-        Launcher launcher = new Launcher(opMode, 0);
+        Launcher launcher = new Launcher(opMode, null, 0);
 
         waitForStart();
         while (opModeIsActive()) {

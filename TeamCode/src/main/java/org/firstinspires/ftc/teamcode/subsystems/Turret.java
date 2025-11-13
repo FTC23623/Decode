@@ -103,6 +103,10 @@ public class Turret implements Subsystem {
         return visionLocked;
     }
 
+    public void ForceUnlock(){
+        visionLocked = false;
+    }
+
     public void GoHome() {
         autoSetAction = true;
         autoSetPos = 0.5;
