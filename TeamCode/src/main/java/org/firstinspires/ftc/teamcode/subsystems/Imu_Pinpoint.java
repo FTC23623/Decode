@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
+import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public class Imu_Pinpoint extends Imu_Base {
     protected HydraOpMode mOpMode;
@@ -13,15 +14,15 @@ public class Imu_Pinpoint extends Imu_Base {
     protected final double mAllianceOffsetDeg;
     private boolean isInit;
 
-    public Imu_Pinpoint(HydraOpMode opMode, Pose2d initialPose, DecodeAprilTag target) {
+    public Imu_Pinpoint(HydraOpMode opMode, Pose2d initialPose, VisionMode target) {
         super();
         mOpMode = opMode;
         mPinpoint = new PinpointLocalizer(opMode.mHardwareMap, 0, initialPose);
         switch (target) {
-            case DecodeTag_RedGoal:
+            case VisionMode_RedGoal:
                 mAllianceOffsetDeg = 90;
                 break;
-            case DecodeTag_BlueGoal:
+            case VisionMode_BlueGoal:
                 mAllianceOffsetDeg = -90;
                 break;
             default:
@@ -42,6 +43,7 @@ public class Imu_Pinpoint extends Imu_Base {
     public static boolean InitPinpoint(PinpointLocalizer pinpoint, Telemetry telemetry) {
         boolean retval = false;
         final GoBildaPinpointDriver driver = pinpoint.driver;
+        pinpoint.update();
         GoBildaPinpointDriver.DeviceStatus status = driver.getDeviceStatus();
         switch (status) {
             case READY:

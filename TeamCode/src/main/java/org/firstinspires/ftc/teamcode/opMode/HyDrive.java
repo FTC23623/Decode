@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Drive_Manual;
 import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Hub;
+import org.firstinspires.ftc.teamcode.subsystems.Imu_Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.Indicator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
@@ -50,6 +51,7 @@ public abstract class HyDrive extends OpMode_Base {
     telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     mImu = new Imu_Hub(mOpMode);
+    //mImu = new Imu_Pinpoint(mOpMode, OpmodeHeading.GetOffset(), mVisionTarget);
     mDrive = new Drive_Manual(mOpMode, mImu);
     mIntake = new Intake(mOpMode);
     mTurret = new Turret(mOpMode);

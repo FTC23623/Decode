@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode.objects;
 
-public class OpmodeHeading {
-    static private double mYawOffset = 0;
+import com.acmerobotics.roadrunner.Pose2d;
 
-    public static void SetOffset(double offset) {
+public class OpmodeHeading {
+    static private Pose2d mYawOffset = null;
+
+    public static void SetOffset(Pose2d offset) {
         mYawOffset = offset;
     }
 
-    public static double GetOffset() {
+    public static Pose2d GetOffset() {
         return mYawOffset;
     }
 

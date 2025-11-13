@@ -115,7 +115,7 @@ public abstract class HydrAuto extends OpMode_Base {
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
-       // OpmodeHeading.SetOffset(mImu.GetYaw());
+        OpmodeHeading.SetOffset(mDrive.localizer.getPose());
         OpmodeHeading.handOff = true;
     }
     
