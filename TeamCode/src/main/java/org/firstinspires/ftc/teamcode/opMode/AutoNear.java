@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class AutoNear extends HydrAuto {
 
-    public AutoNear(VisionMode target, boolean flip, int spikeCount) {
-        super(target, flip, spikeCount);
+    public AutoNear(VisionMode target, boolean flip, int spikeCount, boolean gate) {
+        super(target, flip, spikeCount, gate);
         mBeginPose = FlipPose(-54, 52, 310);
     }
 
@@ -29,6 +29,8 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d PPG = FlipPose(-12, 52, 90);
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
         Pose2d End = FlipPose(-25, 52, -90);
+        Pose2d GateWP = FlipPose(-6, 46, 180);
+        Pose2d Gate = FlipPose(-6, 58, 180);
 
         // Action to launch preloaded artifacts
         Action driveToLaunchPreload = mDrive.actionBuilder(mBeginPose)
@@ -38,16 +40,34 @@ public abstract class AutoNear extends HydrAuto {
                 .build();
 
         // Action to fetch first spike, return to launch position and launch
-        Action fetchPPG = mDrive.actionBuilder(LaunchNear)
-                .setTangent(FlipTangent(0))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(PPG_WP, FlipTangent(90))
-                .splineToSplineHeading(PPG, FlipTangent(90))
-                .setTangent(FlipTangent(-90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-180))
-                .waitSeconds(.75)
-                .build();
+        Action fetchPPG;
+        if (mGate) {
+            fetchPPG = mDrive.actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                    .splineToSplineHeading(PPG_WP, FlipTangent(90))
+                    .splineToSplineHeading(PPG, FlipTangent(90))
+                    .setTangent(FlipTangent(-30))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                    .splineToSplineHeading(GateWP, FlipTangent(-90))
+                    .splineToSplineHeading(Gate, FlipTangent(-90))
+                    .waitSeconds(1.5)
+                    .setTangent(FlipTangent(-90))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-180))
+                    .waitSeconds(.75)
+                    .build();
+        } else {
+            fetchPPG = mDrive.actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                    .splineToSplineHeading(PPG_WP, FlipTangent(90))
+                    .splineToSplineHeading(PPG, FlipTangent(90))
+                    .setTangent(FlipTangent(-90))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-180))
+                    .waitSeconds(.75)
+                    .build();
+        }
 
         // Action to fetch second spike, return to launch position and launch
         Action fetchPGP = mDrive.actionBuilder(LaunchNear)

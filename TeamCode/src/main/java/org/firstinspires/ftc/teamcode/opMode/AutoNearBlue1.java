@@ -7,6 +7,6 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 @Autonomous(name = "BlueNear1", preselectTeleOp = "TeleBlue", group = "Blue")
 public class AutoNearBlue1 extends AutoNear {
     public AutoNearBlue1() {
-        super(VisionMode.VisionMode_BlueGoal, true, 1);
+        super(VisionMode.VisionMode_BlueGoal, true, 1, false);
     }
 }
