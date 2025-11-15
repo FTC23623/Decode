@@ -866,7 +866,7 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
         if(deviceVersion == 1 || deviceVersion == 2){
             return 1;
         }
-        else if (deviceVersion == 3){
+        else if (deviceVersion >= 3){
             return 2;
         }
         return 0;
