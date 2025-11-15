@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.types.Constants;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -10,7 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
-
+@Config
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
     private final double mPosChangeRate = 0.2;
@@ -24,8 +26,7 @@ public class Turret implements Subsystem {
     private double autoSetPos;
     private boolean visionLocked;
     private boolean disableAutoTrack;
-    public static int VisionRefreshTimeMs = 250;
-
+    public static int VisionRefreshTimeMs = 100;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
