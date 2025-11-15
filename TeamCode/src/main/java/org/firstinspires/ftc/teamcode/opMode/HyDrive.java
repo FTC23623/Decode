@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opMode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
@@ -50,8 +51,12 @@ public abstract class HyDrive extends OpMode_Base {
     mLoopSleep = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
-    mImu = new Imu_Hub(mOpMode);
-    //mImu = new Imu_Pinpoint(mOpMode, OpmodeHeading.GetOffset(), mVisionTarget);
+    //mImu = new Imu_Hub(mOpMode);
+    Pose2d pinpointStart = OpmodeHeading.GetOffset();
+    if (pinpointStart == null) {
+      pinpointStart = new Pose2d(0, 0, Math.toRadians(DriverHeadingDefault()));
+    }
+    mImu = new Imu_Pinpoint(mOpMode, pinpointStart, mVisionTarget);
     mDrive = new Drive_Manual(mOpMode, mImu);
     mIntake = new Intake(mOpMode);
     mTurret = new Turret(mOpMode);
@@ -72,8 +77,9 @@ public abstract class HyDrive extends OpMode_Base {
     // manual bulk caching
     SetLynxHubsManual();
     InitializeAllSystems();
-    mImu.SetYawOffset(OpmodeHeading.GetOffset());
-    telemetry.addData("Auto Yaw", OpmodeHeading.GetOffset());
+    final double headingOffset = DriverHeadingFromRobotPose(pinpointStart);
+    mImu.SetYawOffset(headingOffset);
+    telemetry.addData("Auto Yaw", headingOffset);
     telemetry.update();
     // set the vision up for targeting
     mVision.SetMode(mVisionTarget);
@@ -103,4 +109,20 @@ public abstract class HyDrive extends OpMode_Base {
       idle();
     }
   }
+
+  private double DriverHeadingFromRobotPose(Pose2d pose) {
+    return Math.toDegrees(pose.heading.toDouble()) - DriverHeadingDefault();
+  }
+
+  private double DriverHeadingDefault() {
+    switch (mVisionTarget) {
+      case VisionMode_BlueGoal:
+        return -90;
+      case VisionMode_RedGoal:
+        return 90;
+      default:
+        return 0;
+    }
+  }
+
 }

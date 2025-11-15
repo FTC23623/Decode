@@ -21,8 +21,8 @@ public abstract class Imu_Base implements Imu {
     }
 
     @Override
-    public void SetYawOffset(Pose2d offset) {
-        mOffset = offset.heading.toDouble();
+    public void SetYawOffset(double offset) {
+        mOffset = offset;
     }
 
     @Override

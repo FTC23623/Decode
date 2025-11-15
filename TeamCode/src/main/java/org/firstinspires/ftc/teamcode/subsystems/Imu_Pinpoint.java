@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.roadrunner.Pose2d;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
@@ -17,7 +18,7 @@ public class Imu_Pinpoint extends Imu_Base {
     public Imu_Pinpoint(HydraOpMode opMode, Pose2d initialPose, VisionMode target) {
         super();
         mOpMode = opMode;
-        mPinpoint = new PinpointLocalizer(opMode.mHardwareMap, 0, initialPose);
+        mPinpoint = new PinpointLocalizer(opMode.mHardwareMap, MecanumDrive.PARAMS.inPerTick, initialPose);
         switch (target) {
             case VisionMode_RedGoal:
                 mAllianceOffsetDeg = 90;
@@ -59,6 +60,8 @@ public class Imu_Pinpoint extends Imu_Base {
                         break;
                 }
                 retval = true;
+                telemetry.addData("Pinpoint version", version);
+                telemetry.addLine("Pinpoint ready");
                 break;
             case CALIBRATING:
             case NOT_READY:

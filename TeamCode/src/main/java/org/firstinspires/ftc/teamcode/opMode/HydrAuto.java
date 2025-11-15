@@ -51,7 +51,7 @@ public abstract class HydrAuto extends OpMode_Base {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        OpmodeHeading.handOff = false;
+        OpmodeHeading.SetOffset(null);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         mOpMode = new HydraOpMode(telemetry, hardwareMap, null, null);
         mIntake = new Intake(mOpMode);
@@ -118,7 +118,6 @@ public abstract class HydrAuto extends OpMode_Base {
             module.clearBulkCache();
         }
         OpmodeHeading.SetOffset(mDrive.localizer.getPose());
-        OpmodeHeading.handOff = true;
     }
     
     protected void InitializeRRPinpoint() {

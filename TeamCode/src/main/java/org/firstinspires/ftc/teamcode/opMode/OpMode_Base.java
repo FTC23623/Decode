@@ -40,6 +40,7 @@ public abstract class OpMode_Base extends LinearOpMode {
                 init &= system.Init();
             }
             mOpMode.mTelemetry.update();
-        } while (!init);
+            idle();
+        } while (!init && !isStarted() && !isStopRequested());
     }
 }
