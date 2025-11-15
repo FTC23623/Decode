@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import androidx.annotation.NonNull;
+
+import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.types.Constants;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -27,6 +29,7 @@ public class Turret implements Subsystem {
     private boolean visionLocked;
     private boolean disableAutoTrack;
     public static int VisionRefreshTimeMs = 100;
+    private final Debouncer circleDebounce;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
@@ -37,6 +40,7 @@ public class Turret implements Subsystem {
         autoSetPos = 0;
         visionLocked = false;
         disableAutoTrack = false;
+        circleDebounce = new Debouncer(Constants.debounceLong);
     }
 
     @Override
@@ -47,6 +51,12 @@ public class Turret implements Subsystem {
     @Override
     public void HandleUserInput() {
         UserInput = mOp.mOperatorGamepad.right_stick_x;
+        circleDebounce.In(mOp.mOperatorGamepad.circle);
+        if (circleDebounce.Out()) {
+            circleDebounce.Used();
+            disableAutoTrack = !disableAutoTrack;
+            mOp.mOperatorGamepad.rumbleBlips(1);
+        }
     }
 
     @Override
@@ -60,7 +70,7 @@ public class Turret implements Subsystem {
         if (autoSetAction) {
             TurretServo.setPosition(autoSetPos);
         }
-        else if (vision != null) {
+        else if (vision != null && !disableAutoTrack) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
@@ -70,7 +80,7 @@ public class Turret implements Subsystem {
                 double rotate = vision.GetXOffset();
                 mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
-                if (Math.abs(rotate) > 1 && !disableAutoTrack) {
+                if (Math.abs(rotate) > 1) {
                     double NewPos = TurretServo.getPosition() + CalcPositionOffsetAngle(rotate);
                     // clamp the new position to the min and max
                     NewPos = Clamp(NewPos);
@@ -93,7 +103,7 @@ public class Turret implements Subsystem {
                 mOp.mTelemetry.addData("Turret Pos U", NewPos);
             }
         }
-        if (System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
+        if (disableAutoTrack || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
             visionLocked = false;
         }
         mOp.mTelemetry.addData("AutoPos", autoSetPos);
