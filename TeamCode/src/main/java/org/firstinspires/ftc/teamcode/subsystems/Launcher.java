@@ -46,9 +46,9 @@ public class Launcher implements Subsystem {
     public static double noPidPwr = 0;
     private final Servo LaunchServoWheel;
     private boolean RunLaunchServo = false;
-    private boolean Circle;
-    private Debouncer CircleDebounce;
-    private Turret turret;
+    private boolean autoLaunchPressed;
+    private final Debouncer autoLaunchDebounce;
+    private final Turret turret;
 
     public Launcher(HydraOpMode Opmode, Turret turret, double targetRPM) {
         mOp = Opmode;
@@ -61,8 +61,8 @@ public class Launcher implements Subsystem {
         LaunchServoWheel = mOp.mHardwareMap.get(Servo.class, "LaunchServoWheel");
         lastRpmMeasure = new ArrayList<Double>(motors.size());
         lastPwrSetting = new ArrayList<Double>(motors.size());
-        Circle = false;
-        CircleDebounce = new Debouncer(1);
+        autoLaunchPressed = false;
+        autoLaunchDebounce = new Debouncer(1);
         this.turret = turret;
         for (int i = 0; i < motors.size(); i++) {
             lastRpmMeasure.add(0.0);
@@ -104,13 +104,11 @@ public class Launcher implements Subsystem {
         }
         boolean AutoLaunch = false;
         if(turret != null) {
-
-
-            if (CircleDebounce.Out()) {
+            if (autoLaunchDebounce.Out()) {
                 turret.ForceUnlock();
-                CircleDebounce.Used();
+                autoLaunchDebounce.Used();
             }
-            AutoLaunch = Circle && turret.Locked();
+            AutoLaunch = autoLaunchPressed && turret.Locked();
         }
         if (RunLaunchServo || AutoLaunch){
             LaunchServoWheel.setPosition(LaunchServoRun);
@@ -132,9 +130,9 @@ public class Launcher implements Subsystem {
         boolean D_pad_Left = mOp.mOperatorGamepad.dpad_left;
         boolean D_pad_Right = mOp.mOperatorGamepad.dpad_right;
         boolean D_pad_Down = mOp.mOperatorGamepad.dpad_down;
-        Circle = mOp.mOperatorGamepad.square;
-        CircleDebounce.In(Circle);
-        RunLaunchServo = mOp.mOperatorGamepad.right_bumper;
+        autoLaunchPressed = mOp.mOperatorGamepad.right_bumper;
+        autoLaunchDebounce.In(autoLaunchPressed);
+        RunLaunchServo = mOp.mOperatorGamepad.square;
 
         if (D_pad_Up){
             targetRPMtune = Constants.LauncherTopRPMTele;
