@@ -21,6 +21,8 @@ public final class Constants {
     public static final double LauncherTopRPMAuto = 2750;
     public static final double LauncherMedRPMTele = 2450;
     public static final double LauncherMedRPMAuto = 2450;
+    // don't adjust low RPM above this threshold
+    public static final double LauncherLowRPMThreshold = 2250;
     public static final double LauncherLowRPMTele = 2175;
     public static final double LauncherLowRPMAuto = 2175;
     public static final double LauncherIdleRPM = 500;

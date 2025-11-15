@@ -36,6 +36,8 @@ public class Launcher implements Subsystem {
     public static double pidI = 0.0001;
     public static double pidD = 0.0;
     public static double pidF = 0.000242;
+    private final double pidfMedFar = 0.000242;
+    private final double pidfNear = 0.000248;
     private final PIDFController pid;
     private long lastTime;
     public static int samplesToAverage = 0;
@@ -146,14 +148,20 @@ public class Launcher implements Subsystem {
     }
 
     public void Tune() {
-        pid.setPIDF(pidP, pidI, pidD, pidF);
         if (pid.getSetPoint() != targetRPMtune) {
+            if (targetRPMtune < Constants.LauncherLowRPMThreshold) {
+                pidF = pidfNear;
+            } else {
+                pidF = pidfMedFar;
+            }
             pid.setSetPoint(targetRPMtune);
             pid.clearTotalError();
             for (LaunchMotor motor : motors) {
                 motor.mLogger.rpmTgt.set(targetRPMtune);
             }
         }
+        mOp.mTelemetry.addData("pidF", pidF);
+        pid.setPIDF(pidP, pidI, pidD, pidF);
     }
 
     public boolean AtSpeed() {
