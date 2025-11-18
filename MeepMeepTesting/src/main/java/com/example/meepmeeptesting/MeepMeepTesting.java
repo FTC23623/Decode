@@ -173,7 +173,7 @@ public class MeepMeepTesting {
         Pose2d PPG = FlipPose(-12, 52, 90, flip);
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
         Pose2d End = FlipPose(-25, 52, -90, flip);
-        Pose2d GateWP = FlipPose(-6, 46, 180, flip);
+        Pose2d GateWP = FlipPose(-6, 50, 180, flip);
         Pose2d Gate = FlipPose(-6, 58, 180, flip);
 
         Action driveToLaunchPreload = myBot.getDrive().actionBuilder(beginPose)
@@ -188,7 +188,7 @@ public class MeepMeepTesting {
                     .setTangent(FlipTangent(0, flip))
                     .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                     .splineToSplineHeading(PPG, FlipTangent(90, flip))
-                    .setTangent(FlipTangent(-30, flip))
+                    .setTangent(FlipTangent(0, flip))
                     .splineToSplineHeading(GateWP, FlipTangent(-90, flip))
                     .splineToSplineHeading(Gate, FlipTangent(-90, flip))
                     .waitSeconds(1.5)

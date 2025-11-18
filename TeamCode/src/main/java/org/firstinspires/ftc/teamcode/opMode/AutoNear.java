@@ -29,7 +29,7 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d PPG = FlipPose(-12, 52, 90);
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
         Pose2d End = FlipPose(-25, 52, -90);
-        Pose2d GateWP = FlipPose(-6, 46, 180);
+        Pose2d GateWP = FlipPose(-6, 50, 180);
         Pose2d Gate = FlipPose(-6, 58, 180);
 
         // Action to launch preloaded artifacts
@@ -47,7 +47,7 @@ public abstract class AutoNear extends HydrAuto {
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                     .splineToSplineHeading(PPG_WP, FlipTangent(90))
                     .splineToSplineHeading(PPG, FlipTangent(90))
-                    .setTangent(FlipTangent(-30))
+                    .setTangent(FlipTangent(0))
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                     .splineToSplineHeading(GateWP, FlipTangent(-90))
                     .splineToSplineHeading(Gate, FlipTangent(-90))

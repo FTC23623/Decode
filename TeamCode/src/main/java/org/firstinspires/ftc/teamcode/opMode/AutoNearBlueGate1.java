@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
-@Autonomous(name = "BlueNearGate", preselectTeleOp = "TeleBlue", group = "Blue")
-public class AutoNearBlueGate extends AutoNear {
-    public AutoNearBlueGate() {
+@Autonomous(name = "BlueNearGate1", preselectTeleOp = "TeleBlue", group = "Blue")
+public class AutoNearBlueGate1 extends AutoNear {
+    public AutoNearBlueGate1() {
         super(VisionMode.VisionMode_BlueGoal, true, 1, true);
     }
 }
