@@ -22,9 +22,9 @@ public abstract class AutoNear extends HydrAuto {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d GPP_WP = FlipPose(34, 30, 90);
-        Pose2d GPP = FlipPose(34, 56, 90);
+        Pose2d GPP = FlipPose(34, 58, 90);
         Pose2d PGP_WP = FlipPose(12, 30, 90);
-        Pose2d PGP = FlipPose(12, 56, 90);
+        Pose2d PGP = FlipPose(12, 58, 90);
         Pose2d PPG_WP = FlipPose(-12, 35, 90);
         Pose2d PPG = FlipPose(-12, 52, 90);
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
