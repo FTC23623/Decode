@@ -77,11 +77,13 @@ public abstract class AutoFar extends HydrAuto {
 
         // Build the auto for launching preloads, fetching artifacts from the first spike and launching
         SequentialAction ret =  new SequentialAction(
+                mTurret.GetDisableAction(true),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
                     launchPreload
                 ),
+                mTurret.GetDisableAction(false),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
                 fetchGPP,
@@ -104,7 +106,9 @@ public abstract class AutoFar extends HydrAuto {
         if (mSpikeCount > 2) {
             ret = new SequentialAction(
                 ret,
+                mTurret.GetDisableAction(true),
                 pickupPPG,
+                mTurret.GetDisableAction(false),
                 mIntake.GetAction(IntakeActions.IntakeReject)
             );
         }

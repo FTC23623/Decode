@@ -125,7 +125,9 @@ public abstract class AutoNear extends HydrAuto {
         if (mSpikeCount > 2) {
             ret = new SequentialAction(
                     ret,
+                    mTurret.GetDisableAction(true),
                     pickupGPP,
+                    mTurret.GetDisableAction(false),
                     mIntake.GetAction(IntakeActions.IntakeReject)
             );
         }
