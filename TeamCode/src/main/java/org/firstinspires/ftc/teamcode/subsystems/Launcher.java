@@ -32,11 +32,17 @@ public class Launcher implements Subsystem {
     private final ArrayList<LaunchMotor> motors;
     private final ArrayList<Double> lastRpmMeasure;
     private final ArrayList<Double> lastPwrSetting;
-    public static double pidP = 0.0016;
+    public static double pidP = 0.003;
+    private final double pidpMedFar = 0.003;
+    private final double pidpNear = 0.003;
     public static double pidI = 0.0001;
+    private final double pidiMedFar = 0.0001;
+    private final double pidiNear = 0.0001;
     public static double pidD = 0.0;
+    private final double piddMedFar = 0;
+    private final double piddNear = 0;
     public static double pidF = 0.000242;
-    private final double pidfMedFar = 0.000242;
+    private final double pidfMedFar = 0.000215;
     private final double pidfNear = 0.000248;
     private final PIDFController pid;
     private long lastTime;
@@ -149,8 +155,14 @@ public class Launcher implements Subsystem {
         if (pid.getSetPoint() != targetRPMtune) {
             if (targetRPMtune < Constants.LauncherLowRPMThreshold) {
                 pidF = pidfNear;
+                pidI = pidiNear;
+                pidP = pidpNear;
+                pidD = piddNear;
             } else {
                 pidF = pidfMedFar;
+                pidI = pidiMedFar;
+                pidP = pidpMedFar;
+                pidD = piddMedFar;
             }
             pid.setSetPoint(targetRPMtune);
             pid.clearTotalError();
