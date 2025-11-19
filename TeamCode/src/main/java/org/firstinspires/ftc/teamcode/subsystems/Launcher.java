@@ -219,7 +219,7 @@ public class Launcher implements Subsystem {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!started) {
                 started = true;
-
+                launchTimer.reset();
                 switch (mAction) {
                     case LauncherRunOff:
                         targetRPMtune = Constants.LauncherIdleRPM;
@@ -235,11 +235,9 @@ public class Launcher implements Subsystem {
                         break;
                     case LauncherLaunch:
                         RunLaunchServo = true;
-                        launchTimer.reset();
                         break;
                     default:
                         return false;
-
                 }
             }
             switch (mAction) {
@@ -247,7 +245,7 @@ public class Launcher implements Subsystem {
                 case LauncherRunSlow:
                 case LauncherRunMid:
                 case LauncherRunFast:
-                    return !AtSpeed();
+                    return !AtSpeed() && launchTimer.milliseconds() < Constants.LauncherSpeedChangeWaitTimeMs;
                 case LauncherLaunch:
                     boolean launching = launchTimer.milliseconds() < Constants.LauncherAutoLaunchTimeMs;
                     RunLaunchServo = launching;

@@ -42,9 +42,10 @@ public final class Constants {
     public static double goalHeightInches = 38.5;
     public static int LimelightPollRateHz = 20;
     public static double TurretDeadbandDegrees = 1;
-    public static double LaunchWheelRpmDeadband = 100;
+    public static double LaunchWheelRpmDeadband = 50;
     public static double LauncherAutoLaunchTimeMs = 2000;
     public static double TurretServoAnalogRangeVolts = 3.3;
     public static int TurretVisionLockTimeoutMs = 500;
+    public static int LauncherSpeedChangeWaitTimeMs = 6000;
 
 }
