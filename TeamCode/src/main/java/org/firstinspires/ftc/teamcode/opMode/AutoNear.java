@@ -30,7 +30,7 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
         Pose2d End = FlipPose(-25, 52, -90);
         Pose2d GateWP = FlipPose(-6, 50, 180);
-        Pose2d Gate = FlipPose(-6, 58, 180);
+        Pose2d Gate = FlipPose(-6, 59, 180);
 
         // Action to launch preloaded artifacts
         Action driveToLaunchPreload = mDrive.actionBuilder(mBeginPose)
