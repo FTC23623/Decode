@@ -57,6 +57,7 @@ public class Launcher implements Subsystem {
     private final Servo LaunchServoWheel;
     private boolean RunLaunchServo = false;
     private boolean autoLaunchPressed;
+    private boolean autoLaunchStarted;
     private final Debouncer autoLaunchDebounce;
     private final Turret turret;
 
@@ -72,6 +73,7 @@ public class Launcher implements Subsystem {
         lastRpmMeasure = new ArrayList<Double>(motors.size());
         lastPwrSetting = new ArrayList<Double>(motors.size());
         autoLaunchPressed = false;
+        autoLaunchStarted = false;
         autoLaunchDebounce = new Debouncer(1);
         this.turret = turret;
         for (int i = 0; i < motors.size(); i++) {
@@ -118,7 +120,8 @@ public class Launcher implements Subsystem {
                 turret.ForceUnlock();
                 autoLaunchDebounce.Used();
             }
-            AutoLaunch = autoLaunchPressed && turret.Locked();
+            AutoLaunch = autoLaunchPressed && (autoLaunchStarted || turret.Locked());
+            autoLaunchStarted = AutoLaunch;
         }
         if (RunLaunchServo || AutoLaunch){
             LaunchServoWheel.setPosition(LaunchServoRun);
