@@ -33,16 +33,20 @@ public class Launcher implements Subsystem {
     private final ArrayList<Double> lastRpmMeasure;
     private final ArrayList<Double> lastPwrSetting;
     public static double pidP = 0.003;
-    private final double pidpMedFar = 0.003;
+    private final double pidpFar = 0.003;
+    private final double pidpMed = 0.003;
     private final double pidpNear = 0.003;
     public static double pidI = 0.0001;
-    private final double pidiMedFar = 0.0001;
+    private final double pidiFar = 0.0001;
+    private final double pidiMed = 0.0001;
     private final double pidiNear = 0.0001;
     public static double pidD = 0.0;
-    private final double piddMedFar = 0;
+    private final double piddFar = 0;
+    private final double piddMed = 0;
     private final double piddNear = 0;
     public static double pidF = 0.000242;
-    private final double pidfMedFar = 0.000215;
+    private final double pidfFar = 0.000215;
+    private final double pidfMed = 0.000215;
     private final double pidfNear = 0.000248;
     private final PIDFController pid;
     private long lastTime;
@@ -158,11 +162,16 @@ public class Launcher implements Subsystem {
                 pidI = pidiNear;
                 pidP = pidpNear;
                 pidD = piddNear;
+            } else if (targetRPMtune < Constants.LauncherMedRPMThreshold) {
+                pidF = pidfMed;
+                pidI = pidiMed;
+                pidP = pidpMed;
+                pidD = piddMed;
             } else {
-                pidF = pidfMedFar;
-                pidI = pidiMedFar;
-                pidP = pidpMedFar;
-                pidD = piddMedFar;
+                pidF = pidfFar;
+                pidI = pidiFar;
+                pidP = pidpFar;
+                pidD = piddFar;
             }
             pid.setSetPoint(targetRPMtune);
             pid.clearTotalError();
