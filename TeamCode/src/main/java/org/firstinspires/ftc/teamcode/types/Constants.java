@@ -17,8 +17,9 @@ public final class Constants {
     public static final double nsToMs = 1.0e-6;
     public static final double intakeMotorMaxIn = -0.85;
     public static final double intakeMotorMaxOut = .6;
-    public static final double LauncherTopRPMTele = 2900;
-    public static final double LauncherTopRPMAuto = 2725;
+    public static final double LauncherTopRPMTele = 2925;
+    public static final double LauncherTopRPMAuto = 2775;
+    public static final double LauncherMedRPMThreshold = 2600;
     public static final double LauncherMedRPMTele = 2425;
     public static final double LauncherMedRPMAuto = 2450;
     // don't adjust low RPM above this threshold
