@@ -252,6 +252,7 @@ public class Launcher implements Subsystem {
                         return false;
                 }
             }
+            Process();
             switch (mAction) {
                 case LauncherRunOff:
                 case LauncherRunSlow:

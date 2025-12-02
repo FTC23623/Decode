@@ -18,7 +18,7 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
+        String[] autos = {"FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
@@ -81,6 +81,9 @@ public class MeepMeepTesting {
                         break;
                     case "AutoNearRedGate":
                         myBot.runAction(BuildAutoNear(myBot, false, spikeCount, true));
+                        break;
+                    case "FarFetch":
+                        myBot.runAction(BuildFarFetch(myBot,false, spikeCount,false));
                         break;
                 }
 
@@ -237,6 +240,72 @@ public class MeepMeepTesting {
         }
         if (spikeCount > 2) {
             ret = new SequentialAction(ret, pickupGPP);
+        }
+        if (spikeCount < 3) {
+            ret = new SequentialAction(ret, driveToEnd);
+        }
+        return ret;
+    }
+    private static SequentialAction BuildFarFetch(RoadRunnerBotEntity myBot, boolean flip, int spikeCount, boolean gate) {
+        Pose2d beginPose = FlipPose(60.0, 15.0, 0.0, flip);
+
+        Pose2d Launch = FlipPose(55, 15, -20, flip);
+        Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
+        Pose2d GPP = FlipPose(34, 56, 90, flip);
+        Pose2d PGP_WP = FlipPose(12, 30, 90, flip);
+        Pose2d PGP = FlipPose(12, 56, 90, flip);
+        Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
+        Pose2d PPG = FlipPose(-12, 48, 90, flip);
+        Pose2d End = FlipPose(30, 15, 0, flip);
+        Pose2d LoadingZone = FlipPose(59,55,90, flip);
+        Pose2d loadingzone_wp= FlipPose(59, 40, 90,flip);
+
+        Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
+                .splineToSplineHeading(Launch, FlipTangent(180, flip))
+                .waitSeconds(2)
+                .build();
+
+        Action fetchLoadingZone1 = myBot.getDrive().actionBuilder(Launch)
+                .setTangent(FlipTangent(90, flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .setTangent(FlipTangent(-90, flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
+                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
+                .waitSeconds(1.5)
+                .build();
+
+        Action fetchLoadingZone2 = myBot.getDrive().actionBuilder(Launch)
+                .setTangent(FlipTangent(90, flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .setTangent(FlipTangent(180,flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
+                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
+                .waitSeconds(1.5)
+                .build();
+
+        Action fetchLoadingZone3 = myBot.getDrive().actionBuilder(Launch)
+                .setTangent(FlipTangent(90, flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .setTangent(FlipTangent(180, flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
+                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
+                .build();
+
+        Action driveToEnd = myBot.getDrive().actionBuilder(Launch)
+                .setTangent(FlipTangent(180, flip))
+                .splineToSplineHeading(End, FlipTangent(180, flip))
+                .build();
+
+        // This logic mirrors the construction in your AutoFar.java
+        SequentialAction ret =  new SequentialAction(launchPreload, fetchLoadingZone1);
+        if (spikeCount > 1) {
+            ret = new SequentialAction(ret, fetchLoadingZone1);
+        }
+        if (spikeCount > 2) {
+            ret = new SequentialAction(ret, fetchLoadingZone1);
         }
         if (spikeCount < 3) {
             ret = new SequentialAction(ret, driveToEnd);
