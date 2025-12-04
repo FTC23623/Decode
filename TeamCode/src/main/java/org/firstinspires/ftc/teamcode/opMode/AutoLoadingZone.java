@@ -45,7 +45,6 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
-                .waitSeconds(1)
                 .build();
 
         Action fetchLoadingZone2 = mDrive.actionBuilder(Launch)
@@ -57,7 +56,6 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
-                .waitSeconds(1)
                 .build();
 
         Action fetchLoadingZone3 = mDrive.actionBuilder(Launch)
@@ -69,7 +67,6 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
-                .waitSeconds(1)
                 .build();
 
         Action fetchLoadingZone4 = mDrive.actionBuilder(Launch)
@@ -96,11 +93,15 @@ public abstract class AutoLoadingZone extends HydrAuto {
                     launchPreload
                 ),
                 mTurret.GetDisableAction(false),
+                mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
                 fetchLoadingZone1,
                 mTurret.GetDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                new ParallelAction(
+                    mTurret.GetLockAction(),
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
         );
         // If more than one spike, add another fetch from the second spike and launch
@@ -110,7 +111,10 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 fetchLoadingZone2,
                 mTurret.GetDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                new ParallelAction(
+                    mTurret.GetLockAction(),
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         }
@@ -121,7 +125,10 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 fetchLoadingZone3,
                 mTurret.GetDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                new ParallelAction(
+                    mTurret.GetLockAction(),
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         }

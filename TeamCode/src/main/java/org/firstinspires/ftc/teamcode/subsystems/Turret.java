@@ -10,6 +10,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
@@ -117,6 +118,8 @@ public class Turret implements Subsystem {
 
     public void ForceUnlock(){
         visionLocked = false;
+        // reset the timestamp so we can use the very next update from the camera
+        lastVisionTimestamp -= (VisionRefreshTimeMs - 1);
     }
 
     public void GoHome() {
@@ -181,7 +184,9 @@ public class Turret implements Subsystem {
     public class RunLockAction implements Action {
         // run has been called once
         protected boolean started = false;
+        protected ElapsedTime timer;
         public RunLockAction() {
+            timer = new ElapsedTime();
         }
 
         /**
@@ -191,7 +196,12 @@ public class Turret implements Subsystem {
          */
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return !visionLocked;
+            if (!started) {
+                timer.reset();
+                started = true;
+                ForceUnlock();
+            }
+            return !visionLocked && timer.milliseconds() < Constants.TurretVisionLockTimeoutMs;
         }
     }
 

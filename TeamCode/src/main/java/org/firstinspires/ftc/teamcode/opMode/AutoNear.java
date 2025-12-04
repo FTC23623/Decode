@@ -36,7 +36,6 @@ public abstract class AutoNear extends HydrAuto {
         Action driveToLaunchPreload = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(315))
                 .splineToSplineHeading(LaunchNear, FlipTangent(315))
-                .waitSeconds(.75)
                 .build();
 
         // Action to fetch first spike, return to launch position and launch
@@ -54,7 +53,6 @@ public abstract class AutoNear extends HydrAuto {
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90))
                     .splineToSplineHeading(LaunchNear, FlipTangent(-180))
-                    .waitSeconds(.75)
                     .build();
         } else {
             fetchPPG = mDrive.actionBuilder(LaunchNear)
@@ -65,7 +63,6 @@ public abstract class AutoNear extends HydrAuto {
                     .setTangent(FlipTangent(-90))
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                     .splineToSplineHeading(LaunchNear, FlipTangent(-180))
-                    .waitSeconds(.75)
                     .build();
         }
 
@@ -78,7 +75,6 @@ public abstract class AutoNear extends HydrAuto {
                 .setTangent(FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(LaunchNear, FlipTangent(-135))
-                .waitSeconds(.75)
                 .build();
 
         // Action to pick up artifacts from third spike and stop
@@ -103,11 +99,15 @@ public abstract class AutoNear extends HydrAuto {
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunSlow),
                     driveToLaunchPreload),
+                mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
                 fetchPPG,
                 mTurret.GetDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                new ParallelAction(
+                    mTurret.GetLockAction(),
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
         );
         // If more than one spike, add another fetch from the second spike and launch
@@ -117,7 +117,10 @@ public abstract class AutoNear extends HydrAuto {
                     mTurret.GetDisableAction(true),
                     fetchPGP,
                     mTurret.GetDisableAction(false),
-                    mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                    new ParallelAction(
+                        mTurret.GetLockAction(),
+                        mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                    ),
                     mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         }

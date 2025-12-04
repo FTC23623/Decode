@@ -45,7 +45,6 @@ public abstract class AutoFar extends HydrAuto {
                 .setTangent(FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(Launch, FlipTangent(-90))
-                .waitSeconds(.75)
                 .build();
 
         // Action to fetch artifacts from second spike and launch
@@ -58,7 +57,6 @@ public abstract class AutoFar extends HydrAuto {
                 .setTangent(FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(Launch, FlipTangent(-60))
-                .waitSeconds(.75)
                 .build();
 
         // Action to pick up artifacts from third spike and stop
@@ -84,11 +82,15 @@ public abstract class AutoFar extends HydrAuto {
                     launchPreload
                 ),
                 mTurret.GetDisableAction(false),
+                mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
                 fetchGPP,
                 mTurret.GetDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                new ParallelAction(
+                    mTurret.GetLockAction(),
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
         );
         // If more than one spike, add another fetch from the second spike and launch
@@ -98,7 +100,10 @@ public abstract class AutoFar extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 fetchPGP,
                 mTurret.GetDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakePushToLauncher),
+                new ParallelAction(
+                    mTurret.GetLockAction(),
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         }
