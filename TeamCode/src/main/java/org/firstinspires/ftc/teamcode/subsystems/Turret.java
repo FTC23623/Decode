@@ -31,6 +31,7 @@ public class Turret implements Subsystem {
     private boolean disableAutoTrack;
     public static int VisionRefreshTimeMs = 100;
     private final Debouncer circleDebounce;
+    private final Debouncer triangleDebounce;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
@@ -42,6 +43,7 @@ public class Turret implements Subsystem {
         visionLocked = false;
         disableAutoTrack = false;
         circleDebounce = new Debouncer(Constants.debounceLong);
+        triangleDebounce = new Debouncer(1);
     }
 
     @Override
@@ -57,6 +59,11 @@ public class Turret implements Subsystem {
             circleDebounce.Used();
             disableAutoTrack = !disableAutoTrack;
             mOp.mOperatorGamepad.rumbleBlips(1);
+        }
+        triangleDebounce.In(mOp.mOperatorGamepad.triangle);
+        if (triangleDebounce.Out()) {
+            triangleDebounce.Used();
+            GoHome();
         }
     }
 
