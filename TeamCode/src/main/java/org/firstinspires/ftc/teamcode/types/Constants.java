@@ -28,8 +28,8 @@ public final class Constants {
     public static final double LauncherLowRPMAuto = 2175;
     public static final double LauncherIdleRPM = 500;
     public static final double LaunchServoRun = 1;
-    public static final double TransfertoLaunchPower = 0.9;
-    public static final double TransferFromIntakePower = 0.9;
+    public static final double TransfertoLaunchPower = .95;
+    public static final double TransferFromIntakePower = .95;
     public static final double TransferToIntakePower = -0.75;
     public static final double TurretGearRatio = 3.15;
     public static final double TurretRange = 355;

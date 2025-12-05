@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class AutoNear extends HydrAuto {
 
-    public AutoNear(VisionMode target, boolean flip, int spikeCount, boolean gate) {
+    public AutoNear(VisionMode target, boolean flip, int spikeCount, int gate) {
         super(target, flip, spikeCount, gate);
         mBeginPose = FlipPose(-54, 52, 310);
     }
@@ -31,6 +31,8 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d End = FlipPose(-25, 52, -90);
         Pose2d GateWP = FlipPose(-6, 50, 180);
         Pose2d Gate = FlipPose(-6, 59, 180);
+        Pose2d GateWP2 = FlipPose(4, 50, 0);
+        Pose2d Gate2 = FlipPose(4, 59, 0);
 
         // Action to launch preloaded artifacts
         Action driveToLaunchPreload = mDrive.actionBuilder(mBeginPose)
@@ -40,7 +42,7 @@ public abstract class AutoNear extends HydrAuto {
 
         // Action to fetch first spike, return to launch position and launch
         Action fetchPPG;
-        if (mGate) {
+        if (mGate > 0) {
             fetchPPG = mDrive.actionBuilder(LaunchNear)
                     .setTangent(FlipTangent(0))
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
@@ -49,7 +51,7 @@ public abstract class AutoNear extends HydrAuto {
                     .setTangent(FlipTangent(0))
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                     .splineToSplineHeading(GateWP, FlipTangent(-90))
-                    .splineToSplineHeading(Gate, FlipTangent(-90))
+                    .splineToSplineHeading(Gate, FlipTangent(90))
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90))
                     .splineToSplineHeading(LaunchNear, FlipTangent(-180))
@@ -67,15 +69,32 @@ public abstract class AutoNear extends HydrAuto {
         }
 
         // Action to fetch second spike, return to launch position and launch
-        Action fetchPGP = mDrive.actionBuilder(LaunchNear)
-                .setTangent(FlipTangent(0))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(PGP_WP, FlipTangent(90))
-                .splineToSplineHeading(PGP, FlipTangent(90))
-                .setTangent(FlipTangent(-90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-135))
-                .build();
+        Action fetchPGP;
+        if (mGate > 1) {
+            fetchPGP = mDrive.actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                    .splineToSplineHeading(PGP_WP, FlipTangent(90))
+                    .splineToSplineHeading(PGP, FlipTangent(90))
+                    .setTangent(FlipTangent(-150))
+                    .splineToSplineHeading(GateWP2, FlipTangent(-90))
+                    .splineToSplineHeading(Gate2, FlipTangent(90))
+                    .waitSeconds(1.5)
+                    .setTangent(FlipTangent(-90))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-135))
+                    .build();
+        } else {
+            fetchPGP = mDrive.actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                    .splineToSplineHeading(PGP_WP, FlipTangent(90))
+                    .splineToSplineHeading(PGP, FlipTangent(90))
+                    .setTangent(FlipTangent(-90))
+                    .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-135))
+                    .build();
+        }
 
         // Action to pick up artifacts from third spike and stop
         Action pickupGPP = mDrive.actionBuilder(LaunchNear)
@@ -95,10 +114,12 @@ public abstract class AutoNear extends HydrAuto {
 
         // Build the auto for launching preloads, fetching from the first spike and launching
         SequentialAction ret = new SequentialAction(
+                mTurret.GetDisableAction(true),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunSlow),
                     driveToLaunchPreload),
+                mTurret.GetDisableAction(false),
                 mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),

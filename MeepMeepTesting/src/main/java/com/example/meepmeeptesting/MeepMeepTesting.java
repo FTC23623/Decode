@@ -57,7 +57,7 @@ public class MeepMeepTesting {
 
                 // Create a new bot entity for the simulation, setting the color
                 RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-                        .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                        .setConstraints(50, 50, Math.toRadians(180), Math.toRadians(180), 15)
                         .setColorScheme(isBlue ? new ColorSchemeBlueDark() : new ColorSchemeRedDark())
                         .setDimensions(16.2, 17.7)
                         .build();
@@ -177,7 +177,9 @@ public class MeepMeepTesting {
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
         Pose2d End = FlipPose(-25, 52, -90, flip);
         Pose2d GateWP = FlipPose(-6, 50, 180, flip);
-        Pose2d Gate = FlipPose(-6, 58, 180, flip);
+        Pose2d Gate = FlipPose(-6, 59, 180, flip);
+        Pose2d GateWP2 = FlipPose(4, 50, 0, flip);
+        Pose2d Gate2 = FlipPose(4, 59, 0, flip);
 
         Action driveToLaunchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .setTangent(FlipTangent(315, flip))
@@ -193,7 +195,7 @@ public class MeepMeepTesting {
                     .splineToSplineHeading(PPG, FlipTangent(90, flip))
                     .setTangent(FlipTangent(0, flip))
                     .splineToSplineHeading(GateWP, FlipTangent(-90, flip))
-                    .splineToSplineHeading(Gate, FlipTangent(-90, flip))
+                    .splineToSplineHeading(Gate, FlipTangent(90, flip))
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90,flip))
                     .splineToSplineHeading(LaunchNear, FlipTangent(-180, flip))
@@ -210,14 +212,30 @@ public class MeepMeepTesting {
                     .build();
         }
 
-        Action fetchPGP = myBot.getDrive().actionBuilder(LaunchNear)
-                .setTangent(FlipTangent(0, flip))
-                .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
-                .splineToSplineHeading(PGP, FlipTangent(90, flip))
-                .setTangent(FlipTangent(-90, flip))
-                .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
-                .waitSeconds(1.5)
-                .build();
+        Action fetchPGP;
+        if (gate) {
+            fetchPGP = myBot.getDrive().actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0, flip))
+                    .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
+                    .splineToSplineHeading(PGP, FlipTangent(90, flip))
+                    .setTangent(FlipTangent(-150, flip))
+                    .splineToSplineHeading(GateWP2, FlipTangent(-90, flip))
+                    .splineToSplineHeading(Gate2, FlipTangent(90, flip))
+                    .waitSeconds(1.5)
+                    .setTangent(FlipTangent(-90, flip))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
+                    .waitSeconds(1.5)
+                    .build();
+        } else {
+            fetchPGP = myBot.getDrive().actionBuilder(LaunchNear)
+                    .setTangent(FlipTangent(0, flip))
+                    .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
+                    .splineToSplineHeading(PGP, FlipTangent(90, flip))
+                    .setTangent(FlipTangent(-90, flip))
+                    .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
+                    .waitSeconds(1.5)
+                    .build();
+        }
 
         Action pickupGPP = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(0, flip))

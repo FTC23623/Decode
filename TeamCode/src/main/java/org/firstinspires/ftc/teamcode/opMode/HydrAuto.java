@@ -40,9 +40,9 @@ public abstract class HydrAuto extends OpMode_Base {
     protected DecodeAprilTag mMotif;
     protected boolean mFlip;
     protected int mSpikeCount;
-    protected boolean mGate;
+    protected int mGate;
 
-    public HydrAuto(VisionMode tagToTarget, boolean flip, int spikeCount, boolean gate) {
+    public HydrAuto(VisionMode tagToTarget, boolean flip, int spikeCount, int gate) {
         super(tagToTarget);
         mFlip = flip;
         mSpikeCount = spikeCount;

@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class AutoLoadingZone extends HydrAuto {
     public AutoLoadingZone(VisionMode target, boolean flip, int spikeCount) {
-        super(target, flip, spikeCount, false);
+        super(target, flip, spikeCount, 0);
         mBeginPose = FlipPose(60.0, 15.0, 0.0);
     }
 
