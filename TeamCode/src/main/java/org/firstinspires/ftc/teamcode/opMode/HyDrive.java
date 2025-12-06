@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Imu_Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.Indicator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
 import org.firstinspires.ftc.teamcode.subsystems.SystemMonitor;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
@@ -35,6 +36,7 @@ public abstract class HyDrive extends OpMode_Base {
   protected Turret mTurret;
   protected Launcher mLauncher;
   protected Indicator mIndicator;
+  protected Lift mLift;
   protected SystemMonitor mSysMon;
   protected ElapsedTime mLoopSleep;
 
@@ -63,7 +65,8 @@ public abstract class HyDrive extends OpMode_Base {
     mVision = new LimelightVision(mOpMode);
     mLauncher = new Launcher(mOpMode, mTurret, 0);
     mSysMon = new SystemMonitor(mOpMode);
-    mIndicator = new Indicator(mOpMode, mLauncher, mTurret);
+    mLift = new Lift(mOpMode);
+    mIndicator = new Indicator(mOpMode, mLauncher, mLift, mTurret);
     mOpMode.mVision = mVision;
     mSystems = new ArrayList<>();
     mSystems.add(mDrive);
@@ -74,6 +77,7 @@ public abstract class HyDrive extends OpMode_Base {
     mSystems.add(mLauncher);
     mSystems.add(mSysMon);
     mSystems.add(mIndicator);
+    mSystems.add(mLift);
     // manual bulk caching
     SetLynxHubsManual();
     InitializeAllSystems();

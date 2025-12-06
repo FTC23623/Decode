@@ -14,22 +14,26 @@ public class Indicator implements Subsystem {
     private final Servo led;
     private final Launcher launcher;
     private final Turret turret;
+    private final Lift lift;
     private final ElapsedTime timer;
     private final int onTimeMs = 600;
     private final int offTimeMs = 200;
     private final int onTimeIdle = 1000;
     private boolean on;
+    private boolean up;
     private int idleState;
 
-    public Indicator(HydraOpMode opMode, Launcher launcher, Turret turret) {
+    public Indicator(HydraOpMode opMode, Launcher launcher, Lift lift, Turret turret) {
         this.launcher = launcher;
         this.turret = turret;
+        this.lift = lift;
         this.led = opMode.mHardwareMap.get(Servo.class, "led");
         SetColor(IndicatorColor.INDICATOR_OFF);
         on = false;
         idleState = 0;
         timer = new ElapsedTime();
         timer.reset();
+        up = false;
     }
 
     @Override
@@ -41,7 +45,24 @@ public class Indicator implements Subsystem {
     public void Process() {
         boolean targetLocked = turret.Locked();
         boolean launcherSpeed = launcher.AtSpeed();
-        if (on && timer.milliseconds() > onTimeMs) {
+        boolean liftEngaged = lift != null && lift.Engaged();
+        if (liftEngaged) {
+            if (timer.milliseconds() > 10) {
+                double last = led.getPosition();
+                if (last >= 0.74) {
+                    up = false;
+                } else if (last <= 0.28) {
+                    up = true;
+                }
+                double step;
+                if (up) {
+                    step = 0.01;
+                } else {
+                    step = -0.01;
+                }
+                led.setPosition(last + step);
+            }
+        } else if (on && timer.milliseconds() > onTimeMs) {
             SetColor(IndicatorColor.INDICATOR_OFF);
             on = false;
             timer.reset();
