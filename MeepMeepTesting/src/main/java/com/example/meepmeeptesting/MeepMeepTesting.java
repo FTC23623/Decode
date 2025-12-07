@@ -1,6 +1,7 @@
 package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.noahbres.meepmeep.MeepMeep;
@@ -110,6 +111,8 @@ public class MeepMeepTesting {
         Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
         Pose2d PPG = FlipPose(-12, 48, 90, flip);
         Pose2d End = FlipPose(30, 15, 0, flip);
+        Pose2d LoadingZone = FlipPose(59,55,90, flip);
+        Pose2d loadingzone_wp= FlipPose(59, 40, 90,flip);
 
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .splineToSplineHeading(Launch, FlipTangent(180, flip))
@@ -117,14 +120,13 @@ public class MeepMeepTesting {
                 .build();
 
         Action fetchGPP = myBot.getDrive().actionBuilder(Launch)
-                .waitSeconds(2)
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(GPP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(-90, flip))
                 .splineToSplineHeading(Launch, FlipTangent(-90, flip))
-                .waitSeconds(1.5)
+                .waitSeconds(2)
                 .build();
 
         Action fetchPGP = myBot.getDrive().actionBuilder(Launch)
@@ -134,7 +136,7 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(PGP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(-90, flip))
                 .splineToSplineHeading(Launch, FlipTangent(-60, flip))
-                .waitSeconds(1.5)
+                .waitSeconds(2)
                 .build();
 
         Action pickupPPG = myBot.getDrive().actionBuilder(Launch)
@@ -142,6 +144,15 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(PPG, FlipTangent(90, flip))
+                .build();
+
+        Action fetchLoadingZone1 = myBot.getDrive().actionBuilder(Launch)
+                .setTangent(FlipTangent(90, flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
+                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
+                .waitSeconds(2)
                 .build();
 
         Action driveToEnd = myBot.getDrive().actionBuilder(Launch)
@@ -155,11 +166,9 @@ public class MeepMeepTesting {
             ret = new SequentialAction(ret, fetchPGP);
         }
         if (spikeCount > 2) {
-            ret = new SequentialAction(ret, pickupPPG);
+            ret = new SequentialAction(ret, fetchLoadingZone1);
         }
-        if (spikeCount < 3) {
-            ret = new SequentialAction(ret, driveToEnd);
-        }
+        ret = new SequentialAction(ret, driveToEnd);
         return ret;
     }
 

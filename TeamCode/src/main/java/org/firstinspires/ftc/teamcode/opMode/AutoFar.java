@@ -29,6 +29,8 @@ public abstract class AutoFar extends HydrAuto {
         Pose2d PPG_WP = FlipPose(-12, 35, 90);
         Pose2d PPG = FlipPose(-12, 48, 90);
         Pose2d End = FlipPose(30, 15, 0);
+        Pose2d LoadingZone = FlipPose(59,55,90);
+        Pose2d loadingzone_wp= FlipPose(59, 40, 90);
 
         Action launchPreload = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
@@ -66,6 +68,16 @@ public abstract class AutoFar extends HydrAuto {
                 .splineToSplineHeading(PPG_WP, FlipTangent(90))
                 .setTangent(FlipTangent(90))
                 .splineToSplineHeading(PPG, FlipTangent(90))
+                .build();
+
+        Action fetchLoadingZone1 = mDrive.actionBuilder(Launch)
+                .setTangent(FlipTangent(90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(90))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
+                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90))
+                .splineToSplineHeading(Launch, FlipTangent(-90))
                 .build();
 
         Action driveToEnd = mDrive.actionBuilder(Launch)
@@ -107,24 +119,26 @@ public abstract class AutoFar extends HydrAuto {
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         }
-        // Add pickup of artifacts from final spike
+        // Add pickup of artifacts from loading zone
         if (mSpikeCount > 2) {
             ret = new SequentialAction(
                 ret,
                 mTurret.GetDisableAction(true),
-                pickupPPG,
+                fetchLoadingZone1,
                 mTurret.GetDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakeReject)
+                    new ParallelAction(
+                            mTurret.GetLockAction(),
+                            mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                    ),
+                    mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         }
         // when there are 3 spikes we don't launch. If there are less, we need to move off the launch line
-        if (mSpikeCount < 3) {
-            ret = new SequentialAction(
-                ret,
-                mIntake.GetAction(IntakeActions.IntakeStop),
-                driveToEnd
-            );
-        }
+        ret = new SequentialAction(
+            ret,
+            mIntake.GetAction(IntakeActions.IntakeStop),
+            driveToEnd
+        );
         return ret;
     }
 }
