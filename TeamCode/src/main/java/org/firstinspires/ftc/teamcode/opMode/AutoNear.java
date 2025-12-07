@@ -54,7 +54,7 @@ public abstract class AutoNear extends HydrAuto {
                     .splineToSplineHeading(Gate, FlipTangent(90))
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-180))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-180))
                     .build();
         } else {
             fetchPPG = mDrive.actionBuilder(LaunchNear)
@@ -64,7 +64,7 @@ public abstract class AutoNear extends HydrAuto {
                     .splineToSplineHeading(PPG, FlipTangent(90))
                     .setTangent(FlipTangent(-90))
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-180))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-180))
                     .build();
         }
 
@@ -82,7 +82,7 @@ public abstract class AutoNear extends HydrAuto {
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90))
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-135))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-135))
                     .build();
         } else {
             fetchPGP = mDrive.actionBuilder(LaunchNear)
@@ -92,7 +92,7 @@ public abstract class AutoNear extends HydrAuto {
                     .splineToSplineHeading(PGP, FlipTangent(90))
                     .setTangent(FlipTangent(-90))
                     .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-135))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-135))
                     .build();
         }
 

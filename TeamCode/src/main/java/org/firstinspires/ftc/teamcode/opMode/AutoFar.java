@@ -46,7 +46,7 @@ public abstract class AutoFar extends HydrAuto {
                 .splineToSplineHeading(GPP, FlipTangent(90))
                 .setTangent(FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
+                .splineToLinearHeading(Launch, FlipTangent(-90))
                 .build();
 
         // Action to fetch artifacts from second spike and launch
@@ -58,7 +58,7 @@ public abstract class AutoFar extends HydrAuto {
                 .splineToSplineHeading(PGP, FlipTangent(90))
                 .setTangent(FlipTangent(-90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(Launch, FlipTangent(-60))
+                .splineToLinearHeading(Launch, FlipTangent(-60))
                 .build();
 
         // Action to pick up artifacts from third spike and stop

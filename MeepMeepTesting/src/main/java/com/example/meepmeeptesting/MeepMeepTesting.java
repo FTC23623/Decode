@@ -125,7 +125,7 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(GPP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(-90, flip))
-                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
+                .splineToLinearHeading(Launch, FlipTangent(-90, flip))
                 .waitSeconds(2)
                 .build();
 
@@ -135,7 +135,7 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(PGP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(-90, flip))
-                .splineToSplineHeading(Launch, FlipTangent(-60, flip))
+                .splineToLinearHeading(Launch, FlipTangent(-60, flip))
                 .waitSeconds(2)
                 .build();
 
@@ -207,7 +207,7 @@ public class MeepMeepTesting {
                     .splineToSplineHeading(Gate, FlipTangent(90, flip))
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90,flip))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-180, flip))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-180, flip))
                     .waitSeconds(1.5)
                     .build();
         } else {
@@ -216,7 +216,7 @@ public class MeepMeepTesting {
                     .splineToSplineHeading(PPG_WP, FlipTangent(90, flip))
                     .splineToSplineHeading(PPG, FlipTangent(90, flip))
                     .setTangent(FlipTangent(-90, flip))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-180, flip))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-180, flip))
                     .waitSeconds(1.5)
                     .build();
         }
@@ -232,7 +232,7 @@ public class MeepMeepTesting {
                     .splineToSplineHeading(Gate2, FlipTangent(90, flip))
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90, flip))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-135, flip))
                     .waitSeconds(1.5)
                     .build();
         } else {
@@ -241,7 +241,7 @@ public class MeepMeepTesting {
                     .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
                     .splineToSplineHeading(PGP, FlipTangent(90, flip))
                     .setTangent(FlipTangent(-90, flip))
-                    .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
+                    .splineToLinearHeading(LaunchNear, FlipTangent(-135, flip))
                     .waitSeconds(1.5)
                     .build();
         }
