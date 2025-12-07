@@ -268,67 +268,71 @@ public class MeepMeepTesting {
         Pose2d beginPose = FlipPose(60.0, 15.0, 0.0, flip);
 
         Pose2d Launch = FlipPose(55, 15, -20, flip);
-        Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
-        Pose2d GPP = FlipPose(34, 56, 90, flip);
-        Pose2d PGP_WP = FlipPose(12, 30, 90, flip);
-        Pose2d PGP = FlipPose(12, 56, 90, flip);
-        Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
-        Pose2d PPG = FlipPose(-12, 48, 90, flip);
-        Pose2d End = FlipPose(30, 15, 0, flip);
-        Pose2d LoadingZone = FlipPose(59,55,90, flip);
-        Pose2d loadingzone_wp= FlipPose(59, 40, 90,flip);
 
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
+                .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(Launch, FlipTangent(180, flip))
                 .waitSeconds(2)
                 .build();
 
-        Action fetchLoadingZone1 = myBot.getDrive().actionBuilder(Launch)
-                .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(90, flip))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
-                .setTangent(FlipTangent(-90, flip))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
-                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
-                .waitSeconds(1.5)
-                .build();
-
-        Action fetchLoadingZone2 = myBot.getDrive().actionBuilder(Launch)
-                .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(90, flip))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
-                .setTangent(FlipTangent(180,flip))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
-                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
-                .waitSeconds(1.5)
-                .build();
-
-        Action fetchLoadingZone3 = myBot.getDrive().actionBuilder(Launch)
-                .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(90, flip))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
-                .setTangent(FlipTangent(180, flip))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
-                .splineToSplineHeading(Launch, FlipTangent(-90, flip))
-                .build();
-
-        Action driveToEnd = myBot.getDrive().actionBuilder(Launch)
-                .setTangent(FlipTangent(180, flip))
-                .splineToSplineHeading(End, FlipTangent(180, flip))
-                .build();
-
-        // This logic mirrors the construction in your AutoFar.java
-        SequentialAction ret =  new SequentialAction(launchPreload, fetchLoadingZone1);
+        SequentialAction ret =  new SequentialAction(
+                launchPreload,
+                LoadingZoneSequence(myBot, Launch, true, flip)
+        );
+        // If more than one spike, add another fetch from the second spike and launch
         if (spikeCount > 1) {
-            ret = new SequentialAction(ret, fetchLoadingZone1);
+            ret = new SequentialAction(
+                    ret,
+                    LoadingZoneSequence(myBot, Launch, true, flip)
+            );
         }
+        // Add pickup of artifacts from final spike
         if (spikeCount > 2) {
-            ret = new SequentialAction(ret, fetchLoadingZone1);
+            ret = new SequentialAction(
+                    ret,
+                    LoadingZoneSequence(myBot, Launch, true, flip)
+            );
         }
-        if (spikeCount < 3) {
-            ret = new SequentialAction(ret, driveToEnd);
-        }
+        ret = new SequentialAction(
+                ret,
+                LoadingZoneSequence(myBot, Launch, false, flip)
+        );
         return ret;
+    }
+
+    private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip) {
+        Pose2d LoadingZone = FlipPose(59,55,90, flip);
+        Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
+
+        // fetch and drive to waypoint
+        Action fetch = mDrive.getDrive().actionBuilder(LaunchPos)
+                .setTangent(FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90, flip))
+                .build();
+
+        // drive to launch position
+        Action goToLaunch =  mDrive.getDrive().actionBuilder(LaunchPos)
+                .setTangent(FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90, flip))
+                .splineToSplineHeading(LaunchPos, FlipTangent(-90, flip))
+                .waitSeconds(2)
+                .build();
+
+        // if we're launching, continue to launch point, re-enable turret and launch
+        // otherwise stop and re-enable turret
+        if (driveToLaunch) {
+            return new SequentialAction(
+                    goToLaunch
+            );
+        } else {
+            return new SequentialAction(
+                    fetch
+            );
+        }
     }
 
     private static Pose2d FlipPose(double x, double y, double heading, boolean flip) {

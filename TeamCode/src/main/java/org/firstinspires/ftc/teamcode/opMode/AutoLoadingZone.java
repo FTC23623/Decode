@@ -17,71 +17,13 @@ public abstract class AutoLoadingZone extends HydrAuto {
 
     @Override
     protected SequentialAction CreateAuto() {
-        boolean pickupAtEnd = true;
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, -20);
-        Pose2d GPP_WP = FlipPose(34, 30, 90);
-        Pose2d GPP = FlipPose(34, 58, 90);
-        Pose2d PGP_WP = FlipPose(12, 30, 90);
-        Pose2d PGP = FlipPose(12, 58, 90);
-        Pose2d PPG_WP = FlipPose(-12, 35, 90);
-        Pose2d PPG = FlipPose(-12, 48, 90);
-        Pose2d End = FlipPose(30, 15, 0);
-        Pose2d LoadingZone = FlipPose(59,55,90);
-        Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
 
         Action launchPreload = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
                 .splineToSplineHeading(Launch, FlipTangent(180))
-                .build();
-
-        Action fetchLoadingZone1 = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .setTangent(FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
-                .build();
-
-        Action fetchLoadingZone2 = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .setTangent(FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
-                .build();
-
-        Action fetchLoadingZone3 = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .setTangent(FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
-                .build();
-
-        Action fetchLoadingZone4 = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .setTangent(FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
-                .build();
-
-        Action driveToEnd = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(180))
-                .splineToSplineHeading(End, FlipTangent(180))
                 .build();
 
         // Build the auto for launching preloads, fetching artifacts from the first spike and launching
@@ -90,62 +32,80 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
-                    launchPreload
+                    new SequentialAction(
+                            launchPreload,
+                            mTurret.GetDisableAction(false)
+                    )
                 ),
-                mTurret.GetDisableAction(false),
                 mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                mTurret.GetDisableAction(true),
-                fetchLoadingZone1,
-                mTurret.GetDisableAction(false),
-                new ParallelAction(
-                    mTurret.GetLockAction(),
-                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
-                ),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch)
+                LoadingZoneSequence(Launch, true)
         );
         // If more than one spike, add another fetch from the second spike and launch
         if (mSpikeCount > 1) {
             ret = new SequentialAction(
-                ret,
-                mTurret.GetDisableAction(true),
-                fetchLoadingZone2,
-                mTurret.GetDisableAction(false),
-                new ParallelAction(
-                    mTurret.GetLockAction(),
-                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
-                ),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch)
+                    ret,
+                    LoadingZoneSequence(Launch, true)
             );
         }
         // Add pickup of artifacts from final spike
         if (mSpikeCount > 2) {
             ret = new SequentialAction(
-                ret,
-                mTurret.GetDisableAction(true),
-                fetchLoadingZone3,
-                mTurret.GetDisableAction(false),
-                new ParallelAction(
-                    mTurret.GetLockAction(),
-                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
-                ),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch)
+                    ret,
+                    LoadingZoneSequence(Launch, true)
             );
         }
-        if (pickupAtEnd) {
-            ret = new SequentialAction(
-                    ret,
+        ret = new SequentialAction(
+                ret,
+                LoadingZoneSequence(Launch, false)
+        );
+        return ret;
+    }
+
+    private SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch) {
+        Pose2d LoadingZone = FlipPose(59,55,90);
+        Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
+
+        // fetch and drive to waypoint
+        Action fetch = mDrive.actionBuilder(LaunchPos)
+                .setTangent(FlipTangent(90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
+                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
+                .build();
+
+        // fetch and launch
+        Action goToLaunch =  mDrive.actionBuilder(LaunchPos)
+                .setTangent(FlipTangent(90))
+                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
+                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
+                .splineToSplineHeading(LaunchPos, FlipTangent(-90))
+                .build();
+
+        // if we're launching, continue to launch point, re-enable turret and launch
+        // otherwise stop and re-enable turret
+        if (driveToLaunch) {
+            return new SequentialAction(
                     mTurret.GetDisableAction(true),
-                    fetchLoadingZone4,
-                    mIntake.GetAction(IntakeActions.IntakeStop)
+                    goToLaunch,
+                    mTurret.GetDisableAction(false),
+                    new ParallelAction(
+                            mTurret.GetLockAction(),
+                            mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                    ),
+                    mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         } else {
-            ret = new SequentialAction(
-                    ret,
-                    mIntake.GetAction(IntakeActions.IntakeStop),
-                    driveToEnd
+            return new SequentialAction(
+                    mTurret.GetDisableAction(true),
+                    fetch,
+                    mTurret.GetDisableAction(false)
             );
         }
-        return ret;
     }
 }
