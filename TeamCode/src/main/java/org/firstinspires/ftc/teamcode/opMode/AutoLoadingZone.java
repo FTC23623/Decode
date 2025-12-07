@@ -34,10 +34,10 @@ public abstract class AutoLoadingZone extends HydrAuto {
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
                     new SequentialAction(
                             launchPreload,
-                            mTurret.GetDisableAction(false)
+                            mTurret.GetDisableAction(false),
+                            mTurret.GetLockAction()
                     )
                 ),
-                mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 LoadingZoneSequence(Launch, true)
         );

@@ -118,9 +118,12 @@ public abstract class AutoNear extends HydrAuto {
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunSlow),
-                    driveToLaunchPreload),
-                mTurret.GetDisableAction(false),
-                mTurret.GetLockAction(),
+                    new SequentialAction(
+                            driveToLaunchPreload,
+                            mTurret.GetDisableAction(false),
+                            mTurret.GetLockAction()
+                    )
+                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
                 fetchPPG,
