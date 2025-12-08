@@ -39,32 +39,37 @@ public abstract class AutoLoadingZone extends HydrAuto {
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                LoadingZoneSequence(Launch, true)
+                LoadingZoneSequence(Launch, true, false)
         );
         // If more than one spike, add another fetch from the second spike and launch
         if (mSpikeCount > 1) {
             ret = new SequentialAction(
                     ret,
-                    LoadingZoneSequence(Launch, true)
+                    LoadingZoneSequence(Launch, true, true)
             );
         }
         // Add pickup of artifacts from final spike
         if (mSpikeCount > 2) {
             ret = new SequentialAction(
                     ret,
-                    LoadingZoneSequence(Launch, true)
+                    LoadingZoneSequence(Launch, true, true)
             );
         }
         ret = new SequentialAction(
                 ret,
-                LoadingZoneSequence(Launch, false)
+                LoadingZoneSequence(Launch, false, true)
         );
         return ret;
     }
 
-    private SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch) {
+    private SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject) {
         Pose2d LoadingZone = FlipPose(59,55,90);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
+        IntakeActions rejectAction = IntakeActions.IntakeReject;
+        if (!reject) {
+            rejectAction = IntakeActions.IntakeLoadArtifacts;
+
+        }
 
         // fetch and drive to waypoint
         Action fetch = mDrive.actionBuilder(LaunchPos)
@@ -82,7 +87,7 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
+                .afterTime(.75, mIntake.GetAction(rejectAction))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90))
                 .build();
