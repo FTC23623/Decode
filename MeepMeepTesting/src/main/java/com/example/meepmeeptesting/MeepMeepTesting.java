@@ -17,13 +17,15 @@ import java.awt.event.ActionListener;
 
 public class MeepMeepTesting {
 
+    private static final double launchTimeS = 1.3;
+
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
         String[] autos = {"FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
-        Integer[] spikeCounts = {1, 2, 3};
+        Integer[] spikeCounts = { 4, 3, 2, 1};
         JComboBox<Integer> spikeSelector = new JComboBox<>(spikeCounts);
 
         // Create a button to run the selected auto
@@ -126,7 +128,7 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(GPP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(-90, flip))
                 .splineToLinearHeading(Launch, FlipTangent(-90, flip))
-                .waitSeconds(2)
+                .waitSeconds(launchTimeS)
                 .build();
 
         Action fetchPGP = myBot.getDrive().actionBuilder(Launch)
@@ -136,7 +138,7 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(PGP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(-90, flip))
                 .splineToLinearHeading(Launch, FlipTangent(-60, flip))
-                .waitSeconds(2)
+                .waitSeconds(launchTimeS)
                 .build();
 
         Action pickupPPG = myBot.getDrive().actionBuilder(Launch)
@@ -152,7 +154,7 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
                 .splineToSplineHeading(loadingzone_wp, FlipTangent(-90, flip))
                 .splineToSplineHeading(Launch, FlipTangent(-90, flip))
-                .waitSeconds(2)
+                .waitSeconds(launchTimeS)
                 .build();
 
         Action driveToEnd = myBot.getDrive().actionBuilder(Launch)
@@ -177,14 +179,14 @@ public class MeepMeepTesting {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
+        Pose2d GPP_WP = FlipPose(34, 35, 90, flip);
         Pose2d GPP = FlipPose(34, 56, 90, flip);
-        Pose2d PGP_WP = FlipPose(12, 30, 90, flip);
+        Pose2d PGP_WP = FlipPose(12, 35, 90, flip);
         Pose2d PGP = FlipPose(12, 56, 90, flip);
         Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
         Pose2d PPG = FlipPose(-12, 52, 90, flip);
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
-        Pose2d End = FlipPose(-25, 52, -90, flip);
+        Pose2d End = FlipPose(-16, 32, -40, flip);
         Pose2d GateWP = FlipPose(-6, 50, 180, flip);
         Pose2d Gate = FlipPose(-6, 59, 180, flip);
         Pose2d GateWP2 = FlipPose(4, 50, 0, flip);
@@ -208,7 +210,7 @@ public class MeepMeepTesting {
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90,flip))
                     .splineToLinearHeading(LaunchNear, FlipTangent(-180, flip))
-                    .waitSeconds(1.5)
+                    .waitSeconds(launchTimeS)
                     .build();
         } else {
             fetchPPG = myBot.getDrive().actionBuilder(LaunchNear)
@@ -217,7 +219,7 @@ public class MeepMeepTesting {
                     .splineToSplineHeading(PPG, FlipTangent(90, flip))
                     .setTangent(FlipTangent(-90, flip))
                     .splineToLinearHeading(LaunchNear, FlipTangent(-180, flip))
-                    .waitSeconds(1.5)
+                    .waitSeconds(launchTimeS)
                     .build();
         }
 
@@ -233,7 +235,7 @@ public class MeepMeepTesting {
                     .waitSeconds(1.5)
                     .setTangent(FlipTangent(-90, flip))
                     .splineToLinearHeading(LaunchNear, FlipTangent(-135, flip))
-                    .waitSeconds(1.5)
+                    .waitSeconds(launchTimeS)
                     .build();
         } else {
             fetchPGP = myBot.getDrive().actionBuilder(LaunchNear)
@@ -242,7 +244,7 @@ public class MeepMeepTesting {
                     .splineToSplineHeading(PGP, FlipTangent(90, flip))
                     .setTangent(FlipTangent(-90, flip))
                     .splineToLinearHeading(LaunchNear, FlipTangent(-135, flip))
-                    .waitSeconds(1.5)
+                    .waitSeconds(launchTimeS)
                     .build();
         }
 
@@ -250,14 +252,14 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(0, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(GPP, FlipTangent(90, flip))
-                //.splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
-                //.waitSeconds(1.5)
-                //.splineToSplineHeading(End, FlipTangent(90, flip))
+                .setTangent(FlipTangent(-90, flip))
+                .splineToSplineHeading(LaunchNear, FlipTangent(-135, flip))
+                .waitSeconds(launchTimeS)
                 .build();
 
         Action driveToEnd = myBot.getDrive().actionBuilder(LaunchNear)
-                .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(End, FlipTangent(90, flip))
+                .setTangent(FlipTangent(40, flip))
+                .splineToSplineHeading(End, FlipTangent(40, flip))
                 .build();
 
         // This logic mirrors the construction in your AutoNear.java
@@ -268,9 +270,7 @@ public class MeepMeepTesting {
         if (spikeCount > 2) {
             ret = new SequentialAction(ret, pickupGPP);
         }
-        if (spikeCount < 3) {
-            ret = new SequentialAction(ret, driveToEnd);
-        }
+        ret = new SequentialAction(ret, driveToEnd);
         return ret;
     }
     private static SequentialAction BuildFarFetch(RoadRunnerBotEntity myBot, boolean flip, int spikeCount, boolean gate) {
@@ -288,30 +288,26 @@ public class MeepMeepTesting {
                 launchPreload,
                 LoadingZoneSequence(myBot, Launch, true, flip)
         );
-        // If more than one spike, add another fetch from the second spike and launch
-        if (spikeCount > 1) {
+        int count = spikeCount;
+        while (count > 0) {
+            count--;
+            double waitTime = 0;
+            if (count == 1) {
+                waitTime = 0.25;
+            }
             ret = new SequentialAction(
                     ret,
-                    LoadingZoneSequence(myBot, Launch, true, flip)
+                    myBot.getDrive().actionBuilder(Launch).waitSeconds(waitTime).build(),
+                    LoadingZoneSequence(myBot, Launch, count > 0, flip)
             );
         }
-        // Add pickup of artifacts from final spike
-        if (spikeCount > 2) {
-            ret = new SequentialAction(
-                    ret,
-                    LoadingZoneSequence(myBot, Launch, true, flip)
-            );
-        }
-        ret = new SequentialAction(
-                ret,
-                LoadingZoneSequence(myBot, Launch, false, flip)
-        );
         return ret;
     }
 
     private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip) {
         Pose2d LoadingZone = FlipPose(59,55,90, flip);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
+        Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
 
         // fetch and drive to waypoint
         Action fetch = mDrive.getDrive().actionBuilder(LaunchPos)
@@ -326,9 +322,9 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90, flip))
+                .splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90, flip))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90, flip))
-                .waitSeconds(2)
+                .waitSeconds(launchTimeS)
                 .build();
 
         // if we're launching, continue to launch point, re-enable turret and launch

@@ -41,30 +41,27 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 LoadingZoneSequence(Launch, true, false)
         );
-        // If more than one spike, add another fetch from the second spike and launch
-        if (mSpikeCount > 1) {
+        int count = mSpikeCount;
+        while (count > 0) {
+            count--;
+            double waitTime = 0;
+            if (count == 1) {
+                waitTime = 0.25;
+            }
             ret = new SequentialAction(
                     ret,
-                    LoadingZoneSequence(Launch, true, true)
+                    mDrive.actionBuilder(Launch).waitSeconds(waitTime).build(),
+                    LoadingZoneSequence(Launch, count > 0, true)
             );
         }
-        // Add pickup of artifacts from final spike
-        if (mSpikeCount > 2) {
-            ret = new SequentialAction(
-                    ret,
-                    LoadingZoneSequence(Launch, true, true)
-            );
-        }
-        ret = new SequentialAction(
-                ret,
-                LoadingZoneSequence(Launch, false, true)
-        );
         return ret;
     }
 
     private SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject) {
         Pose2d LoadingZone = FlipPose(59,55,90);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
+        Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
+
         IntakeActions rejectAction = IntakeActions.IntakeReject;
         if (!reject) {
             rejectAction = IntakeActions.IntakeLoadArtifacts;
@@ -88,7 +85,7 @@ public abstract class AutoLoadingZone extends HydrAuto {
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90))
                 .afterTime(.75, mIntake.GetAction(rejectAction))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
+                .splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90))
                 .build();
 

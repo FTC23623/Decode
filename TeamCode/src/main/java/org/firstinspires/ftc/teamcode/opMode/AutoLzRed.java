@@ -7,6 +7,6 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 @Autonomous(name = "RedLz", preselectTeleOp = "TeleRed", group = "Red")
 public class AutoLzRed extends AutoLoadingZone {
     public AutoLzRed() {
-        super(VisionMode.VisionMode_RedGoal, false, 3);
+        super(VisionMode.VisionMode_RedGoal, false, 4);
     }
 }
