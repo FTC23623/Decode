@@ -186,7 +186,7 @@ public class MeepMeepTesting {
         Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
         Pose2d PPG = FlipPose(-12, 52, 90, flip);
         Pose2d LaunchNear = FlipPose(-25, 24, -40, flip);
-        Pose2d End = FlipPose(-16, 32, -40, flip);
+        Pose2d End = FlipPose(-14, 36, -40, flip);
         Pose2d GateWP = FlipPose(-6, 50, 180, flip);
         Pose2d Gate = FlipPose(-6, 59, 180, flip);
         Pose2d GateWP2 = FlipPose(4, 50, 0, flip);
@@ -259,7 +259,7 @@ public class MeepMeepTesting {
 
         Action driveToEnd = myBot.getDrive().actionBuilder(LaunchNear)
                 .setTangent(FlipTangent(40, flip))
-                .splineToSplineHeading(End, FlipTangent(40, flip))
+                .splineToLinearHeading(End, FlipTangent(40, flip))
                 .build();
 
         // This logic mirrors the construction in your AutoNear.java

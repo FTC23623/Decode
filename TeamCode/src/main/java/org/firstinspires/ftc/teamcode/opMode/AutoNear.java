@@ -28,7 +28,7 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d PPG_WP = FlipPose(-12, 35, 90);
         Pose2d PPG = FlipPose(-12, 52, 90);
         Pose2d LaunchNear = FlipPose(-25, 24, -40);
-        Pose2d End = FlipPose(-16, 32, -40);
+        Pose2d End = FlipPose(-14, 36, -40);
         Pose2d GateWP = FlipPose(-6, 50, 180);
         Pose2d Gate = FlipPose(-6, 59, 180);
         Pose2d GateWP2 = FlipPose(4, 50, 0);
@@ -109,8 +109,8 @@ public abstract class AutoNear extends HydrAuto {
 
         // Action to drive from launch position to end position
         Action driveToEnd = mDrive.actionBuilder(LaunchNear)
-                .setTangent(FlipTangent(90))
-                .splineToSplineHeading(End, FlipTangent(90))
+                .setTangent(FlipTangent(40))
+                .splineToLinearHeading(End, FlipTangent(40))
                 .build();
 
         // Build the auto for launching preloads, fetching from the first spike and launching
