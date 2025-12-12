@@ -148,7 +148,7 @@ public class Intake implements Subsystem {
         } else {
             transferMotor.setPower(0);
         }
-        mOp.mTelemetry.addData("Auto Reject", sensorRejectEnabled);
+        mOp.mTelemetry.addData("AutoReject", sensorRejectEnabled);
     }
 
     private boolean TransferFilled() {

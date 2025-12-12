@@ -123,6 +123,7 @@ public class Turret implements Subsystem {
         //mOp.mTelemetry.addData("AutoPos", autoSetPos);
         //mOp.mTelemetry.addData("AutoAction", autoSetAction);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
+        mOp.mTelemetry.addData("AutoTrack", !disableAutoTrack);
     }
 
     public boolean Locked() {

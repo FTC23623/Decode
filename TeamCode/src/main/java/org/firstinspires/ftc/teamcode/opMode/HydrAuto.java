@@ -99,6 +99,7 @@ public abstract class HydrAuto extends OpMode_Base {
                         break;
                 }
             }
+            telemetry.addData("OpMode", this.getClass().getSimpleName());
             telemetry.update();
             idle();
         }
