@@ -5,12 +5,16 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.IntakeActions;
+
+import java.util.ArrayList;
 
 public class Intake implements Subsystem {
     private final HydraOpMode mOp;
@@ -22,8 +26,13 @@ public class Intake implements Subsystem {
     private double intakeInSpeed;
     private boolean transferForward;
     private boolean transferReverse;
+    private final ArrayList<ArtifactSensor> artifactSensors;
+    private boolean sensorRejectEnabled;
+    private boolean transferFull;
+    private final ElapsedTime rejectionTimer;
+    private boolean rejecting = true;
 
-    public Intake(HydraOpMode opmode) {
+    public Intake(HydraOpMode opmode, boolean enableSensorReject) {
         mOp = opmode;
         intakeMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
         transferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
@@ -34,6 +43,14 @@ public class Intake implements Subsystem {
         intakeInSpeed = Constants.intakeMotorMaxIn;
         transferForward = false;
         transferReverse = false;
+        this.sensorRejectEnabled = enableSensorReject;
+        artifactSensors = new ArrayList<>(3);
+        artifactSensors.add(new ArtifactSensor(mOp.mHardwareMap.get(DigitalChannel.class, "artifactSensor1")));
+        artifactSensors.add(new ArtifactSensor(mOp.mHardwareMap.get(DigitalChannel.class, "artifactSensor2")));
+        artifactSensors.add(new ArtifactSensor(mOp.mHardwareMap.get(DigitalChannel.class, "artifactSensor3")));
+        transferFull = false;
+        rejectionTimer = new ElapsedTime();
+        rejecting = false;
     }
 
     /**
@@ -86,6 +103,25 @@ public class Intake implements Subsystem {
     @Override
     public void Process() {
         // run the intake
+        if (sensorRejectEnabled) {
+            if (TransferFilled()) {
+                // the transfer just filled, we need to reject remaining artifacts
+                rejectionTimer.reset();
+                rejecting = true;
+                if (mOp.mOperatorGamepad != null) {
+                    // notify operator transfer has filled
+                    mOp.mOperatorGamepad.rumbleBlips(2);
+                }
+            } else if (rejecting && rejectionTimer.milliseconds() >= Constants.IntakeRejectionTimeMs) {
+                // stop rejection now
+                rejecting = false;
+            }
+            if (rejecting) {
+                // always want this when rejecting
+                intakeIn = false;
+                intakeOut = true;
+            }
+        }
         if (intakeIn) {
             intakeMotor.setPower(intakeInSpeed);
         } else if (intakeOut) {
@@ -102,6 +138,28 @@ public class Intake implements Subsystem {
             transferMotor.setPower(Constants.TransferToIntakePower);
         } else {
             transferMotor.setPower(0);
+        }
+    }
+
+    private boolean TransferFilled() {
+        boolean full = true;
+        // check for artifacts in all positions
+        for (ArtifactSensor sensor : artifactSensors) {
+            if (!sensor.Full()) {
+                // at least one position is still empty, break
+                full = false;
+                break;
+            }
+        }
+        if (!transferFull && full) {
+            // rising edge, capture the state and return true
+            transferFull = true;
+            return true;
+        } else {
+            // transfer full state always matches the sensors
+            transferFull = full;
+            // not a rising edge, so return false
+            return false;
         }
     }
 
@@ -173,6 +231,39 @@ public class Intake implements Subsystem {
                     return true;
                 }
             }
+            return false;
+        }
+    }
+
+    private class ArtifactSensor {
+        private final DigitalChannel sensor;
+        private final ElapsedTime timer;
+        private boolean wasFull;
+
+        public ArtifactSensor(DigitalChannel sensor) {
+            this.sensor = sensor;
+            sensor.setMode(DigitalChannel.Mode.INPUT);
+            timer = new ElapsedTime();
+            wasFull = false;
+        }
+
+        public boolean Full() {
+            boolean state = sensor.getState();
+            if (state) {
+                // beam is broken
+                if (!wasFull) {
+                    // start timer if this is the rising edge
+                    timer.reset();
+                    wasFull = true;
+                } else {
+                    // return true once beam has been broken for desired time
+                    return timer.milliseconds() >= Constants.ArtifactDetectionTimeMs;
+                }
+            } else {
+                // reset state
+                wasFull = false;
+            }
+            // beam is not broken or time has not elapsed
             return false;
         }
     }

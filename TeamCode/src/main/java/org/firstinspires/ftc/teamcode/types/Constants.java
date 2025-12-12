@@ -48,5 +48,7 @@ public final class Constants {
     public static double TurretServoAnalogRangeVolts = 3.3;
     public static int TurretVisionLockTimeoutMs = 500;
     public static int LauncherSpeedChangeWaitTimeMs = 6000;
+    public static int IntakeRejectionTimeMs = 500;
+    public static int ArtifactDetectionTimeMs = 100;
 
 }
