@@ -30,7 +30,8 @@ public class Intake implements Subsystem {
     private boolean sensorRejectEnabled;
     private boolean transferFull;
     private final ElapsedTime rejectionTimer;
-    private boolean rejecting = true;
+    private boolean rejecting;
+    private final Debouncer disableAutoReject;
 
     public Intake(HydraOpMode opmode, boolean enableSensorReject) {
         mOp = opmode;
@@ -51,6 +52,7 @@ public class Intake implements Subsystem {
         transferFull = false;
         rejectionTimer = new ElapsedTime();
         rejecting = false;
+        disableAutoReject = new Debouncer(3);
     }
 
     /**
@@ -66,6 +68,13 @@ public class Intake implements Subsystem {
         intakeOutSpeed = Constants.intakeMotorMaxOut * left;
         transferForward = mOp.mOperatorGamepad.right_bumper || mOp.mOperatorGamepad.square;
         transferReverse = mOp.mOperatorGamepad.left_bumper;
+        disableAutoReject.In(mOp.mDriverGamepad.triangle);
+        if (disableAutoReject.Out()) {
+            disableAutoReject.Used();
+            sensorRejectEnabled = !sensorRejectEnabled;
+            mOp.mOperatorGamepad.rumbleBlips(1);
+            mOp.mDriverGamepad.rumbleBlips(1);
+        }
     }
 
     /**
@@ -139,6 +148,7 @@ public class Intake implements Subsystem {
         } else {
             transferMotor.setPower(0);
         }
+        mOp.mTelemetry.addData("Auto Reject", sensorRejectEnabled);
     }
 
     private boolean TransferFilled() {
@@ -146,9 +156,9 @@ public class Intake implements Subsystem {
         // check for artifacts in all positions
         for (ArtifactSensor sensor : artifactSensors) {
             if (!sensor.Full()) {
-                // at least one position is still empty, break
+                // at least one position is still empty
                 full = false;
-                break;
+                mOp.mTelemetry.addData("Sensor" + artifactSensors.indexOf(sensor), sensor.Full());
             }
         }
         if (!transferFull && full) {
