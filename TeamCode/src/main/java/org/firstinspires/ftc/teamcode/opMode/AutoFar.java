@@ -29,8 +29,6 @@ public abstract class AutoFar extends HydrAuto {
         Pose2d PPG_WP = FlipPose(-12, 35, 90);
         Pose2d PPG = FlipPose(-12, 48, 90);
         Pose2d End = FlipPose(30, 15, 0);
-        Pose2d LoadingZone = FlipPose(59,55,90);
-        Pose2d loadingzone_wp= FlipPose(59, 40, 90);
 
         Action launchPreload = mDrive.actionBuilder(mBeginPose)
                 .setTangent(FlipTangent(180))
@@ -61,31 +59,9 @@ public abstract class AutoFar extends HydrAuto {
                 .splineToLinearHeading(Launch, FlipTangent(-60))
                 .build();
 
-        // Action to pick up artifacts from third spike and stop
-        Action pickupPPG = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(180))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(PPG_WP, FlipTangent(90))
-                .setTangent(FlipTangent(90))
-                .splineToSplineHeading(PPG, FlipTangent(90))
-                .build();
-
-        Action fetchLoadingZone1 = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(90))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
-                .splineToSplineHeading(loadingzone_wp, FlipTangent(-90))
-                .splineToSplineHeading(Launch, FlipTangent(-90))
-                .build();
-
-        Action driveToEnd = mDrive.actionBuilder(Launch)
-                .setTangent(FlipTangent(180))
-                .splineToSplineHeading(End, FlipTangent(180))
-                .build();
-
-        // Build the auto for launching preloads, fetching artifacts from the first spike and launching
+        // Launch preloads
+        // Pickup from loading zone and launch
+        // Pickup spike and launch
         SequentialAction ret =  new SequentialAction(
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
@@ -98,6 +74,7 @@ public abstract class AutoFar extends HydrAuto {
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                LoadingZoneSequence(Launch, true, false),
                 mTurret.GetDisableAction(true),
                 fetchGPP,
                 mTurret.GetDisableAction(false),
@@ -108,6 +85,7 @@ public abstract class AutoFar extends HydrAuto {
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
         );
         // If more than one spike, add another fetch from the second spike and launch
+        // Else pickup and launch from loading zone twice
         if (mSpikeCount > 1) {
             ret = new SequentialAction(
                 ret,
@@ -120,26 +98,17 @@ public abstract class AutoFar extends HydrAuto {
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
-        }
-        // Add pickup of artifacts from loading zone
-        if (mSpikeCount > 2) {
+        } else {
             ret = new SequentialAction(
                 ret,
-                mTurret.GetDisableAction(true),
-                fetchLoadingZone1,
-                mTurret.GetDisableAction(false),
-                    new ParallelAction(
-                            mTurret.GetLockAction(),
-                            mIntake.GetAction(IntakeActions.IntakePushToLauncher)
-                    ),
-                    mLauncher.GetAction(LauncherActions.LauncherLaunch)
+                LoadingZoneSequence(Launch, true, true),
+                LoadingZoneSequence(Launch, true, true)
             );
         }
-        // when there are 3 spikes we don't launch. If there are less, we need to move off the launch line
+        // for one or two spikes, pickup from loading zone at the end
         ret = new SequentialAction(
             ret,
-            mIntake.GetAction(IntakeActions.IntakeStop),
-            driveToEnd
+            LoadingZoneSequence(Launch, false, true)
         );
         return ret;
     }
