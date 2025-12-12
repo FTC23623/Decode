@@ -86,13 +86,13 @@ public class Turret implements Subsystem {
         }
         else if (vision != null && !disableAutoTrack) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
-            mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
-            mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
+            //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
+            //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
             CalcDistanceToTag(vision);
             if (vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) {
-                mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
+                //mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
                 double rotate = vision.GetXOffset();
-                mOp.mTelemetry.addData("rotate", rotate);
+                //mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
                 if (Math.abs(rotate) > 1) {
                     double NewPos = TurretServo.getPosition() + CalcPositionOffsetAngle(rotate);
@@ -100,7 +100,7 @@ public class Turret implements Subsystem {
                     NewPos = Clamp(NewPos);
                     TurretServo.setPosition(NewPos);
                     visionLocked = false;
-                    mOp.mTelemetry.addData("Turret Pos V", NewPos);
+                    //mOp.mTelemetry.addData("Turret Pos V", NewPos);
                 } else {
                     visionLocked = true;
                 }
@@ -114,14 +114,14 @@ public class Turret implements Subsystem {
                 // clamp the new position to the min and max
                 NewPos = Clamp(NewPos);
                 TurretServo.setPosition(Clamp(NewPos));
-                mOp.mTelemetry.addData("Turret Pos U", NewPos);
+                //mOp.mTelemetry.addData("Turret Pos U", NewPos);
             }
         }
         if (disableAutoTrack || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
             visionLocked = false;
         }
-        mOp.mTelemetry.addData("AutoPos", autoSetPos);
-        mOp.mTelemetry.addData("AutoAction", autoSetAction);
+        //mOp.mTelemetry.addData("AutoPos", autoSetPos);
+        //mOp.mTelemetry.addData("AutoAction", autoSetAction);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
     }
 
@@ -156,7 +156,7 @@ public class Turret implements Subsystem {
         double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
         //calculate distance
         double distanceFromLimelightToGoalInches = (Constants.goalHeightInches - Constants.limelightLensHeightInches) / Math.tan(angleToGoalRadians);
-        mOp.mTelemetry.addData("GoalDistance", distanceFromLimelightToGoalInches);
+        //mOp.mTelemetry.addData("GoalDistance", distanceFromLimelightToGoalInches);
         return distanceFromLimelightToGoalInches;
     }
 

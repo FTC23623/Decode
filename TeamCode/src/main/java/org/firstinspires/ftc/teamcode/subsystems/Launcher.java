@@ -130,11 +130,11 @@ public class Launcher implements Subsystem {
             LaunchServoWheel.setPosition(contServoOff);
         }
 
-        mOp.mTelemetry.addData("LaunchPwr", lastPwrSetting.get(0));
+        //mOp.mTelemetry.addData("LaunchPwr", lastPwrSetting.get(0));
         mOp.mTelemetry.addData("LaunchRPM", lastRpmMeasure.get(0));
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
-        mOp.mTelemetry.addData("launchLoad", RunLaunchServo);
-        mOp.mTelemetry.addData("launchLoadSet", LaunchServoRun);
+        //mOp.mTelemetry.addData("launchLoad", RunLaunchServo);
+        //mOp.mTelemetry.addData("launchLoadSet", LaunchServoRun);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class Launcher implements Subsystem {
                 motor.mLogger.rpmTgt.set(targetRPMtune);
             }
         }
-        mOp.mTelemetry.addData("pidF", pidF);
+        //mOp.mTelemetry.addData("pidF", pidF);
         pid.setPIDF(pidP, pidI, pidD, pidF);
     }
 
