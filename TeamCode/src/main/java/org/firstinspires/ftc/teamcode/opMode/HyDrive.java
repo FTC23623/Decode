@@ -37,7 +37,7 @@ public abstract class HyDrive extends OpMode_Base {
   protected Launcher mLauncher;
   protected Indicator mIndicator;
   protected Lift mLift;
-  protected SystemMonitor mSysMon;
+  //protected SystemMonitor mSysMon;
   protected ElapsedTime mLoopSleep;
 
   public HyDrive(VisionMode target) {
@@ -64,7 +64,7 @@ public abstract class HyDrive extends OpMode_Base {
     mTurret = new Turret(mOpMode);
     mVision = new LimelightVision(mOpMode);
     mLauncher = new Launcher(mOpMode, mTurret, 0);
-    mSysMon = new SystemMonitor(mOpMode);
+    //mSysMon = new SystemMonitor(mOpMode);
     mLift = new Lift(mOpMode);
     mIndicator = new Indicator(mOpMode, mLauncher, mLift, mTurret);
     mOpMode.mVision = mVision;
@@ -75,7 +75,7 @@ public abstract class HyDrive extends OpMode_Base {
     mSystems.add(mImu);
     mSystems.add(mTurret);
     mSystems.add(mLauncher);
-    mSystems.add(mSysMon);
+    //mSystems.add(mSysMon);
     mSystems.add(mIndicator);
     mSystems.add(mLift);
     // manual bulk caching
