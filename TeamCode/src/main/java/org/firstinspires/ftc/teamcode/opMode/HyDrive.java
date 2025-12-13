@@ -103,10 +103,14 @@ public abstract class HyDrive extends OpMode_Base {
       for (Subsystem system : mSystems) {
         system.HandleUserInput();
       }
+      //ElapsedTime timer = new ElapsedTime();
       // System processes
       for (Subsystem system : mSystems) {
+        //timer.reset();
         system.Process();
+        //telemetry.addData("time" + system.getClass().getSimpleName(), timer.milliseconds());
       }
+      //telemetry.addData("LoopTime", mLoopSleep.milliseconds());
       // Update telemetry once for all processes
       telemetry.update();
       mLoopSleep.reset();
