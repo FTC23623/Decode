@@ -112,6 +112,8 @@ public class Intake implements Subsystem {
     @Override
     public void Process() {
         // run the intake
+        //mOp.mTelemetry.addData("intakeInUser", intakeIn);
+        boolean intakeInSave = intakeIn;
         if (sensorRejectEnabled) {
             if (TransferFilled()) {
                 // the transfer just filled, we need to reject remaining artifacts
@@ -120,6 +122,7 @@ public class Intake implements Subsystem {
                 if (mOp.mOperatorGamepad != null) {
                     // notify operator transfer has filled
                     mOp.mOperatorGamepad.rumbleBlips(2);
+                    mOp.mDriverGamepad.rumbleBlips(2);
                 }
             } else if (rejecting && rejectionTimer.milliseconds() >= Constants.IntakeRejectionTimeMs) {
                 // stop rejection now
@@ -127,10 +130,16 @@ public class Intake implements Subsystem {
             }
             if (rejecting) {
                 // always want this when rejecting
-                intakeIn = false;
                 intakeOut = true;
+                intakeOutSpeed = Constants.intakeMotorMaxOut;
+            }
+            if (transferFull) {
+                intakeIn = false;
             }
         }
+        //mOp.mTelemetry.addData("intakeIn", intakeIn);
+        //mOp.mTelemetry.addData("rejecting", rejecting);
+        mOp.mTelemetry.addData("transferFull", transferFull);
         if (intakeIn) {
             intakeMotor.setPower(intakeInSpeed);
         } else if (intakeOut) {
@@ -141,7 +150,7 @@ public class Intake implements Subsystem {
         // run the transfer
         if (transferForward) {
             transferMotor.setPower(Constants.TransfertoLaunchPower);
-        } else if (intakeIn) {
+        } else if (intakeInSave) {
             transferMotor.setPower(Constants.TransferFromIntakePower);
         } else if (transferReverse) {
             transferMotor.setPower(Constants.TransferToIntakePower);
@@ -158,8 +167,8 @@ public class Intake implements Subsystem {
             if (!sensor.Full()) {
                 // at least one position is still empty
                 full = false;
-                mOp.mTelemetry.addData("Sensor" + artifactSensors.indexOf(sensor), sensor.Full());
             }
+            mOp.mTelemetry.addData("Sensor" + artifactSensors.indexOf(sensor), sensor.Full());
         }
         if (!transferFull && full) {
             // rising edge, capture the state and return true
