@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -36,6 +37,7 @@ public class Intake implements Subsystem {
     public Intake(HydraOpMode opmode, boolean enableSensorReject) {
         mOp = opmode;
         intakeMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         transferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
         transferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeIn = false;
@@ -130,7 +132,11 @@ public class Intake implements Subsystem {
             if (rejecting) {
                 // always want this when rejecting
                 intakeOut = true;
-                intakeOutSpeed = Constants.intakeMotorMaxOut;
+                if (rejectionTimer.milliseconds() < Constants.IntakeReversalTimeMs) {
+                    intakeOutSpeed = 0;
+                } else {
+                    intakeOutSpeed = Constants.intakeMotorMaxOut;
+                }
             }
             if (transferFull) {
                 intakeIn = false;

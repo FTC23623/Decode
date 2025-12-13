@@ -49,6 +49,7 @@ public final class Constants {
     public static int TurretVisionLockTimeoutMs = 500;
     public static int LauncherSpeedChangeWaitTimeMs = 6000;
     public static int IntakeRejectionTimeMs = 1000;
+    public static int IntakeReversalTimeMs = 50;
     public static int ArtifactDetectionTimeMs = 100;
 
 }
