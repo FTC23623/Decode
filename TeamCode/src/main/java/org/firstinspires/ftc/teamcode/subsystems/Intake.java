@@ -122,7 +122,6 @@ public class Intake implements Subsystem {
                 if (mOp.mOperatorGamepad != null) {
                     // notify operator transfer has filled
                     mOp.mOperatorGamepad.rumbleBlips(2);
-                    mOp.mDriverGamepad.rumbleBlips(2);
                 }
             } else if (rejecting && rejectionTimer.milliseconds() >= Constants.IntakeRejectionTimeMs) {
                 // stop rejection now
