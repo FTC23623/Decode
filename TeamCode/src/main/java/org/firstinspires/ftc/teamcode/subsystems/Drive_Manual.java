@@ -10,6 +10,7 @@ public class Drive_Manual extends Drive {
     private final com.qualcomm.robotcore.hardware.Gamepad mGamepad;
     private final Debouncer mCircle;
     private final Debouncer mLeftBumper;
+    private final Debouncer squareButton;
     public Drive_Manual(HydraOpMode op, Imu imu) {
         super(op, imu);
         mGamepad = mOp.mDriverGamepad;
@@ -17,6 +18,7 @@ public class Drive_Manual extends Drive {
         SetAllMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mCircle = new Debouncer(Constants.debounce);
         mLeftBumper = new Debouncer(Constants.debounce);
+        squareButton = new Debouncer(2);
     }
 
     @Override
@@ -56,6 +58,15 @@ public class Drive_Manual extends Drive {
         // if the target is visible, turn towards it
         if (mLeftBumper.Out() && Constants.fieldCentricDrive && vision != null) {
             rotate = -Math.sin(vision.GetXOffset() * Math.PI / 180) * 1.1;
+        } else {
+            rotate = -mGamepad.right_stick_x;
+        }
+        // use the cross button to aid in squaring to the field
+        squareButton.In(mGamepad.square);
+        if (squareButton.Out() && Constants.fieldCentricDrive) {
+            // snap heading to square robot in base zone
+            double snapHeading = 0;
+            rotate = -Math.sin((yaw - snapHeading) * Math.PI / 180) * 1.1;
         } else {
             rotate = -mGamepad.right_stick_x;
         }

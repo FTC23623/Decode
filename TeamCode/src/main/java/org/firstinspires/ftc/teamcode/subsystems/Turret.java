@@ -32,7 +32,7 @@ public class Turret implements Subsystem {
     public static int VisionRefreshTimeMs = 100;
     private final Debouncer circleDebounce;
     private final Debouncer triangleDebounce;
-    private final Debouncer squareDebounce;
+    //private final Debouncer squareDebounce;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
@@ -45,7 +45,7 @@ public class Turret implements Subsystem {
         disableAutoTrack = false;
         circleDebounce = new Debouncer(Constants.debounceLong);
         triangleDebounce = new Debouncer(1);
-        squareDebounce = new Debouncer(2);
+        //squareDebounce = new Debouncer(2);
     }
 
     @Override
@@ -67,10 +67,10 @@ public class Turret implements Subsystem {
             triangleDebounce.Used();
             GoHome();
         }
-        squareDebounce.In(mOp.mDriverGamepad.square);
-        if (squareDebounce.Out()) {
-            GoHome();
-        }
+        //squareDebounce.In(mOp.mDriverGamepad.square);
+        //if (squareDebounce.Out()) {
+        //    GoHome();
+        //}
     }
 
     @Override
