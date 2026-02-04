@@ -41,7 +41,7 @@ public final class Constants {
 
     // distance from the target to the floor
     public static double goalHeightInches = 38.5;
-    public static int LimelightPollRateHz = 20;
+    public static int LimelightPollRateHz = 100;
     public static double TurretDeadbandDegrees = 1;
     public static double LaunchWheelRpmDeadband = 50;
     public static double LauncherAutoLaunchTimeMs = 1300;

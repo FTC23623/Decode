@@ -29,10 +29,12 @@ public class Turret implements Subsystem {
     private double autoSetPos;
     private boolean visionLocked;
     private boolean disableAutoTrack;
-    public static int VisionRefreshTimeMs = 100;
+    public static int VisionRefreshTimeMs = 50;
     private final Debouncer circleDebounce;
     private final Debouncer triangleDebounce;
     //private final Debouncer squareDebounce;
+    private boolean first;
+    private double firstUpdate;
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
@@ -46,6 +48,7 @@ public class Turret implements Subsystem {
         circleDebounce = new Debouncer(Constants.debounceLong);
         triangleDebounce = new Debouncer(1);
         //squareDebounce = new Debouncer(2);
+        first = true;
     }
 
     @Override
@@ -95,11 +98,24 @@ public class Turret implements Subsystem {
                 //mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
                 if (Math.abs(rotate) > 1) {
-                    double NewPos = TurretServo.getPosition() + CalcPositionOffsetAngle(rotate);
+                    double update = CalcPositionOffsetAngle(rotate);
+                    boolean applyUpdate = false;
+                    if (first) {
+                        firstUpdate = update;
+                        first = false;
+                    } else {
+                        if (Math.abs(update - firstUpdate) < 1) {
+                            applyUpdate = true;
+                            first = true;
+                        }
+                    }
+                    double NewPos = TurretServo.getPosition() + update;
                     // clamp the new position to the min and max
                     NewPos = Clamp(NewPos);
-                    TurretServo.setPosition(NewPos);
-                    visionLocked = false;
+                    if (applyUpdate) {
+                        TurretServo.setPosition(NewPos);
+                        visionLocked = false;
+                    }
                     //mOp.mTelemetry.addData("Turret Pos V", NewPos);
                 } else {
                     visionLocked = true;
