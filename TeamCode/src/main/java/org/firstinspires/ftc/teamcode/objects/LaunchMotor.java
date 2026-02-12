@@ -11,9 +11,6 @@ public class LaunchMotor {
     private final HydraOpMode mOp;
     private final DcMotorEx motor;
     private final double ticksPerRev;
-    private double lastPosition;
-    private long lastTime;
-    private final double nsToMs = 1.0e-6;
     private final SampleAverage mAvgRpm;
     public final LaunchDatalogger mLogger;
 
@@ -22,8 +19,6 @@ public class LaunchMotor {
         mOp = opMode;
         motor = mot;
         motor.setDirection(motorDir);
-        lastPosition = 0;
-        lastTime = 0;
         motor.setPower(0);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -34,29 +29,16 @@ public class LaunchMotor {
     }
 
     public double GetRPM() {
-        // calculate time since the last measurement
-        long timeNow = System.nanoTime();
-        double timeDifMs = (timeNow - lastTime) * nsToMs;
-        // get the current position of the motor and calculate the difference since last time
-        double position = motor.getCurrentPosition();
-        double dif = Math.abs(position - lastPosition);
-        // convert difference in ticks to revolutions
-        double rev = dif / ticksPerRev;
+        // get velocity from motor controller
+        double ticksPerSecond = motor.getVelocity();
+        // convert to rpm
+        double ticksPerMin = 60 * ticksPerSecond;
         // rpm
-        double rpm = 60000 * (rev / timeDifMs);
-        // capture present values for the next call
-        lastPosition = position;
-        lastTime = timeNow;
-        // calculate average of last few rpm values
+        double rpm = ticksPerMin / ticksPerRev;
         mAvgRpm.AddSample(rpm);
         double avgRpm = mAvgRpm.GetAverage();
         // telemetry and datalogging
         double current = motor.getCurrent(CurrentUnit.MILLIAMPS);
-        //mOp.mTelemetry.addData(mName + " ticks", dif);
-        //mOp.mTelemetry.addData(mName + " time", timeDifMs);
-        //mOp.mTelemetry.addData(mName + " current", current);
-        //mOp.mTelemetry.addData(mName + " RPM", rpm);
-        //mOp.mTelemetry.addData(mName + " RPM Avg", avgRpm);
         mLogger.rpm.set(rpm);
         mLogger.current.set(current);
         // return rpm
