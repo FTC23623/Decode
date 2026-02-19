@@ -107,11 +107,11 @@ public class MeepMeepTesting {
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, -20, flip);
         Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
-        Pose2d GPPStraight = FlipPose(46, 56, 90, flip);
-        Pose2d GPPLoop = FlipPose(46, 56, 90, flip);
+        Pose2d GPPStraight = FlipPose(46, 58, 90, flip);
+        Pose2d GPPLoop = FlipPose(46, 58, 90, flip);
         Pose2d PGP_WP = FlipPose(12, 30, 90, flip);
-        Pose2d PGPStraight = FlipPose(24, 56, 90, flip);
-        Pose2d PGPLoop = FlipPose(24, 56, 90, flip);
+        Pose2d PGPStraight = FlipPose(24, 58, 90, flip);
+        Pose2d PGPLoop = FlipPose(24, 58, 90, flip);
         Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
         Pose2d PPG = FlipPose(-12, 48, 90, flip);
         Pose2d End = FlipPose(30, 15, 0, flip);
