@@ -1,9 +1,9 @@
 package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueDark;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedDark;
@@ -68,10 +68,10 @@ public class MeepMeepTesting {
                 // Run the selected auto
                 switch (selectedAuto) {
                     case "AutoFarBlue":
-                        myBot.runAction(BuildAutoFar(myBot, true, spikeCount));
+                        myBot.runAction(BuildAutoFar(myBot, true, spikeCount, false));
                         break;
                     case "AutoFarRed":
-                        myBot.runAction(BuildAutoFar(myBot, false, spikeCount));
+                        myBot.runAction(BuildAutoFar(myBot, false, spikeCount, false));
                         break;
                     case "AutoNearBlue":
                         myBot.runAction(BuildAutoNear(myBot, true, spikeCount, false));
@@ -100,19 +100,34 @@ public class MeepMeepTesting {
         });
     }
 
-    private static SequentialAction BuildAutoFar(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
+    private static SequentialAction BuildAutoFar(RoadRunnerBotEntity myBot, boolean flip, int spikeCount, boolean loop) {
         Pose2d beginPose = FlipPose(60.0, 15.0, 0.0, flip);
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch = FlipPose(55, 15, -20, flip);
         Pose2d GPP_WP = FlipPose(34, 30, 90, flip);
-        Pose2d GPP = FlipPose(34, 56, 90, flip);
+        Pose2d GPPStraight = FlipPose(46, 56, 90, flip);
+        Pose2d GPPLoop = FlipPose(46, 56, 90, flip);
         Pose2d PGP_WP = FlipPose(12, 30, 90, flip);
-        Pose2d PGP = FlipPose(12, 56, 90, flip);
+        Pose2d PGPStraight = FlipPose(24, 56, 90, flip);
+        Pose2d PGPLoop = FlipPose(24, 56, 90, flip);
         Pose2d PPG_WP = FlipPose(-12, 35, 90, flip);
         Pose2d PPG = FlipPose(-12, 48, 90, flip);
         Pose2d End = FlipPose(30, 15, 0, flip);
+
+        Pose2d GPP;
+        Pose2d PGP;
+        double spikeTangent;
+        if (loop) {
+            GPP = GPPLoop;
+            PGP = PGPLoop;
+            spikeTangent = 0;
+        } else {
+            GPP = GPPStraight;
+            PGP = PGPStraight;
+            spikeTangent = 90;
+        }
 
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .splineToSplineHeading(Launch, FlipTangent(180, flip))
@@ -123,8 +138,8 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(GPP_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(GPP, FlipTangent(90, flip))
-                .setTangent(FlipTangent(-90, flip))
+                .splineToSplineHeading(GPP, FlipTangent(spikeTangent, flip))
+                .setTangent(FlipTangent(-spikeTangent, flip))
                 .splineToLinearHeading(Launch, FlipTangent(-90, flip))
                 .waitSeconds(launchTimeS)
                 .build();
@@ -133,8 +148,8 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(180, flip))
                 .splineToSplineHeading(PGP_WP, FlipTangent(90, flip))
                 .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(PGP, FlipTangent(90, flip))
-                .setTangent(FlipTangent(-90, flip))
+                .splineToSplineHeading(PGP, FlipTangent(spikeTangent, flip))
+                .setTangent(FlipTangent(-spikeTangent, flip))
                 .splineToLinearHeading(Launch, FlipTangent(-60, flip))
                 .waitSeconds(launchTimeS)
                 .build();
@@ -292,15 +307,18 @@ public class MeepMeepTesting {
     }
 
     private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip) {
-        Pose2d LoadingZone = FlipPose(59,55,90, flip);
+        Pose2d LoadingZone = FlipPose(59,53,90, flip);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
+
+        // cap velocity when going into the corner of the field
+        final double maxVelToCorner = 25;
 
         // fetch and drive to waypoint
         Action fetch = mDrive.getDrive().actionBuilder(LaunchPos)
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90, flip))
                 .build();
 
@@ -308,7 +326,7 @@ public class MeepMeepTesting {
         Action goToLaunch =  mDrive.getDrive().actionBuilder(LaunchPos)
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
                 .splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90, flip))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90, flip))
                 .waitSeconds(launchTimeS)
