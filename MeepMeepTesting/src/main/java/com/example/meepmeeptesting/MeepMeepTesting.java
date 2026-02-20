@@ -21,7 +21,7 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
+        String[] autos = {"AutoNoTurnRed","FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
@@ -87,6 +87,9 @@ public class MeepMeepTesting {
                         break;
                     case "FarFetch":
                         myBot.runAction(BuildFarFetch(myBot,false, spikeCount,false));
+                        break;
+                    case "AutoNoTurnRed":
+                        myBot.runAction(BuildFarAutoNoTurn(myBot, false, spikeCount));
                         break;
                 }
 
@@ -157,7 +160,7 @@ public class MeepMeepTesting {
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
                 launchPreload,
-                LoadingZoneSequence(myBot, Launch, true, flip),
+                LoadingZoneSequence(myBot, Launch, true, flip,Launch),
                 fetchGPP
         );
         if (spikeCount > 1) {
@@ -168,11 +171,11 @@ public class MeepMeepTesting {
         } else {
             ret = new SequentialAction(
                     ret,
-                    LoadingZoneSequence(myBot, Launch, true, flip),
-                    LoadingZoneSequence(myBot, Launch, true, flip)
+                    LoadingZoneSequence(myBot, Launch, true, flip, Launch),
+                    LoadingZoneSequence(myBot, Launch, true, flip, Launch)
             );
         }
-        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch, false, flip));
+        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch, false, flip, Launch));
         return ret;
     }
 
@@ -288,7 +291,7 @@ public class MeepMeepTesting {
 
         SequentialAction ret =  new SequentialAction(
                 launchPreload,
-                LoadingZoneSequence(myBot, Launch, true, flip)
+                LoadingZoneSequence(myBot, Launch, true, flip, Launch)
         );
         int count = spikeCount;
         while (count > 0) {
@@ -300,13 +303,13 @@ public class MeepMeepTesting {
             ret = new SequentialAction(
                     ret,
                     myBot.getDrive().actionBuilder(Launch).waitSeconds(waitTime).build(),
-                    LoadingZoneSequence(myBot, Launch, count > 0, flip)
+                    LoadingZoneSequence(myBot, Launch, count > 0, flip, Launch)
             );
         }
         return ret;
     }
 
-    private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip) {
+    private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip, Pose2d StartPos) {
         Pose2d LoadingZone = FlipPose(59,53,90, flip);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
@@ -315,7 +318,7 @@ public class MeepMeepTesting {
         final double maxVelToCorner = 25;
 
         // fetch and drive to waypoint
-        Action fetch = mDrive.getDrive().actionBuilder(LaunchPos)
+        Action fetch = mDrive.getDrive().actionBuilder(StartPos)
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
@@ -323,7 +326,7 @@ public class MeepMeepTesting {
                 .build();
 
         // drive to launch position
-        Action goToLaunch =  mDrive.getDrive().actionBuilder(LaunchPos)
+        Action goToLaunch =  mDrive.getDrive().actionBuilder(StartPos)
                 .setTangent(FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
@@ -343,6 +346,60 @@ public class MeepMeepTesting {
                     fetch
             );
         }
+    }
+
+    private static SequentialAction BuildFarAutoNoTurn(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
+        Pose2d beginPose = FlipPose(62, 15.0, 90, flip);
+
+        // All poses defined for autos on the red side
+        // FlipPose and FlipTangent auto adjust for blue
+        Pose2d Launch1 = FlipPose(55, 15, 90, flip);
+        Pose2d GPP = FlipPose(34, 56, 110, flip);
+        Pose2d PGP = FlipPose(12, 56, 90, flip);
+        Pose2d PPG = FlipPose(55, 15, -20, flip);
+        Pose2d Launch2 = FlipPose(55, 15, 110, flip);
+        Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
+                .splineToLinearHeading(Launch1, FlipTangent(180, flip))
+                .waitSeconds(2)
+                .build();
+
+        Action fetchGPP = myBot.getDrive().actionBuilder(Launch2)
+                .setTangent(FlipTangent(110, flip))
+                .splineToLinearHeading(GPP, FlipTangent(110, flip))
+                .setTangent(FlipTangent(110, flip))
+                .splineToLinearHeading(Launch2, FlipTangent(-70, flip))
+                .waitSeconds(launchTimeS)
+                .build();
+
+        Action fetchPGP = myBot.getDrive().actionBuilder(Launch2)
+                .setTangent(FlipTangent(110, flip))
+                .setTangent(FlipTangent(110, flip))
+               .splineToLinearHeading(PGP, FlipTangent(110, flip))
+                .setTangent(FlipTangent(-110, flip))
+                .splineToLinearHeading(Launch2, FlipTangent(90, flip))
+                .waitSeconds(launchTimeS)
+                .build();
+
+        // This logic mirrors the construction in your AutoFar.java
+        SequentialAction ret =  new SequentialAction(
+                launchPreload,
+                LoadingZoneSequence(myBot, Launch2, true, flip, Launch1),
+                fetchGPP
+        );
+        if (spikeCount > 1) {
+            ret = new SequentialAction(
+                    ret,
+                    fetchPGP
+            );
+        } else {
+            ret = new SequentialAction(
+                    ret//,
+                   // LoadingZoneSequence(myBot, Launch1, true, flip),
+                  //  LoadingZoneSequence(myBot, Launch2, true, flip)
+            );
+        }
+      //  ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch1, false, flip));
+        return ret;
     }
 
     private static Pose2d FlipPose(double x, double y, double heading, boolean flip) {
