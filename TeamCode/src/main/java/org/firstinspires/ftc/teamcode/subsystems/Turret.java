@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import androidx.annotation.NonNull;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.types.Constants;
 
@@ -9,8 +10,12 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
+import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
@@ -23,6 +28,9 @@ public class Turret implements Subsystem {
     private final double mMinPos = 0;
     private double UserInput = 0;
     private Servo TurretServo;
+    private CRServoEx TurretCRServo;
+    private AbsoluteAnalogEncoder AnalogTurretEncoder;
+    private Motor.Encoder TurretEncoder;
     private final AnalogInput TurretServoFb;
     private long lastVisionTimestamp;
     private boolean autoSetAction;
@@ -40,6 +48,25 @@ public class Turret implements Subsystem {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
         TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
+
+        /** Continuous Rotation Dual Servo
+        * Setup as Single Servo. The Servo output will be split to two power injector ports to run two servos.
+        * Alternative is to setup a ServoExGroup to run both from C-Hub
+        */
+        TurretCRServo = new CRServoEx(mOp.mHardwareMap,"TurretServo")
+                .setCachingTolerance(0.001)
+                .setRunMode(CRServoEx.RunMode.RawPower)
+        ;
+        AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServo")
+                .zero(0.0) //ToDo: Use a Constant TURRET_ENCODER_OFFSET set to value in Constants.java
+                .setReversed(true) // set based on observation.
+        ;
+        TurretEncoder = new Motor(mOp.mHardwareMap, "TurretEncoder").encoder
+                .setDirection(Motor.Direction.FORWARD) // Set based on Encoder orientation and Pos rotation convention
+                .overrideResetPos((int) 0) //ToDo: Use a Constant TURRET_SYNC_OFFSET set to value in Constants.java
+        ;
+        //** TODO: Add Remaining Methods and Process Functions
+
         lastVisionTimestamp = 0;
         autoSetAction = false;
         autoSetPos = 0;
