@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueDark;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedDark;
@@ -21,7 +22,7 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"AutoNoTurnRed","FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
+        String[] autos = {"AutoNoTurnRed", "AutoNoTurnBlue", "FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
@@ -90,6 +91,9 @@ public class MeepMeepTesting {
                         break;
                     case "AutoNoTurnRed":
                         myBot.runAction(BuildFarAutoNoTurn(myBot, false, spikeCount));
+                        break;
+                    case "AutoNoTurnBlue":
+                        myBot.runAction(BuildFarAutoNoTurn(myBot, true, spikeCount));
                         break;
                 }
 
@@ -354,29 +358,30 @@ public class MeepMeepTesting {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch1 = FlipPose(55, 15, 90, flip);
-        Pose2d GPP = FlipPose(34, 56, 110, flip);
-        Pose2d PGP = FlipPose(12, 56, 90, flip);
-        Pose2d PPG = FlipPose(55, 15, -20, flip);
-        Pose2d Launch2 = FlipPose(55, 15, 110, flip);
+        Vector2d GPPPos = FlipCoordinate(34, 56, flip);
+        Vector2d PGPPos = FlipCoordinate(12, 56, flip);
+        Vector2d Launch2Pos = FlipCoordinate(55, 15, flip);
+        Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos, flip));
+        Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos, flip));
+        Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(110, flip));
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .splineToLinearHeading(Launch1, FlipTangent(180, flip))
                 .waitSeconds(2)
                 .build();
 
         Action fetchGPP = myBot.getDrive().actionBuilder(Launch2)
-                .setTangent(FlipTangent(110, flip))
-                .splineToLinearHeading(GPP, FlipTangent(110, flip))
-                .setTangent(FlipTangent(110, flip))
-                .splineToLinearHeading(Launch2, FlipTangent(-70, flip))
+                .setTangent(GPP.heading)
+                .splineToLinearHeading(GPP, GPP.heading)
+                .setTangent(AutoTangent(GPPPos, Launch2Pos, flip))
+                .splineToLinearHeading(Launch2, AutoTangent(GPPPos, Launch2Pos, flip))
                 .waitSeconds(launchTimeS)
                 .build();
 
         Action fetchPGP = myBot.getDrive().actionBuilder(Launch2)
-                .setTangent(FlipTangent(110, flip))
-                .setTangent(FlipTangent(110, flip))
-               .splineToLinearHeading(PGP, FlipTangent(110, flip))
-                .setTangent(FlipTangent(-110, flip))
-                .splineToLinearHeading(Launch2, FlipTangent(90, flip))
+                .setTangent(PGP.heading)
+                .splineToLinearHeading(PGP, PGP.heading)
+                .setTangent(AutoTangent(PGPPos, Launch2Pos, flip))
+                .splineToLinearHeading(Launch2, AutoTangent(PGPPos, Launch2Pos, flip))
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -409,10 +414,29 @@ public class MeepMeepTesting {
         return new Pose2d(x, y, Math.toRadians(heading));
     }
 
+    private static Vector2d FlipCoordinate(double x, double y, boolean flip) {
+        if (flip) {
+            return new Vector2d(x, -y);
+        }
+        return new Vector2d(x, y);
+    }
+
     private static double FlipTangent(double tangent, boolean flip) {
         if (flip) {
             return Math.toRadians(-tangent);
         }
         return Math.toRadians(tangent);
+    }
+
+    private static double AutoTangent(Vector2d start, Vector2d end, boolean flip) {
+        double dx = end.x - start.x;
+        double dy = end.y - start.y;
+        double ret;
+        ret = Math.atan2(dy, dx);
+        if (flip) {
+            return ret;
+        } else {
+            return ret;
+        }
     }
 }
