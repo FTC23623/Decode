@@ -15,8 +15,8 @@ public final class Constants {
     public static final double motorRpmIntervalMs = 50;
     public static final double linearLaunchMotTicksPerRev = 28;
     public static final double nsToMs = 1.0e-6;
-    public static final double intakeMotorMaxIn = -0.85;
-    public static final double intakeMotorMaxOut = .6;
+    public static final double intakeMotorMaxIn = -1000;
+    public static final double intakeMotorMaxOut = 500;
     public static final double LauncherTopRPMTele = 2925;
     public static final double LauncherTopRPMAuto = 2825;
     public static final double LauncherMedRPMThreshold = 2600;
@@ -28,9 +28,9 @@ public final class Constants {
     public static final double LauncherLowRPMAuto = 2175;
     public static final double LauncherIdleRPM = 500;
     public static final double LaunchServoRun = 1;
-    public static final double TransfertoLaunchPower = .95;
-    public static final double TransferFromIntakePower = .95;
-    public static final double TransferToIntakePower = -0.75;
+    public static final double TransfertoLaunchPower = 1100;
+    public static final double TransferFromIntakePower = 1100;
+    public static final double TransferToIntakePower = -900;
     public static final double TurretGearRatio = 3.15;
     public static final double TurretRange = 355;
     // how many degrees back is your limelight rotated from perfectly vertical?

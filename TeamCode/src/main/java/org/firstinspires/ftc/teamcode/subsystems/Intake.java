@@ -38,8 +38,12 @@ public class Intake implements Subsystem {
         mOp = opmode;
         intakeMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMotor.setVelocity(0);
         transferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
         transferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        transferMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        transferMotor.setVelocity(0);
         intakeIn = false;
         intakeOut = false;
         intakeOutSpeed = Constants.intakeMotorMaxOut;
@@ -145,24 +149,52 @@ public class Intake implements Subsystem {
         //mOp.mTelemetry.addData("intakeIn", intakeIn);
         //mOp.mTelemetry.addData("rejecting", rejecting);
         mOp.mTelemetry.addData("transferFull", transferFull);
+        double intakesetrpm;
         if (intakeIn) {
-            intakeMotor.setPower(intakeInSpeed);
+            intakesetrpm = intakeInSpeed;
         } else if (intakeOut) {
-            intakeMotor.setPower(intakeOutSpeed);
+            intakesetrpm = intakeOutSpeed;
+
         } else {
-            intakeMotor.setPower(0);
+            intakesetrpm = 0;
         }
         // run the transfer
+        double transfersetrpm;
         if (transferForward) {
-            transferMotor.setPower(Constants.TransfertoLaunchPower);
+            transfersetrpm = Constants.TransfertoLaunchPower;
         } else if (intakeInSave) {
-            transferMotor.setPower(Constants.TransferFromIntakePower);
+            transfersetrpm = Constants.TransferFromIntakePower;
         } else if (transferReverse) {
-            transferMotor.setPower(Constants.TransferToIntakePower);
+            transfersetrpm = Constants.TransferToIntakePower;
         } else {
-            transferMotor.setPower(0);
+            transfersetrpm = 0;
         }
         mOp.mTelemetry.addData("AutoReject", sensorRejectEnabled);
+
+        double ticksPerSecond = transferMotor.getVelocity();
+        // convert to rpm
+        double ticksPerMin = 60 * ticksPerSecond;
+        // rpm
+        double transferrpm = ticksPerMin / Constants.linearLaunchMotTicksPerRev;
+
+
+         ticksPerSecond = intakeMotor.getVelocity();
+        // convert to rpm
+         ticksPerMin = 60 * ticksPerSecond;
+        // rpm
+        double intakerpm = ticksPerMin / Constants.linearLaunchMotTicksPerRev;
+
+        mOp.mTelemetry.addData("transferrpm", transferrpm);
+
+        mOp.mTelemetry.addData("intakerpm", intakerpm);
+
+        ticksPerMin = transfersetrpm * Constants.linearLaunchMotTicksPerRev;
+        ticksPerSecond = ticksPerMin / 60;
+        transferMotor.setVelocity(ticksPerSecond);
+        ticksPerMin = intakesetrpm * Constants.linearLaunchMotTicksPerRev;
+        ticksPerSecond = ticksPerMin / 60;
+        intakeMotor.setVelocity(ticksPerSecond);
+
     }
 
     private boolean TransferFilled() {
