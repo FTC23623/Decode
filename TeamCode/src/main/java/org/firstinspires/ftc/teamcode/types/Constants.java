@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.types;
 
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
 public final class Constants {
     public static final boolean fieldCentricDrive = true;
     public static final double trgBtnThresh = 0.05;
@@ -31,8 +33,25 @@ public final class Constants {
     public static final double TransfertoLaunchPower = .95;
     public static final double TransferFromIntakePower = .95;
     public static final double TransferToIntakePower = -0.75;
-    public static final double TurretGearRatio = 3.15;
-    public static final double TurretRange = 355;
+
+    //Turret Constants
+    public static final double TurretGearRatioTurretToEncoder = 3.15; // ratio from Turret to Encoder 252/80
+    public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96
+
+    public static final double TurretEncoderOffset = 0; //
+    public static PIDFCoefficients TurretPIDFCoefficients = new PIDFCoefficients(0.0, 0.0, 0.0,0.0); //ToDo Set Turret PIDF Coefficients based on Units and Tuning.
+    public static double TurretFF = 0.00; // 0.029 Power Acts as feedforward term when turret PIDF is non zero
+    public static double TurretMinPower = 0;
+    public static double TurretMaxPower = 0.5; // Todo: Adjust based on tuning.
+    public static double TurretDegreesPerTick = 8192.0 / 360 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math
+    public static double TurretMaxAngle = 100; //Degrees
+    public static double TurretMinAngle = -100; //Degrees
+    public static double TurretDeadbandDegrees = 1; // Tolerance wrt turret
+    public static int TurretVisionLockTimeoutMs = 500;
+    public static double TurretServoAnalogRangeVolts = 3.3;
+    public static double DefaultVoltage = 12.7; // Default voltage use for controllers Voltage compensation
+
+    // Vision and Tracking Constants
     // how many degrees back is your limelight rotated from perfectly vertical?
     public static double limelightMountAngleDegrees = 22;
 
@@ -42,11 +61,8 @@ public final class Constants {
     // distance from the target to the floor
     public static double goalHeightInches = 38.5;
     public static int LimelightPollRateHz = 100;
-    public static double TurretDeadbandDegrees = 1;
     public static double LaunchWheelRpmDeadband = 50;
     public static double LauncherAutoLaunchTimeMs = 1300;
-    public static double TurretServoAnalogRangeVolts = 3.3;
-    public static int TurretVisionLockTimeoutMs = 500;
     public static int LauncherSpeedChangeWaitTimeMs = 6000;
     public static int IntakeRejectionTimeMs = 1000;
     public static int IntakeReversalTimeMs = 50;
