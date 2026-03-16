@@ -9,8 +9,6 @@ import org.firstinspires.ftc.teamcode.types.Constants;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -43,7 +41,7 @@ public class Turret implements Subsystem {
     private final Debouncer triangleDebounce;
     //private final Debouncer squareDebounce;
     public static double TurretSyncOffset = 0;
-    private boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
+    public static boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
     public final VoltageSensor voltageSensor;
 
     public Turret(HydraOpMode opMode) {
@@ -67,6 +65,9 @@ public class Turret implements Subsystem {
                 .overrideResetPos((int) TurretSyncOffset)
         ;
         TurretController = new PIDFController(Constants.TurretPIDFCoefficients);
+        TurretController.setTolerance(Constants.TurretDeadbandDegrees);
+        TurretController.setMaxOutput(Constants.TurretMaxPower);
+        TurretController.setMinOutput(Constants.TurretMinPower);
 
         lastVisionTimestamp = 0;
         autoSetAction = false;
@@ -93,14 +94,6 @@ public class Turret implements Subsystem {
                 TurretSynced = true;
             }
         }
-    }
-
-    // Call to update Turret Controller Coefficients after Class Instantiation
-    // Used when there may different coefficients for small error vs. Large error.
-    public void updateCoefficients() {
-        TurretController.setTolerance(Constants.TurretDeadbandDegrees);
-        TurretController.setMaxOutput(Constants.TurretMaxPower);
-        TurretController.setMinOutput(Constants.TurretMinPower);
     }
 
     public void setTurret(double setPoint) {
@@ -173,7 +166,7 @@ public class Turret implements Subsystem {
             if (position_change != 0) {
                 // get the last set position and calculate the new position
                 double Target = getPosition() + position_change;
-                setTurret(Target);;
+                setTurret(Target);
                 //mOp.mTelemetry.addData("Turret Pos U", NewPos);
             }
         }
