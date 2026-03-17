@@ -35,7 +35,7 @@ public final class Constants {
     public static final double TransferToIntakePower = -0.75;
 
     //Turret Constants
-    public static final double TurretGearRatioTurretToEncoder = 3.15; // ratio from Turret to Encoder 252/80
+    public static final double TurretGearRatioTurretToEncoder = 1/3.15; // ratio from Turret to Encoder 80/252
     public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96
 
     public static final double TurretEncoderOffset = 0; //
@@ -43,7 +43,7 @@ public final class Constants {
     public static double TurretFF = 0.00; // 0.029 Power Acts as feedforward term when turret PIDF is non zero
     public static double TurretMinPower = 0;
     public static double TurretMaxPower = 0.5; // Todo: Adjust based on tuning.
-    public static double TurretDegreesPerTick = 8192.0 / 360 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math
+    public static double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math
     public static double TurretMaxAngle = 100; //Degrees
     public static double TurretMinAngle = -100; //Degrees
     public static double TurretDeadbandDegrees = 1; // Tolerance wrt turret

@@ -56,11 +56,11 @@ public class Turret implements Subsystem {
                 .setCachingTolerance(0.001)
                 .setRunMode(CRServoEx.RunMode.RawPower)
         ;
-        AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoEncoder",Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
+        AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb",Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
                 .zero(Constants.TurretEncoderOffset)
                 .setReversed(true) // ToDo: Set based on observation.
         ;
-        TurretEncoder = new Motor(mOp.mHardwareMap, "TurretEncoder").encoder //ToDo: set name based on port used for encoder
+        TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder //ToDo: set name based on port used for encoder
                 .setDirection(Motor.Direction.FORWARD) // ToDo: Set based on Encoder orientation and Positive rotation convention
                 .overrideResetPos((int) TurretSyncOffset)
         ;
@@ -89,7 +89,8 @@ public class Turret implements Subsystem {
         if (!TurretSynced) {
             if (AnalogTurretEncoder.getVoltage() > 0.001) {
                 TurretEncoder.overrideResetPos(0);
-                TurretSyncOffset = TurretEncoder.getPosition() - (MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false) / Constants.TurretDegreesPerTick);
+                //TurretSyncOffset = TurretEncoder.getPosition() - (MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false) * Constants.TurretDegreesPerTick); //ToDo: The Math should have a gear ratio from Servo to encoder in it.
+                TurretSyncOffset = TurretEncoder.getPosition() - (MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false)/Constants.TurretGearRatioTurretToServo); // ToDo: Need to look into how to reduce error between Analog and Relative Encoder
                 TurretEncoder.overrideResetPos((int) TurretSyncOffset);
                 TurretSynced = true;
             }
@@ -109,13 +110,13 @@ public class Turret implements Subsystem {
         if (!TurretSynced) {
             resetTurretEncoder();
         }
-        return MathUtils.normalizeDegrees(TurretEncoder.getPosition() * Constants.TurretDegreesPerTick, false); //ToDo: Verify the math especially TurretDegreesPerTick
+        return MathUtils.normalizeDegrees(TurretEncoder.getPosition() * Constants.TurretDegreesPerTick, false);
     }
 
     @Override
     public void HandleUserInput() {
-        UserInput = mOp.mOperatorGamepad.right_stick_x;
-        UserInput = Range.scale(UserInput,0,1,Constants.TurretMinAngle, Constants.TurretMaxAngle); // Scale stick to Min Max Turret Angle
+        //UserInput = mOp.mOperatorGamepad.right_stick_x;
+        //UserInput = Range.scale(UserInput,0,1,Constants.TurretMinAngle, Constants.TurretMaxAngle); // Scale stick to Min Max Turret Angle
         circleDebounce.In(mOp.mOperatorGamepad.circle);
         if (circleDebounce.Out()) {
             circleDebounce.Used();
@@ -189,6 +190,10 @@ public class Turret implements Subsystem {
         //mOp.mTelemetry.addData("AutoAction", autoSetAction);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
         mOp.mTelemetry.addData("AutoTrack", !disableAutoTrack);
+        mOp.mTelemetry.addData("TurretAnalogPos", MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false)/Constants.TurretGearRatioTurretToServo);
+        mOp.mTelemetry.addData("TurretAnalogEncVolt",AnalogTurretEncoder.getVoltage());
+        mOp.mTelemetry.addData("TurretEncPos", getPosition());
+        mOp.mTelemetry.addData("TurretEncTicks", TurretEncoder.getPosition());
     }
 
     public boolean Locked() {
