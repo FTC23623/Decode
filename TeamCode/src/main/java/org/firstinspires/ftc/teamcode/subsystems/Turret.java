@@ -89,8 +89,7 @@ public class Turret implements Subsystem {
         if (!TurretSynced) {
             if (AnalogTurretEncoder.getVoltage() > 0.001) {
                 TurretEncoder.overrideResetPos(0);
-                //TurretSyncOffset = TurretEncoder.getPosition() - (MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false) * Constants.TurretDegreesPerTick); //ToDo: The Math should have a gear ratio from Servo to encoder in it.
-                TurretSyncOffset = TurretEncoder.getPosition() - (MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false)/Constants.TurretGearRatioTurretToServo); // ToDo: Need to look into how to reduce error between Analog and Relative Encoder
+                TurretSyncOffset = TurretEncoder.getPosition() - (MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false) * Constants.TurretDegreesPerTick); //ToDo: The Math should have a gear ratio from Servo to encoder in it.
                 TurretEncoder.overrideResetPos((int) TurretSyncOffset);
                 TurretSynced = true;
             }
