@@ -75,7 +75,7 @@ public abstract class HyDrive extends OpMode_Base {
     mSystems.add(mImu);
     mSystems.add(mTurret);
     mSystems.add(mLauncher);
-    //mSystems.add(mSysMon);
+    mSystems.add(mSysMon);
     mSystems.add(mIndicator);
     mSystems.add(mLift);
     // manual bulk caching
@@ -100,6 +100,8 @@ public abstract class HyDrive extends OpMode_Base {
     while (opModeIsActive()) {
       ClearLynxHubCaches();
       mOpMode.mLoopTime = mLoopSleep.milliseconds();
+      mLoopSleep.reset();
+      mOpMode.mTelemetry.addData("LoopTime", mOpMode.mLoopTime);
       // Pass user input to the systems
       for (Subsystem system : mSystems) {
         system.HandleUserInput();
@@ -114,7 +116,6 @@ public abstract class HyDrive extends OpMode_Base {
       //telemetry.addData("LoopTime", mLoopSleep.milliseconds());
       // Update telemetry once for all processes
       telemetry.update();
-      mLoopSleep.reset();
       idle();
     }
   }

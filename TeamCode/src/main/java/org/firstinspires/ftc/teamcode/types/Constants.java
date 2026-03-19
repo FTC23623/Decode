@@ -39,10 +39,8 @@ public final class Constants {
     public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96
     //Set based Offset angle of Axon feedback at turret zero position. Note: Turret Zero should be set close to 180deg so the +/- rotation does not go through Axon 0 deg.
     public static final double TurretEncoderOffset = 180.0 / TurretGearRatioTurretToServo ; //Degrees ToDo: Set based on angle of Servo at zero Turret angle.
-    public static PIDFCoefficients TurretPIDFCoefficients = new PIDFCoefficients(0.0, 0.0, 0.0,0.0); //ToDo Set Turret PIDF Coefficients based on Units and Tuning.
-    public static double TurretFF = 0.00; // 0.029 Power Acts as feedforward term when turret PIDF is non zero
-    public static double TurretMinPower = 0;
-    public static double TurretMaxPower = 0.5; // Todo: Adjust based on tuning.
+    public static double TurretMinPower = -0.2;
+    public static double TurretMaxPower = 0.2; // Todo: Adjust based on tuning.
     public static double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math
     public static double TurretMaxAngle = 100; //Degrees
     public static double TurretMinAngle = -100; //Degrees

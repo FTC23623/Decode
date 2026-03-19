@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.types.Constants;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -43,6 +44,11 @@ public class Turret implements Subsystem {
     public static double TurretSyncOffset = 0;
     public static boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
     public final VoltageSensor voltageSensor;
+    public static double TuningTarget = 0;
+//    public static double ExternalP = 0;
+
+    public static PIDFCoefficients TurretPIDFCoefficients = new PIDFCoefficients(0.0, 0.0, 0.0,0.0); //ToDo Set Turret PIDF Coefficients based on Units and Tuning.
+    public static double TurretFF = 0.00; // 0.029 Power Acts as feedforward term when turret PIDF is non zero
 
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
@@ -56,6 +62,7 @@ public class Turret implements Subsystem {
                 .setCachingTolerance(0.001)
                 .setRunMode(CRServoEx.RunMode.RawPower)
         ;
+        TurretCRServo.setInverted(true);
         AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb",Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
                 .zero(Constants.TurretEncoderOffset)
                 .setReversed(true) // ToDo: Set based on observation.
@@ -64,7 +71,7 @@ public class Turret implements Subsystem {
                 .setDirection(Motor.Direction.FORWARD) // ToDo: Set based on Encoder orientation and Positive rotation convention
                 .overrideResetPos((int) TurretSyncOffset)
         ;
-        TurretController = new PIDFController(Constants.TurretPIDFCoefficients);
+        TurretController = new PIDFController(TurretPIDFCoefficients);
         TurretController.setTolerance(Constants.TurretDeadbandDegrees);
         TurretController.setMaxOutput(Constants.TurretMaxPower);
         TurretController.setMinOutput(Constants.TurretMinPower);
@@ -97,7 +104,7 @@ public class Turret implements Subsystem {
     }
 
     public void setTurret(double setPoint) {
-        TurretController.setCoefficients(Constants.TurretPIDFCoefficients);
+        TurretController.setCoefficients(TurretPIDFCoefficients);
         TurretController.setSetPoint(Range.clip(setPoint,Constants.TurretMinAngle, Constants.TurretMaxAngle));
     }
 
@@ -169,17 +176,22 @@ public class Turret implements Subsystem {
                 setTurret(Target);
                 //mOp.mTelemetry.addData("Turret Pos U", NewPos);
             }
+            setTurret(TuningTarget);
+            mOp.mTelemetry.addData("Turret tuning target", TuningTarget);
         }
         double power;
         double voltage = voltageSensor.getVoltage();
         power = TurretController.calculate(getPosition()); // PIDF positional control output
-        power += Constants.TurretFF * (Constants.DefaultVoltage /voltage) * Math.signum(power); // kstatic feedforward output scaled relative to voltage
-
-        if ((getPosition() >= Constants.TurretMaxAngle || getPosition() <= Constants.TurretMinAngle) && (Math.signum(power) == Math.signum(getPosition()))) {
+        power += TurretFF * (Constants.DefaultVoltage /voltage) * Math.signum(power); // kstatic feedforward output scaled relative to voltage
+        mOp.mTelemetry.addData("Turret servo power", power);
+        boolean hardStop = (getPosition() >= Constants.TurretMaxAngle || getPosition() <= Constants.TurretMinAngle) && (Math.signum(power) == Math.signum(getPosition()));
+        mOp.mTelemetry.addData("Turret hard stop", hardStop);
+        if (hardStop) {
             // don't push the turret even further in that direction if it is already past the hardware limits
             TurretCRServo.set(0);
         } else {
             TurretCRServo.set(power);
+            //TurretCRServo.set((TuningTarget - getPosition()) * ExternalP);
         }
 
         if (disableAutoTrack || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {

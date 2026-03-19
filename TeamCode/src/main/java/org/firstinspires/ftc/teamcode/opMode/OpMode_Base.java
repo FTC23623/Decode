@@ -33,11 +33,14 @@ public abstract class OpMode_Base extends LinearOpMode {
     }
 
     protected void InitializeAllSystems() {
-        boolean init = true;
+        boolean init;
         do {
+            init = true;
             ClearLynxHubCaches();
             for (Subsystem system : mSystems) {
-                init &= system.Init();
+                boolean sysInit = system.Init();
+                //mOpMode.mTelemetry.addData(system.toString() + " init", sysInit);
+                init &= sysInit;
             }
             mOpMode.mTelemetry.update();
             idle();
