@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
+import org.firstinspires.ftc.teamcode.objects.HydraPIDFController;
 import org.firstinspires.ftc.teamcode.types.Constants;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -13,7 +14,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import com.seattlesolvers.solverslib.controller.PIDFController;
+//import com.seattlesolvers.solverslib.controller.PIDFController;
+//import com.arcrobotics.ftclib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -30,7 +32,7 @@ public class Turret implements Subsystem {
     public CRServoEx TurretCRServo;
     public AbsoluteAnalogEncoder AnalogTurretEncoder;
     public Motor.Encoder TurretEncoder;
-    public PIDFController TurretController;
+    public HydraPIDFController TurretController;
     //private final AnalogInput TurretServoFb;
     private long lastVisionTimestamp;
     private boolean autoSetAction;
@@ -47,7 +49,7 @@ public class Turret implements Subsystem {
     public static double TuningTarget = 0;
 //    public static double ExternalP = 0;
 
-    public static PIDFCoefficients TurretPIDFCoefficients = new PIDFCoefficients(0.0, 0.0, 0.0,0.0); //ToDo Set Turret PIDF Coefficients based on Units and Tuning.
+    public static PIDFCoefficients TurretPIDFCoefficients = new PIDFCoefficients(0.007, 0.0, 0.0005,0.07); //ToDo Set Turret PIDF Coefficients based on Units and Tuning.
     public static double TurretFF = 0.00; // 0.029 Power Acts as feedforward term when turret PIDF is non zero
 
     public Turret(HydraOpMode opMode) {
@@ -71,10 +73,11 @@ public class Turret implements Subsystem {
                 .setDirection(Motor.Direction.FORWARD) // ToDo: Set based on Encoder orientation and Positive rotation convention
                 .overrideResetPos((int) TurretSyncOffset)
         ;
-        TurretController = new PIDFController(TurretPIDFCoefficients);
+        TurretController = new HydraPIDFController(TurretPIDFCoefficients.p, TurretPIDFCoefficients.i, TurretPIDFCoefficients.d, TurretPIDFCoefficients.f);
         TurretController.setTolerance(Constants.TurretDeadbandDegrees);
-        TurretController.setMaxOutput(Constants.TurretMaxPower);
-        TurretController.setMinOutput(Constants.TurretMinPower);
+        TurretController.setIntegrationBounds(-0.2, 0.2);
+        //TurretController.setMaxOutput(Constants.TurretMaxPower);
+        //TurretController.setMinOutput(Constants.TurretMinPower);
 
         lastVisionTimestamp = 0;
         autoSetAction = false;
@@ -104,7 +107,7 @@ public class Turret implements Subsystem {
     }
 
     public void setTurret(double setPoint) {
-        TurretController.setCoefficients(TurretPIDFCoefficients);
+        TurretController.setPIDF(TurretPIDFCoefficients.p, TurretPIDFCoefficients.i, TurretPIDFCoefficients.d, TurretPIDFCoefficients.f);
         TurretController.setSetPoint(Range.clip(setPoint,Constants.TurretMinAngle, Constants.TurretMaxAngle));
     }
 
