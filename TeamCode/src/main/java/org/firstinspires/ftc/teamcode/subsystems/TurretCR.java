@@ -156,7 +156,7 @@ public class TurretCR implements Subsystem {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
-            CalcDistanceToTag(vision);
+            TurretKinematics.CalcDistanceToTag(vision);
             if (vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) {
                 //mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
                 double rotate = -vision.GetXOffset();
@@ -226,17 +226,6 @@ public class TurretCR implements Subsystem {
         Process();
         autoSetAction = false;
     }
-
-    private double CalcDistanceToTag(VisionResult vision) {
-        double targetOffsetAngle_Vertical = vision.GetYOffset();
-        double angleToGoalDegrees = Constants.limelightMountAngleDegrees + targetOffsetAngle_Vertical;
-        double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
-        //calculate distance
-        double distanceFromLimelightToGoalInches = (Constants.goalHeightInches - Constants.limelightLensHeightInches) / Math.tan(angleToGoalRadians);
-        //mOp.mTelemetry.addData("GoalDistance", distanceFromLimelightToGoalInches);
-        return distanceFromLimelightToGoalInches;
-    }
-
 
     /*
      * ROAD RUNNER API
