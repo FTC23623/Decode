@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
@@ -69,7 +69,6 @@ public class Imu_Pinpoint extends Imu_Base {
                 break;
             case FAULT_BAD_READ:
             case FAULT_IMU_RUNAWAY:
-            case FAULT_BAD_WRITE_CRC:
             case FAULT_NO_PODS_DETECTED:
             case FAULT_X_POD_NOT_DETECTED:
             case FAULT_Y_POD_NOT_DETECTED:
