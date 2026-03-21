@@ -29,22 +29,22 @@ public class TurretCR implements Subsystem {
     private final HydraOpMode mOp;
     private final double mPosChangeRate = 0.2;
     private double UserInput = 0;
-    public CRServoEx TurretCRServo;
+    private final CRServoEx TurretCRServo;
+    //private final AnalogInput TurretServoFb;
     public AbsoluteAnalogEncoder AnalogTurretEncoder;
     public Motor.Encoder TurretEncoder;
+    public static double TurretSyncOffset = 0.0;
     public HydraPIDFController TurretController;
-    //private final AnalogInput TurretServoFb;
+    public static boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
     private long lastVisionTimestamp;
     private boolean autoSetAction;
     private double autoSetPos;
     private boolean visionLocked;
     private boolean disableAutoTrack;
-    public static int VisionRefreshTimeMs = 10; // Set low for CRServo Based control
+    public static int VisionRefreshTimeMs = 10;
     private final Debouncer circleDebounce;
     private final Debouncer triangleDebounce;
     //private final Debouncer squareDebounce;
-    public static double TurretSyncOffset = 0;
-    public static boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
     public final VoltageSensor voltageSensor;
     public static double TuningTarget = 0;
 //    public static double ExternalP = 0;

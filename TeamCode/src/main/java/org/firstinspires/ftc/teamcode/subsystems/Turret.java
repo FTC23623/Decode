@@ -29,16 +29,12 @@ public class Turret implements Subsystem {
     public static double mMaxPos = 0.8333333333333;
     public static double mMinPos = 0.3333333333333;
     private double UserInput = 0;
-    private Servo TurretServo;
+    private final Servo TurretServo;
     //private final AnalogInput TurretServoFb;
     public AbsoluteAnalogEncoder AnalogTurretEncoder;
     public Motor.Encoder TurretEncoder;
     public static double TurretSyncOffset = 0.0;
-    public static double TurretEncoderOffset = 0.0;
-    public static final double TurretGearRatioTurretToEncoder = 1/3.15; // ratio from Turret to Encoder 80/252
-    public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96
-    public static final double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math;
-    public static boolean TurretSynced;
+    public static boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
     private long lastVisionTimestamp;
     private boolean autoSetAction;
     private double autoSetPos;
@@ -124,7 +120,7 @@ public class Turret implements Subsystem {
             vision = mOp.mVision.GetResult();
         }
         //double servoFbPosition = GetPositionFromFb();
-        double servoFbPosition = TurretEncoder.getPosition() * TurretDegreesPerTick;
+        double servoFbPosition = TurretEncoder.getPosition() * Constants.TurretDegreesPerTick;
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
         if (autoSetAction) {
             TurretServo.setPosition(autoSetPos);
