@@ -61,7 +61,7 @@ public abstract class HydrAuto extends OpMode_Base {
         mIntake = new Intake(mOpMode, true);
         mDrive = new MecanumDrive(hardwareMap, mBeginPose);
         mSystems = new ArrayList<>();
-        mTurret = new Turret(mOpMode);
+        mTurret = new Turret(mOpMode, null);
         mVision = new LimelightVision(mOpMode);
         mLauncher = new Launcher(mOpMode, null, 0);
         mIndicator = new Indicator(mOpMode, mLauncher, null, mTurret);

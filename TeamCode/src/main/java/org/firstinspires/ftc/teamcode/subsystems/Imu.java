@@ -10,4 +10,5 @@ public interface Imu extends Subsystem {
     public void ResetYaw();
     public double GetYaw();
     public void SetYawOffset(double offset);
+    public Pose2d GetPose();
 }

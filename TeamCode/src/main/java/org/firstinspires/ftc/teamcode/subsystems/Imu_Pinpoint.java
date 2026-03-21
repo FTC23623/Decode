@@ -98,4 +98,9 @@ public class Imu_Pinpoint extends Imu_Base {
         // adjust for alliance
         return absHeading - mAllianceOffsetDeg;
     }
+
+    @Override
+    public Pose2d GetPose() {
+        return mPinpoint.getPose();
+    }
 }

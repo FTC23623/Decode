@@ -8,6 +8,8 @@ import org.firstinspires.ftc.teamcode.types.Constants;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,6 +20,8 @@ import org.firstinspires.ftc.teamcode.objects.VisionResult;
 
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.util.MathUtils;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
@@ -46,8 +50,9 @@ public class Turret implements Subsystem {
     //private final Debouncer squareDebounce;
     private boolean first;
     private double firstUpdate;
+    private final Imu imu;
 
-    public Turret(HydraOpMode opMode) {
+    public Turret(HydraOpMode opMode, Imu imu) {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
         //TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
@@ -72,6 +77,7 @@ public class Turret implements Subsystem {
         triangleDebounce = new Debouncer(1);
         //squareDebounce = new Debouncer(2);
         first = true;
+        this.imu = imu;
     }
 
     @Override
@@ -119,13 +125,22 @@ public class Turret implements Subsystem {
         if (mOp.mVision != null) {
             vision = mOp.mVision.GetResult();
         }
+        Pose2d currentPose = null;
+        if (imu != null) {
+            currentPose = imu.GetPose();
+        }
         //double servoFbPosition = GetPositionFromFb();
         double servoFbPosition = TurretEncoder.getPosition() * Constants.TurretDegreesPerTick;
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
+
+        // Order of priorities
+        // 1) Auto sets a desired position
+        // 2) if a tag is visible, track it
+        // 3) turn the turret towards the target using odometry
+        // 4) take user input
         if (autoSetAction) {
             TurretServo.setPosition(autoSetPos);
-        }
-        else if (vision != null && !disableAutoTrack) {
+        } else if (!disableAutoTrack && vision != null) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
@@ -159,6 +174,15 @@ public class Turret implements Subsystem {
                     visionLocked = true;
                 }
             }
+        } else if (!disableAutoTrack && currentPose != null){
+            // TODO: GET GOAL POSITIONS AND SELECT BASED ON ALLIANCE
+            Vector2d goalPosition = new Vector2d(144, 144);
+            // angle from the robot's current x,y position to the goal
+            double angleToGoal = AutoTangent(currentPose.position, goalPosition);
+            // get the robot's heading, offset by 180 because the turret is on the back
+            double robotHeading = Math.toDegrees(currentPose.heading.toDouble()) - 180;
+            // calculate the angle of the turret to point at the goal
+            double turretAngleToSet = MathUtils.normalizeDegrees(robotHeading - angleToGoal, true);
         } else {
             // scale user input with a constant rate
             double position_change = UserInput * mPosChangeRate;
@@ -178,6 +202,12 @@ public class Turret implements Subsystem {
         //mOp.mTelemetry.addData("AutoAction", autoSetAction);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
         mOp.mTelemetry.addData("AutoTrack", !disableAutoTrack);
+    }
+
+    private static double AutoTangent(Vector2d start, Vector2d end) {
+        double dx = end.x - start.x;
+        double dy = end.y - start.y;
+        return Math.toDegrees(Math.atan2(dy, dx));
     }
 
     public boolean Locked() {

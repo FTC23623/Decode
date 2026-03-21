@@ -26,6 +26,11 @@ public abstract class Imu_Base implements Imu {
     }
 
     @Override
+    public Pose2d GetPose() {
+        return null;
+    }
+
+    @Override
     public boolean Calibrating() {
         return false;
     }
