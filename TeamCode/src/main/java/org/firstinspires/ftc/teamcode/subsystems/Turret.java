@@ -15,21 +15,36 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
+
+import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 @Config
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
     private final double mPosChangeRate = 0.2;
-    private final double mMaxPos = 1;
-    private final double mMinPos = 0;
+    //private final double mMaxPos = 0.8333333333333;
+    //private final double mMinPos = 0.3333333333333;
+    public static double mMaxPos = 0.8333333333333;
+    public static double mMinPos = 0.3333333333333;
     private double UserInput = 0;
     private Servo TurretServo;
-    private final AnalogInput TurretServoFb;
+    //private final AnalogInput TurretServoFb;
+    public AbsoluteAnalogEncoder AnalogTurretEncoder;
+    public Motor.Encoder TurretEncoder;
+    public static double TurretSyncOffset = 0.0;
+    public static double TurretEncoderOffset = 0.0;
+    public static final double TurretGearRatioTurretToEncoder = 1/3.15; // ratio from Turret to Encoder 80/252
+    public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96
+    public static final double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math;
+    public static boolean TurretSynced;
     private long lastVisionTimestamp;
     private boolean autoSetAction;
     private double autoSetPos;
     private boolean visionLocked;
     private boolean disableAutoTrack;
-    public static int VisionRefreshTimeMs = 50;
+    public static int VisionRefreshTimeMs = 10;
     private final Debouncer circleDebounce;
     private final Debouncer triangleDebounce;
     //private final Debouncer squareDebounce;
@@ -39,7 +54,19 @@ public class Turret implements Subsystem {
     public Turret(HydraOpMode opMode) {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
-        TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
+        //TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
+        /*
+        AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb",Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
+                .zero(TurretEncoderOffset)
+                .setReversed(true) // ToDo: Set based on observation.
+        ;
+
+         */
+        TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder //ToDo: set name based on port used for encoder
+                .setDirection(Motor.Direction.REVERSE) // ToDo: Set based on Encoder orientation and Positive rotation convention
+                .overrideResetPos((int) TurretSyncOffset)
+        ;
+
         lastVisionTimestamp = 0;
         autoSetAction = false;
         autoSetPos = 0;
@@ -53,8 +80,22 @@ public class Turret implements Subsystem {
 
     @Override
     public boolean Init() {
+        TurretEncoder.overrideResetPos(0);
         return true;
     }
+/*
+    // Synchronize throughbore encoder with Axon Servo feedback
+    public void resetTurretEncoder() {
+        if (!TurretSynced) {
+            if (AnalogTurretEncoder.getVoltage() > 0.001) {
+                TurretEncoder.overrideResetPos(0);
+                TurretSyncOffset = TurretEncoder.getPosition() - (MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false) * Constants.TurretDegreesPerTick); //ToDo: The Math should have a gear ratio from Servo to encoder in it.
+                TurretEncoder.overrideResetPos((int) TurretSyncOffset);
+                TurretSynced = true;
+            }
+        }
+    }
+*/
 
     @Override
     public void HandleUserInput() {
@@ -83,7 +124,8 @@ public class Turret implements Subsystem {
             vision = mOp.mVision.GetResult();
         }
         //double servoFbPosition = GetPositionFromFb();
-        //mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
+        double servoFbPosition = TurretEncoder.getPosition() * TurretDegreesPerTick;
+        mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
         if (autoSetAction) {
             TurretServo.setPosition(autoSetPos);
         }
@@ -109,7 +151,7 @@ public class Turret implements Subsystem {
                             first = true;
                         }
                     }
-                    double NewPos = TurretServo.getPosition() + update;
+                    double NewPos = TurretServo.getPosition() + update; //servoFbPosition + update;
                     // clamp the new position to the min and max
                     NewPos = Clamp(NewPos);
                     if (applyUpdate) {
@@ -126,7 +168,7 @@ public class Turret implements Subsystem {
             double position_change = UserInput * mPosChangeRate;
             if (position_change != 0) {
                 // get the last set position and calculate the new position
-                double NewPos = TurretServo.getPosition() + position_change;
+                double NewPos = TurretServo.getPosition() + position_change; //servoFbPosition + position_change;
                 // clamp the new position to the min and max
                 NewPos = Clamp(NewPos);
                 TurretServo.setPosition(Clamp(NewPos));
@@ -163,9 +205,9 @@ public class Turret implements Subsystem {
         return Math.min(mMaxPos, Math.max(mMinPos, position));
     }
 
-    private double GetPositionFromFb() {
-        return Clamp(1 - TurretServoFb.getVoltage() / Constants.TurretServoAnalogRangeVolts);
-    }
+   // private double GetPositionFromFb() {
+   //     return Clamp(1 - TurretServoFb.getVoltage() / Constants.TurretServoAnalogRangeVolts);
+   // }
 
     private double CalcDistanceToTag(VisionResult vision) {
         double targetOffsetAngle_Vertical = vision.GetYOffset();

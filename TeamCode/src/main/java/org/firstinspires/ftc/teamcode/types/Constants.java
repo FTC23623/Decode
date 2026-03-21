@@ -31,7 +31,7 @@ public final class Constants {
     public static final double TransfertoLaunchPower = 1100;
     public static final double TransferFromIntakePower = 1100;
     public static final double TransferToIntakePower = -900;
-    public static final double TurretGearRatio = 3.15;
+    public static final double TurretGearRatio = 1/1.52381; //3.15
     public static final double TurretRange = 355;
     // how many degrees back is your limelight rotated from perfectly vertical?
     public static double limelightMountAngleDegrees = 22;
