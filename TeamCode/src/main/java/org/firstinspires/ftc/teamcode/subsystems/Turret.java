@@ -159,7 +159,7 @@ public class Turret implements Subsystem {
             CalcDistanceToTag(vision);
             if (vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) {
                 //mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
-                double rotate = vision.GetXOffset();
+                double rotate = -vision.GetXOffset();
                 //mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
                 if (Math.abs(rotate) > 1) {
@@ -179,7 +179,7 @@ public class Turret implements Subsystem {
                 setTurret(Target);
                 //mOp.mTelemetry.addData("Turret Pos U", NewPos);
             }
-            setTurret(TuningTarget);
+            //setTurret(TuningTarget);
             mOp.mTelemetry.addData("Turret tuning target", TuningTarget);
         }
         double power;
