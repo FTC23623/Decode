@@ -15,21 +15,21 @@ public class SystemMonitor implements Subsystem {
     private final HydraOpMode op;
     private final VoltageSensor voltageSensor;
     private final AnalogInput floodgateAin;
-    private final SystemDatalogger logger;
-    private final ArrayList<MotorToLog> motors;
+    //private final SystemDatalogger logger;
+    //private final ArrayList<MotorToLog> motors;
     public SystemMonitor(HydraOpMode opMode) {
         op = opMode;
         voltageSensor = op.mHardwareMap.get(VoltageSensor.class, "Control Hub");
         floodgateAin = op.mHardwareMap.get(AnalogInput.class, "Floodgate");
-        logger = new SystemDatalogger("System");
-        motors = new ArrayList<>();
-        motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "leftFront"), logger.driveLF));
-        motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "rightFront"), logger.driveRF));
-        motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "leftBack"), logger.driveLB));
-        motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "rightFront"), logger.driveRB));
-        motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "intakeMotor"), logger.intake));
-        motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "transferMotor"), logger.transfer));
-        motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "left"), logger.launch));
+        //logger = new SystemDatalogger("System");
+        //motors = new ArrayList<>();
+        //motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "leftFront"), logger.driveLF));
+        //motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "rightFront"), logger.driveRF));
+        //motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "leftBack"), logger.driveLB));
+        //motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "rightFront"), logger.driveRB));
+        //motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "intakeMotor"), logger.intake));
+        //motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "transferMotor"), logger.transfer));
+        //motors.add(new MotorToLog(op.mHardwareMap.get(DcMotorEx.class, "left"), logger.launch));
     }
 
     @Override
@@ -43,13 +43,13 @@ public class SystemMonitor implements Subsystem {
         double current = 50 * floodgateAin.getVoltage() / 3.3;
         op.mTelemetry.addData("Voltage", voltage);
         op.mTelemetry.addData("Current", current);
-        logger.current.set(current);
-        logger.voltage.set(voltage);
-        for (MotorToLog motor : motors) {
-            op.mTelemetry.addData(motor.loggerField.GetName() + " Current", motor.motor.getCurrent(CurrentUnit.AMPS));
-            motor.loggerField.set(motor.motor.getCurrent(CurrentUnit.AMPS));
-        }
-        logger.writeLine();
+        //logger.current.set(current);
+        //logger.voltage.set(voltage);
+        //for (MotorToLog motor : motors) {
+        //    op.mTelemetry.addData(motor.loggerField.GetName() + " Current", motor.motor.getCurrent(CurrentUnit.AMPS));
+        //    motor.loggerField.set(motor.motor.getCurrent(CurrentUnit.AMPS));
+        //}
+        //logger.writeLine();
     }
 
     @Override

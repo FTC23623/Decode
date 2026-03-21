@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.types;
 
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
 public final class Constants {
     public static final boolean fieldCentricDrive = true;
     public static final double trgBtnThresh = 0.05;
@@ -31,8 +33,27 @@ public final class Constants {
     public static final double TransfertoLaunchPower = 1100;
     public static final double TransferFromIntakePower = 1100;
     public static final double TransferToIntakePower = -900;
+
+    //Turret Constants
+    public static final double TurretGearRatioTurretToEncoder = 1/3.15; // ratio from Turret to Encoder 80/252
+    public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96
+    //Set based Offset angle of Axon feedback at turret zero position. Note: Turret Zero should be set close to 180deg so the +/- rotation does not go through Axon 0 deg.
+    public static final double TurretEncoderOffset = 180.0 / TurretGearRatioTurretToServo ; //Degrees ToDo: Set based on angle of Servo at zero Turret angle.
+    public static double TurretMinPower = -0.2;
+    public static double TurretMaxPower = 0.2; // Todo: Adjust based on tuning.
+    public static double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math
+    public static double TurretMaxAngle = 100; //Degrees
+    public static double TurretMinAngle = -100; //Degrees
+    public static double TurretDeadbandDegrees = 1; // Tolerance wrt turret
+    public static int TurretVisionLockTimeoutMs = 500;
+    public static double TurretServoAnalogRangeVolts = 3.3;
+    public static double DefaultVoltage = 12.7; // Default voltage use for controllers Voltage compensation
+
+	//servo mode turret
     public static final double TurretGearRatio = 1/1.52381; //3.15
     public static final double TurretRange = 355;
+
+    // Vision and Tracking Constants
     // how many degrees back is your limelight rotated from perfectly vertical?
     public static double limelightMountAngleDegrees = 22;
 
@@ -42,11 +63,8 @@ public final class Constants {
     // distance from the target to the floor
     public static double goalHeightInches = 38.5;
     public static int LimelightPollRateHz = 100;
-    public static double TurretDeadbandDegrees = 1;
     public static double LaunchWheelRpmDeadband = 50;
     public static double LauncherAutoLaunchTimeMs = 1300;
-    public static double TurretServoAnalogRangeVolts = 3.3;
-    public static int TurretVisionLockTimeoutMs = 500;
     public static int LauncherSpeedChangeWaitTimeMs = 6000;
     public static int IntakeRejectionTimeMs = 1000;
     public static int IntakeReversalTimeMs = 50;
