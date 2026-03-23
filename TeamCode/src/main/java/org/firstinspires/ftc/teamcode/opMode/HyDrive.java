@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
 import org.firstinspires.ftc.teamcode.subsystems.SystemMonitor;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.TurretCR;
+import org.firstinspires.ftc.teamcode.subsystems.Turret_Base;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
@@ -33,7 +35,7 @@ public abstract class HyDrive extends OpMode_Base {
   protected Drive mDrive;
   protected Intake mIntake;
   protected Vision mVision;
-  protected Turret mTurret;
+  protected Turret_Base mTurret;
   protected Launcher mLauncher;
   protected Indicator mIndicator;
   protected Lift mLift;

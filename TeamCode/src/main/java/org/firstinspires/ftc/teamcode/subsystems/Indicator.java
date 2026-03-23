@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Indicator implements Subsystem {
     private final Servo led;
     private final Launcher launcher;
-    private final Turret turret;
+    private final Turret_Base turret;
     private final Lift lift;
     private final ElapsedTime timer;
     private final int onTimeMs = 600;
@@ -23,7 +23,7 @@ public class Indicator implements Subsystem {
     private boolean up;
     private int idleState;
 
-    public Indicator(HydraOpMode opMode, Launcher launcher, Lift lift, Turret turret) {
+    public Indicator(HydraOpMode opMode, Launcher launcher, Lift lift, Turret_Base turret) {
         this.launcher = launcher;
         this.turret = turret;
         this.lift = lift;

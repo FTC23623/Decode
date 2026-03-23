@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import androidx.annotation.NonNull;
 
-import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.types.Constants;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -11,80 +10,29 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
-import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
 
-import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 @Config
-public class Turret implements Subsystem {
-    private final HydraOpMode mOp;
-    private final double mPosChangeRate = 0.2;
+public class Turret extends Turret_Base {
     public static double mMaxPos = 0.83802817; //0.5 + 120/177.5 * 0.5 (120deg)
     public static double mMinPos = 0.33802817; // 120/177.5 * 0.5 (-120deg)
-    private double UserInput = 0;
     private final Servo TurretServo;
     //private final AnalogInput TurretServoFb;
-    public AbsoluteAnalogEncoder AnalogTurretEncoder;
-    public Motor.Encoder TurretEncoder;
-    public static double TurretSyncOffset = 0.0;
     public static boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
-    private long lastVisionTimestamp;
-    private boolean autoSetAction;
-    private double autoSetPos;
-    private boolean visionLocked;
-    private boolean disableAutoTrack;
-    public static int VisionRefreshTimeMs = 10;
-    private final Debouncer circleDebounce;
-    private final Debouncer triangleDebounce;
-    //private final Debouncer squareDebounce;
     private boolean first;
     private double firstUpdate;
-    private final Imu imu;
     private boolean initEncoder = true;
-    protected static double mAllianceFactor = -1;
-
-
 
     public Turret(HydraOpMode opMode, Imu imu, VisionMode target) {
-        mOp = opMode;
+        super(opMode, imu, target);
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
-        //TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
-
-        AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb",Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
-                .zero(Constants.TurretEncoderOffset)
-                .setReversed(true) // ToDo: Set based on observation.
-        ;
-
-        TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder
-                .setDirection(Motor.Direction.REVERSE) // ToDo: Set based on Encoder orientation and Positive rotation convention
-                .overrideResetPos((int) TurretSyncOffset)
-        ;
-        // Adjust target location for alliance
-        if (target == VisionMode.VisionMode_BlueGoal) {
-            mAllianceFactor = 1;
-        }
-        else {
-            mAllianceFactor = -1;
-        }
-        lastVisionTimestamp = 0;
-        autoSetAction = false;
-        autoSetPos = 0;
-        visionLocked = false;
-        disableAutoTrack = false;
-        circleDebounce = new Debouncer(Constants.debounceLong);
-        triangleDebounce = new Debouncer(1);
-        //squareDebounce = new Debouncer(2);
         first = true;
-        this.imu = imu;
     }
 
     @Override
@@ -105,26 +53,6 @@ public class Turret implements Subsystem {
         }
     }
 */
-
-    @Override
-    public void HandleUserInput() {
-        UserInput = mOp.mOperatorGamepad.right_stick_x;
-        circleDebounce.In(mOp.mOperatorGamepad.circle);
-        if (circleDebounce.Out()) {
-            circleDebounce.Used();
-            disableAutoTrack = !disableAutoTrack;
-            mOp.mOperatorGamepad.rumbleBlips(1);
-        }
-        triangleDebounce.In(mOp.mOperatorGamepad.triangle);
-        if (triangleDebounce.Out()) {
-            triangleDebounce.Used();
-            GoHome();
-        }
-        //squareDebounce.In(mOp.mDriverGamepad.square);
-        //if (squareDebounce.Out()) {
-        //    GoHome();
-        //}
-    }
 
     @Override
     public void Process() {
@@ -222,22 +150,7 @@ public class Turret implements Subsystem {
         mOp.mTelemetry.addData("AutoTrack", !disableAutoTrack);
     }
 
-    private static double AutoTangent(Vector2d start, Vector2d end) {
-        double dx = end.x - start.x;
-        double dy = end.y - start.y;
-        return Math.toDegrees(Math.atan2(dy, dx));
-    }
-
-    public boolean Locked() {
-        return visionLocked;
-    }
-
-    public void ForceUnlock(){
-        visionLocked = false;
-        // reset the timestamp so we can use the very next update from the camera
-        lastVisionTimestamp -= (VisionRefreshTimeMs - 1);
-    }
-
+    @Override
     public void GoHome() {
         autoSetAction = true;
         autoSetPos = 0.5;
@@ -268,47 +181,10 @@ public class Turret implements Subsystem {
     /*
      * ROAD RUNNER API
      */
-    /**
-     * Get a new action object for Road Runner to run
-     * @param action: the action to run in this instance
-     * @return the action object for RR to use
-     */
-    public Action GetLockAction() {
-        return new Turret.RunLockAction();
-    }
 
+    @Override
     public Action GetSetAction(double position) {
         return new Turret.RunSetAction(position);
-    }
-
-    public Action GetDisableAction(boolean disable) {
-        return new Turret.RunDisableAction(disable);
-    }
-    /**
-     * Runs the supplied action until completion
-     */
-    public class RunLockAction implements Action {
-        // run has been called once
-        protected boolean started = false;
-        protected ElapsedTime timer;
-        public RunLockAction() {
-            timer = new ElapsedTime();
-        }
-
-        /**
-         * Runs the desired action until completion
-         * @param packet: ??
-         * @return true while the action is running
-         */
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (!started) {
-                timer.reset();
-                started = true;
-                ForceUnlock();
-            }
-            return !visionLocked && timer.milliseconds() < Constants.TurretVisionLockTimeoutMs;
-        }
     }
 
     public class RunSetAction implements Action {
@@ -338,19 +214,4 @@ public class Turret implements Subsystem {
             return false;
         }
     }
-
-    public class RunDisableAction implements Action {
-        boolean disable;
-
-        public RunDisableAction(boolean disable) {
-            this.disable = disable;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            disableAutoTrack = disable;
-            return false;
-        }
-    }
-
 }

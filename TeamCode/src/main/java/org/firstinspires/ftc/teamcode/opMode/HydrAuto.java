@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightVision;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.Turret_Base;
 import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
@@ -36,7 +37,7 @@ public abstract class HydrAuto extends OpMode_Base {
     protected Intake mIntake;
     protected Pose2d mBeginPose;
     protected Vision mVision;
-    protected Turret mTurret;
+    protected Turret_Base mTurret;
     protected Launcher mLauncher;
     protected Indicator mIndicator;
     protected ElapsedTime mTimeSinceStart;

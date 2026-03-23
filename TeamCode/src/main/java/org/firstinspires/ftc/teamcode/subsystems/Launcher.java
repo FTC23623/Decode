@@ -59,9 +59,9 @@ public class Launcher implements Subsystem {
     private boolean autoLaunchPressed;
     private boolean autoLaunchStarted;
     private final Debouncer autoLaunchDebounce;
-    private final Turret turret;
+    private final Turret_Base turret;
 
-    public Launcher(HydraOpMode Opmode, Turret turret, double targetRPM) {
+    public Launcher(HydraOpMode Opmode, Turret_Base turret, double targetRPM) {
         mOp = Opmode;
         motors = new ArrayList<>(2);
         motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
