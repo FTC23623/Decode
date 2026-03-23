@@ -10,7 +10,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -23,15 +22,14 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 @Config
 public class Turret implements Subsystem {
     private final HydraOpMode mOp;
     private final double mPosChangeRate = 0.2;
-    //private final double mMaxPos = 0.8333333333333;
-    //private final double mMinPos = 0.3333333333333;
-    public static double mMaxPos = 0.8333333333333;
-    public static double mMinPos = 0.3333333333333;
+    public static double mMaxPos = 0.83802817; //0.5 + 120/177.5 * 0.5 (120deg)
+    public static double mMinPos = 0.33802817; // 120/177.5 * 0.5 (-120deg)
     private double UserInput = 0;
     private final Servo TurretServo;
     //private final AnalogInput TurretServoFb;
@@ -51,23 +49,32 @@ public class Turret implements Subsystem {
     private boolean first;
     private double firstUpdate;
     private final Imu imu;
+    private boolean initEncoder = true;
+    protected static double mAllianceFactor = -1;
 
-    public Turret(HydraOpMode opMode, Imu imu) {
+
+
+    public Turret(HydraOpMode opMode, Imu imu, VisionMode target) {
         mOp = opMode;
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
         //TurretServoFb = mOp.mHardwareMap.get(AnalogInput.class, "TurretServoFb");
-        /*
+
         AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb",Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
-                .zero(TurretEncoderOffset)
+                .zero(Constants.TurretEncoderOffset)
                 .setReversed(true) // ToDo: Set based on observation.
         ;
 
-         */
-        TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder //ToDo: set name based on port used for encoder
+        TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder
                 .setDirection(Motor.Direction.REVERSE) // ToDo: Set based on Encoder orientation and Positive rotation convention
                 .overrideResetPos((int) TurretSyncOffset)
         ;
-
+        // Adjust target location for alliance
+        if (target == VisionMode.VisionMode_BlueGoal) {
+            mAllianceFactor = 1;
+        }
+        else {
+            mAllianceFactor = -1;
+        }
         lastVisionTimestamp = 0;
         autoSetAction = false;
         autoSetPos = 0;
@@ -81,8 +88,8 @@ public class Turret implements Subsystem {
     }
 
     @Override
-    public boolean Init() {
-        TurretEncoder.overrideResetPos(0);
+    public boolean Init() {  //ToDo: ?????? Does this really get called during Opmode Init? ????????
+        //TurretEncoder.overrideResetPos(0); // Assumes Turret is at Zero on Init
         return true;
     }
 /*
@@ -121,6 +128,13 @@ public class Turret implements Subsystem {
 
     @Override
     public void Process() {
+        // Initialize turret encoder on first loop
+        if (initEncoder){ //Todo: Verify that this will work. Does turret get to home before encoder is reset? Better would be to run this at Init.
+            TurretServo.setPosition(0.5); // Send Turret Home
+            TurretEncoder.overrideResetPos(0); // Assumes Turret is at Zero on Init;
+            initEncoder = false;
+        }
+
         VisionResult vision = null;
         if (mOp.mVision != null) {
             vision = mOp.mVision.GetResult();
@@ -130,8 +144,10 @@ public class Turret implements Subsystem {
             currentPose = imu.GetPose();
         }
         //double servoFbPosition = GetPositionFromFb();
-        double servoFbPosition = TurretEncoder.getPosition() * Constants.TurretDegreesPerTick;
+        double servoFbPosition = TurretEncoder.getPosition() * Constants.TurretDegreesPerTick; //Degrees
+        double TurretAnalogPositon = MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false)/Constants.TurretGearRatioTurretToServo; //Degrees
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
+        mOp.mTelemetry.addData("TurretAnalogPos", TurretAnalogPositon);
 
         // Order of priorities
         // 1) Auto sets a desired position
@@ -163,10 +179,11 @@ public class Turret implements Subsystem {
                         }
                     }
                     double NewPos = TurretServo.getPosition() + update; //servoFbPosition + update;
+                    //double NewPos = servoFbPosition + update; // in Degrees
                     // clamp the new position to the min and max
                     NewPos = Clamp(NewPos);
                     if (applyUpdate) {
-                        TurretServo.setPosition(NewPos);
+                        TurretServo.setPosition(NewPos); // ToDo: Seperate Set Position from Nested IF and use common variable to set in each IF case.
                         visionLocked = false;
                     }
                     //mOp.mTelemetry.addData("Turret Pos V", NewPos);
@@ -176,22 +193,23 @@ public class Turret implements Subsystem {
             }
         } else if (!disableAutoTrack && currentPose != null){
             // TODO: GET GOAL POSITIONS AND SELECT BASED ON ALLIANCE
-            Vector2d goalPosition = new Vector2d(144, 144);
+            Vector2d goalPosition = new Vector2d(-72, 72 * mAllianceFactor);
             // angle from the robot's current x,y position to the goal
             double angleToGoal = AutoTangent(currentPose.position, goalPosition);
             // get the robot's heading, offset by 180 because the turret is on the back
             double robotHeading = Math.toDegrees(currentPose.heading.toDouble()) - 180;
             // calculate the angle of the turret to point at the goal
-            double turretAngleToSet = MathUtils.normalizeDegrees(robotHeading - angleToGoal, true);
+            double turretAngleToSet = MathUtils.normalizeDegrees(robotHeading - angleToGoal, true); // ToDo: Seperate Set Position from Nested IF and use common variable to set in each IF case.
         } else {
             // scale user input with a constant rate
-            double position_change = UserInput * mPosChangeRate;
+            double position_change = UserInput * mPosChangeRate; //Todo: Change to angle based rather than servo command based.
             if (position_change != 0) {
                 // get the last set position and calculate the new position
-                double NewPos = TurretServo.getPosition() + position_change; //servoFbPosition + position_change;
+                double NewPos = TurretServo.getPosition() + position_change;
+                //double NewPos = servoFbPosition + position_change; // in Degrees
                 // clamp the new position to the min and max
                 NewPos = Clamp(NewPos);
-                TurretServo.setPosition(Clamp(NewPos));
+                TurretServo.setPosition(Clamp(NewPos)); // ToDo: Seperate Set Position from Nested IF and use common variable to set in each IF case.
                 //mOp.mTelemetry.addData("Turret Pos U", NewPos);
             }
         }

@@ -17,8 +17,8 @@ public final class Constants {
     public static final double motorRpmIntervalMs = 50;
     public static final double linearLaunchMotTicksPerRev = 28;
     public static final double nsToMs = 1.0e-6;
-    public static final double intakeMotorMaxIn = -1000;
-    public static final double intakeMotorMaxOut = 500;
+    public static final double intakeMotorMaxIn = -160000;
+    public static final double intakeMotorMaxOut = 80000;
     public static final double LauncherTopRPMTele = 2925;
     public static final double LauncherTopRPMAuto = 2825;
     public static final double LauncherMedRPMThreshold = 2600;
@@ -30,10 +30,11 @@ public final class Constants {
     public static final double LauncherLowRPMAuto = 2175;
     public static final double LauncherIdleRPM = 500;
     public static final double LaunchServoRun = 1;
-    public static final double TransfertoLaunchPower = 1100;
-    public static final double TransferFromIntakePower = 1100;
-    public static final double TransferToIntakePower = -900;
-
+    public static  double TransfertoLaunchPower = 160000; //ToDo: Find Value that works
+    public static  double TransferFromIntakePower = 160000;
+    public static final double TransferToIntakePower = -50000;
+    public static final double TransferMotorTickperRev = 28*3.17; // 3.7:1 Motor ratio
+    public static final double IntakeMotorTickperRev = 28*7.8; // 5.2:1 Motor ratio + 24/16 belt ratio
     //Turret Constants
     public static final double TurretGearRatioTurretToEncoder = 1/3.15; // ratio from Turret to Encoder 80/252
     public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96

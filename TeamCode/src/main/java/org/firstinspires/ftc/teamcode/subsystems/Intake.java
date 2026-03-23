@@ -175,14 +175,14 @@ public class Intake implements Subsystem {
         // convert to rpm
         double ticksPerMin = 60 * ticksPerSecond;
         // rpm
-        double transferrpm = ticksPerMin / Constants.linearLaunchMotTicksPerRev;
+        double transferrpm = ticksPerMin / Constants.TransferMotorTickperRev;
 
 
          ticksPerSecond = intakeMotor.getVelocity();
         // convert to rpm
          ticksPerMin = 60 * ticksPerSecond;
         // rpm
-        double intakerpm = ticksPerMin / Constants.linearLaunchMotTicksPerRev;
+        double intakerpm = ticksPerMin / Constants.IntakeMotorTickperRev;
 
         mOp.mTelemetry.addData("transferrpm", transferrpm);
 
