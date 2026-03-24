@@ -4,37 +4,45 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
+import org.firstinspires.ftc.teamcode.objects.VisionResult;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class Turret_Base implements Subsystem {
     protected final HydraOpMode mOp;
-    protected int mAllianceFactor;
     protected final VoltageSensor voltageSensor;
     protected final AbsoluteAnalogEncoder AnalogTurretEncoder;
     protected Motor.Encoder TurretEncoder;
-    protected final double mPosChangeRate = 0.2;
+    protected final double mPosChangeRateDegrees = 10;
     protected double TurretSyncOffset = 0.0;
     protected long lastVisionTimestamp;
     protected boolean autoSetAction;
-    protected double autoSetPos;
+    protected double autoSetAngle;
     protected boolean visionLocked;
-    protected boolean disableAutoTrack;
+    public static boolean disableAutoTrack;
     protected final Debouncer circleDebounce;
     protected final Debouncer triangleDebounce;
     protected final Imu imu;
     protected double UserInput = 0;
     public static int VisionRefreshTimeMs = 10;
+    protected final Vector2d goalPosition;
+    private boolean first;
+    private double firstUpdate;
+    public static double manualAngle = 0;
+    public static boolean manualAngleEnable = false;
 
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target) {
@@ -42,10 +50,10 @@ public abstract class Turret_Base implements Subsystem {
         voltageSensor = mOp.mHardwareMap.get(VoltageSensor.class, "Control Hub");
         // Adjust target location for alliance
         if (target == VisionMode.VisionMode_BlueGoal) {
-            mAllianceFactor = 1;
+            goalPosition = new Vector2d(-72, 72);
         }
         else {
-            mAllianceFactor = -1;
+            goalPosition = new Vector2d(-72, -72);
         }
         AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb", Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
                 .zero(Constants.TurretEncoderOffset)
@@ -57,18 +65,19 @@ public abstract class Turret_Base implements Subsystem {
         ;
         lastVisionTimestamp = 0;
         autoSetAction = false;
-        autoSetPos = 0;
+        autoSetAngle = 0;
         visionLocked = false;
         disableAutoTrack = false;
         circleDebounce = new Debouncer(Constants.debounceLong);
         triangleDebounce = new Debouncer(1);
         this.imu = imu;
+        first = true;
     }
 
     @Override
     public void HandleUserInput() {
-        //UserInput = mOp.mOperatorGamepad.right_stick_x;
-        //UserInput = Range.scale(UserInput,0,1,Constants.TurretMinAngle, Constants.TurretMaxAngle); // Scale stick to Min Max Turret Angle
+        UserInput = mOp.mOperatorGamepad.right_stick_x;
+        // UserInput = Range.scale(UserInput,0,1,Constants.TurretMinAngle, Constants.TurretMaxAngle); // Scale stick to Min Max Turret Angle
         circleDebounce.In(mOp.mOperatorGamepad.circle);
         if (circleDebounce.Out()) {
             circleDebounce.Used();
@@ -80,10 +89,93 @@ public abstract class Turret_Base implements Subsystem {
             triangleDebounce.Used();
             GoHome();
         }
-        //squareDebounce.In(mOp.mDriverGamepad.square);
-        //if (squareDebounce.Out()) {
-        //    GoHome();
-        //}
+    }
+
+    @Override
+    public void Process() {
+        VisionResult vision = null;
+        if (mOp.mVision != null) {
+            vision = mOp.mVision.GetResult();
+        }
+        Pose2d currentPose = null;
+        if (imu != null) {
+            currentPose = imu.GetPose();
+        }
+        //double servoFbPosition = GetPositionFromFb();
+        double servoFbPosition = TurretEncoder.getPosition() * Constants.TurretDegreesPerTick; //Degrees
+        double TurretAnalogPositon = MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false)/Constants.TurretGearRatioTurretToServo; //Degrees
+        mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
+        mOp.mTelemetry.addData("TurretAnalogPos", TurretAnalogPositon);
+
+        // Order of priorities
+        // 1) Auto sets a desired position
+        // 2) if a tag is visible, track it
+        // 3) turn the turret towards the target using odometry
+        // 4) take user input
+        boolean applyUpdate = false;
+        double NewAngle = 0;
+        if (autoSetAction) {
+            NewAngle = autoSetAngle;
+            applyUpdate = true;
+        } else if (!disableAutoTrack && vision != null) {
+            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
+            //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
+            //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
+            TurretKinematics.CalcDistanceToTag(vision);
+            if (vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) {
+                //mOp.mTelemetry.addData("timestamp", vision.GetTimestamp());
+                double rotate = vision.GetXOffset();
+                //mOp.mTelemetry.addData("rotate", rotate);
+                lastVisionTimestamp = vision.GetTimestamp();
+                if (Math.abs(rotate) > 1) {
+                    if (first) {
+                        firstUpdate = rotate;
+                        first = false;
+                    } else {
+                        if (Math.abs(rotate - firstUpdate) < 1) {
+                            applyUpdate = true;
+                            first = true;
+                        }
+                    }
+                    NewAngle = servoFbPosition + rotate;
+                    //mOp.mTelemetry.addData("Turret Pos V", NewPos);
+                } else {
+                    visionLocked = true;
+                }
+            }
+        } else if (!disableAutoTrack && currentPose != null) {
+            // angle from the robot's current x,y position to the goal
+            double angleToGoal = AutoTangent(currentPose.position, goalPosition);
+            // get the robot's heading, offset by 180 because the turret is on the back
+            double robotHeading = Math.toDegrees(currentPose.heading.toDouble()) - 180;
+            // calculate the angle of the turret to point at the goal
+            NewAngle = Clamp(servoFbPosition + MathUtils.normalizeDegrees(robotHeading - angleToGoal, true));
+            applyUpdate = true;
+        } else if (manualAngleEnable) {
+            NewAngle = manualAngle;
+            applyUpdate = true;
+        } else {
+            // scale user input with a constant rate
+            double position_change = UserInput * mPosChangeRateDegrees;
+            if (position_change != 0) {
+                // get the last set position and calculate the new position
+                NewAngle = servoFbPosition + position_change;
+                applyUpdate = true;
+            }
+        }
+        if (applyUpdate) {
+            // TODO: might need fancier logic for this
+            visionLocked = Math.abs(NewAngle - servoFbPosition) > 1;
+            NewAngle = Clamp(NewAngle);
+            SetTurretAngle(NewAngle);
+        }
+        if (disableAutoTrack || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
+            visionLocked = false;
+        }
+        //mOp.mTelemetry.addData("AutoPos", autoSetPos);
+        //mOp.mTelemetry.addData("AutoAction", autoSetAction);
+        mOp.mTelemetry.addData("VisionLocked", visionLocked);
+        mOp.mTelemetry.addData("AutoTrack", !disableAutoTrack);
     }
 
     public boolean Locked() {
@@ -102,7 +194,18 @@ public abstract class Turret_Base implements Subsystem {
         return Math.toDegrees(Math.atan2(dy, dx));
     }
 
-    public abstract void GoHome();
+    public void GoHome() {
+        autoSetAction = true;
+        autoSetAngle = 0;
+        Process();
+        autoSetAction = false;
+    }
+
+    private double Clamp(double position) {
+        return Range.clip(position, Constants.TurretMinAngle, Constants.TurretMaxAngle);
+    }
+
+    protected abstract void SetTurretAngle(double angle);
 
     /*
      * ROAD RUNNER API
@@ -115,8 +218,6 @@ public abstract class Turret_Base implements Subsystem {
     public Action GetLockAction() {
         return new Turret_Base.RunLockAction();
     }
-
-    public abstract Action GetSetAction(double position);
 
     public Action GetDisableAction(boolean disable) {
         return new Turret.RunDisableAction(disable);
@@ -158,6 +259,38 @@ public abstract class Turret_Base implements Subsystem {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             disableAutoTrack = disable;
+            return false;
+        }
+    }
+
+    public Action GetSetAction(double position) {
+        return new Turret.RunSetAction(position);
+    }
+
+    public class RunSetAction implements Action {
+        private boolean started = false;
+        private final double angleToSet;
+        public RunSetAction(double angleToSet) {
+            this.angleToSet = angleToSet;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!started) {
+                started = true;
+                autoSetAction = true;
+                autoSetAngle = angleToSet;
+            }
+            Process();
+            autoSetAction = false;
+            /*if (visionLocked) {
+                autoSetAction = false;
+                return false;
+            } else
+            if (Math.abs(GetPositionFromFb() - autoSetPos) < CalcPositionOffsetAngle(Constants.TurretDeadbandDegrees)) {
+                autoSetAction = false;
+                return false;
+            }*/
             return false;
         }
     }
