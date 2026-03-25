@@ -26,14 +26,14 @@ public abstract class Turret_Base implements Subsystem {
     protected final VoltageSensor voltageSensor;
     protected final AbsoluteAnalogEncoder AnalogTurretEncoder;
     protected Motor.Encoder TurretEncoder;
-    protected final double mPosChangeRateDegrees = 10;
+    public static double mPosChangeRateDegrees = 10;
     protected double TurretSyncOffset = 0.0;
     protected long lastVisionTimestamp;
     protected boolean autoSetAction;
     protected double autoSetAngle;
     protected boolean visionLocked;
-    public static boolean disableAutoTrack;
-    protected final Debouncer circleDebounce;
+    protected final Debouncer disableOdoTrackWithCircle;
+    protected final Debouncer disableVisionTrackWithCircle;
     protected final Debouncer triangleDebounce;
     protected final Imu imu;
     protected double UserInput = 0;
@@ -43,7 +43,9 @@ public abstract class Turret_Base implements Subsystem {
     private double firstUpdate;
     public static double manualAngle = 0;
     public static boolean manualAngleEnable = false;
-
+    public enum autoTrackType { autoTrackEnabled, autoTrackOdoDisabled, autoTrackDisabled };
+    public static autoTrackType autoTrack;
+    public static double userInputExponent = 1;
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target) {
         mOp = opMode;
@@ -67,8 +69,9 @@ public abstract class Turret_Base implements Subsystem {
         autoSetAction = false;
         autoSetAngle = 0;
         visionLocked = false;
-        disableAutoTrack = false;
-        circleDebounce = new Debouncer(Constants.debounceLong);
+        autoTrack = autoTrackType.autoTrackEnabled;
+        disableOdoTrackWithCircle = new Debouncer(Constants.debounceLong);
+        disableVisionTrackWithCircle = new Debouncer(Constants.debounceLong * 2);
         triangleDebounce = new Debouncer(1);
         this.imu = imu;
         first = true;
@@ -78,11 +81,25 @@ public abstract class Turret_Base implements Subsystem {
     public void HandleUserInput() {
         UserInput = mOp.mOperatorGamepad.right_stick_x;
         // UserInput = Range.scale(UserInput,0,1,Constants.TurretMinAngle, Constants.TurretMaxAngle); // Scale stick to Min Max Turret Angle
-        circleDebounce.In(mOp.mOperatorGamepad.circle);
-        if (circleDebounce.Out()) {
-            circleDebounce.Used();
-            disableAutoTrack = !disableAutoTrack;
+        disableOdoTrackWithCircle.In(mOp.mOperatorGamepad.circle);
+        if (disableOdoTrackWithCircle.Out()) {
+            disableOdoTrackWithCircle.Used();
+            if (autoTrack == autoTrackType.autoTrackEnabled) {
+                autoTrack = autoTrackType.autoTrackOdoDisabled;
+            } else {
+                autoTrack = autoTrackType.autoTrackEnabled;
+            }
             mOp.mOperatorGamepad.rumbleBlips(1);
+        }
+        disableVisionTrackWithCircle.In(mOp.mOperatorGamepad.circle);
+        if (disableVisionTrackWithCircle.Out()) {
+            disableVisionTrackWithCircle.Used();
+            if (autoTrack == autoTrackType.autoTrackDisabled) {
+                autoTrack = autoTrackType.autoTrackEnabled;
+            } else {
+                autoTrack = autoTrackType.autoTrackDisabled;
+            }
+            mOp.mOperatorGamepad.rumbleBlips(2);
         }
         triangleDebounce.In(mOp.mOperatorGamepad.triangle);
         if (triangleDebounce.Out()) {
@@ -117,7 +134,7 @@ public abstract class Turret_Base implements Subsystem {
         if (autoSetAction) {
             NewAngle = autoSetAngle;
             applyUpdate = true;
-        } else if (!disableAutoTrack && vision != null) { // ToDo: Need to add condition to only track tag when below a speed threshold to avoid tracking jitter
+        } else if (VisionTrackingEnabled() && vision != null) {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
@@ -143,7 +160,7 @@ public abstract class Turret_Base implements Subsystem {
                     visionLocked = true;
                 }
             }
-        } else if (!disableAutoTrack && currentPose != null) {
+        } else if (OdometryTrackingEnabled() && currentPose != null) {
             // angle from the robot's current x,y position to the goal
             double angleToGoal = AutoTangent(currentPose.position, goalPosition);
             // get the robot's heading, offset by 180 because the turret is on the back
@@ -155,8 +172,11 @@ public abstract class Turret_Base implements Subsystem {
             NewAngle = manualAngle;
             applyUpdate = true;
         } else {
-            // scale user input with a constant rate
-            double position_change = UserInput * mPosChangeRateDegrees;
+            // scale user input
+            double userInputMagnitude = Math.abs(UserInput);
+            double userInputSign = Math.signum(UserInput);
+            double userInputScalar = userInputSign * Math.pow(userInputMagnitude, userInputExponent);
+            double position_change = userInputScalar * mPosChangeRateDegrees;
             if (position_change != 0) {
                 // get the last set position and calculate the new position
                 NewAngle = servoFbPosition + position_change;
@@ -169,13 +189,13 @@ public abstract class Turret_Base implements Subsystem {
             NewAngle = Clamp(NewAngle);
             SetTurretAngle(NewAngle);
         }
-        if (disableAutoTrack || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
+        if (!VisionTrackingEnabled() || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
             visionLocked = false;
         }
         //mOp.mTelemetry.addData("AutoPos", autoSetPos);
         //mOp.mTelemetry.addData("AutoAction", autoSetAction);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
-        mOp.mTelemetry.addData("AutoTrack", !disableAutoTrack);
+        mOp.mTelemetry.addData("AutoTrack", autoTrack);
     }
 
     public boolean Locked() {
@@ -206,6 +226,15 @@ public abstract class Turret_Base implements Subsystem {
     }
 
     protected abstract void SetTurretAngle(double angle);
+
+    protected boolean OdometryTrackingEnabled() {
+        return autoTrack == autoTrackType.autoTrackEnabled;
+    }
+
+    protected boolean VisionTrackingEnabled() {
+        return autoTrack != autoTrackType.autoTrackOdoDisabled;
+    }
+
 
     /*
      * ROAD RUNNER API
@@ -258,7 +287,11 @@ public abstract class Turret_Base implements Subsystem {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            disableAutoTrack = disable;
+            if (disable) {
+                autoTrack = autoTrackType.autoTrackDisabled;
+            } else {
+                autoTrack = autoTrackType.autoTrackEnabled;
+            }
             return false;
         }
     }
