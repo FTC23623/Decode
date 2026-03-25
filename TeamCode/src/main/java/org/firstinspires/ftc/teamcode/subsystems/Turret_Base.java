@@ -50,10 +50,10 @@ public abstract class Turret_Base implements Subsystem {
         voltageSensor = mOp.mHardwareMap.get(VoltageSensor.class, "Control Hub");
         // Adjust target location for alliance
         if (target == VisionMode.VisionMode_BlueGoal) {
-            goalPosition = new Vector2d(-72, 72);
+            goalPosition = new Vector2d(-72, -72);
         }
         else {
-            goalPosition = new Vector2d(-72, -72);
+            goalPosition = new Vector2d(-72, 72);
         }
         AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb", Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
                 .zero(Constants.TurretEncoderOffset)
@@ -117,7 +117,7 @@ public abstract class Turret_Base implements Subsystem {
         if (autoSetAction) {
             NewAngle = autoSetAngle;
             applyUpdate = true;
-        } else if (!disableAutoTrack && vision != null) {
+        } else if (!disableAutoTrack && vision != null) { // ToDo: Need to add condition to only track tag when below a speed threshold to avoid tracking jitter
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
@@ -149,7 +149,7 @@ public abstract class Turret_Base implements Subsystem {
             // get the robot's heading, offset by 180 because the turret is on the back
             double robotHeading = Math.toDegrees(currentPose.heading.toDouble()) - 180;
             // calculate the angle of the turret to point at the goal
-            NewAngle = Clamp(servoFbPosition + MathUtils.normalizeDegrees(robotHeading - angleToGoal, true));
+            NewAngle = Clamp(servoFbPosition + MathUtils.normalizeDegrees(robotHeading - angleToGoal, true)); //ToDo: Shout the zero to full be false? what if angle was 360?
             applyUpdate = true;
         } else if (manualAngleEnable) {
             NewAngle = manualAngle;
@@ -165,7 +165,7 @@ public abstract class Turret_Base implements Subsystem {
         }
         if (applyUpdate) {
             // TODO: might need fancier logic for this
-            visionLocked = Math.abs(NewAngle - servoFbPosition) > 1;
+            visionLocked = Math.abs(NewAngle - servoFbPosition) < 1;
             NewAngle = Clamp(NewAngle);
             SetTurretAngle(NewAngle);
         }

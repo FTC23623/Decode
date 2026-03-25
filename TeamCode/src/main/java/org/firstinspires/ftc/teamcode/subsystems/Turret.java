@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
@@ -10,16 +12,30 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 public class Turret extends Turret_Base {
     private final Servo TurretServo;
     public static boolean TurretSynced = false; // Indicates turret encoder is synced to servo absolute encoder.
+    private final ElapsedTime InitTimer;
+    private boolean started = false;
 
     public Turret(HydraOpMode opMode, Imu imu, VisionMode target) {
         super(opMode, imu, target);
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
+        InitTimer = new ElapsedTime();
     }
 
     @Override
-    public boolean Init() {  //ToDo: ?????? Does this really get called during Opmode Init? ????????
+    public boolean Init() {
         //TurretEncoder.overrideResetPos(0); // Assumes Turret is at Zero on Init
-        return true;
+        if (!started) {
+            started = true;
+            InitTimer.reset();
+            SetTurretAngle(0); // Send Turret Home
+        }
+        // Wait a bit for Turret to get home.
+        if (InitTimer.milliseconds() > 1000) {
+            TurretEncoder.overrideResetPos(0); // Assumes Turret is at Zero on Init
+            return true;
+        } else{
+            return false;
+        }
     }
 
     @Override

@@ -41,7 +41,7 @@ public class TurretCR extends Turret_Base {
     }
 
     // Synchronize throughbore encoder with Axon Servo feedback
-    public void resetTurretEncoder() {
+    public void resetTurretEncoder() { //Todo: Consider moving this to Turret_Base so it can be used for Servo based control as well.
         if (!TurretSynced) {
             if (AnalogTurretEncoder.getVoltage() > 0.001) {
                 TurretEncoder.overrideResetPos(0);

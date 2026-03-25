@@ -38,9 +38,9 @@ public class LaunchMotor {
         mAvgRpm.AddSample(rpm);
         double avgRpm = mAvgRpm.GetAverage();
         // telemetry and datalogging
-        double current = motor.getCurrent(CurrentUnit.MILLIAMPS);
+        //double current = motor.getCurrent(CurrentUnit.MILLIAMPS);
         mLogger.rpm.set(rpm);
-        mLogger.current.set(current);
+        //mLogger.current.set(current);
         // return rpm
         return avgRpm;
     }
