@@ -4,6 +4,7 @@ import org.firstinspires.ftc.teamcode.types.Constants;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
@@ -40,11 +41,7 @@ public class Turret extends Turret_Base {
 
     @Override
     protected void SetTurretAngle(double angle) {
-        // convert the angle to 0 to max since servo is 0 to 1
-        double degrees = angle * Constants.TurretGearRatio + Constants.TurretRange / 2;
-        // clamp the value to the range
-        degrees = Math.max(0, Math.min(Constants.TurretRange, degrees));
-        double position = degrees / Constants.TurretRange;
-        TurretServo.setPosition(position);
+        double servoPosition = Range.scale(angle, -Constants.TurretRange / 2, Constants.TurretRange / 2, 0, 1);
+        TurretServo.setPosition(servoPosition);
     }
 }

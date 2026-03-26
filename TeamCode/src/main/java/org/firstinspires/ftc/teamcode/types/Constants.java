@@ -43,16 +43,15 @@ public final class Constants {
     public static double TurretMinPower = -0.2;
     public static double TurretMaxPower = 0.2; // Todo: Adjust based on tuning.
     public static double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math
-    public static double TurretMaxAngle = 100; //Degrees
-    public static double TurretMinAngle = -100; //Degrees
+    public static double TurretMaxAngle = 118; //Degrees
+    public static double TurretMinAngle = -118; //Degrees
     public static double TurretDeadbandDegrees = 1; // Tolerance wrt turret
     public static int TurretVisionLockTimeoutMs = 500;
     public static double TurretServoAnalogRangeVolts = 3.3;
     public static double DefaultVoltage = 12.7; // Default voltage use for controllers Voltage compensation
 
 	//servo mode turret
-    public static final double TurretGearRatio = 1/1.52381; //3.15
-    public static final double TurretRange = 355;
+    public static final double TurretRange = 355 / TurretGearRatioTurretToServo;//(((113.0 / 255.0) * 355.0) / TurretGearRatioTurretToServo);
 
     // Vision and Tracking Constants
     // how many degrees back is your limelight rotated from perfectly vertical?

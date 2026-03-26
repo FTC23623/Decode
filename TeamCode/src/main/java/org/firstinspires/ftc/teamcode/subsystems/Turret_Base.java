@@ -26,7 +26,7 @@ public abstract class Turret_Base implements Subsystem {
     protected final VoltageSensor voltageSensor;
     protected final AbsoluteAnalogEncoder AnalogTurretEncoder;
     protected Motor.Encoder TurretEncoder;
-    public static double mPosChangeRateDegrees = 10;
+    public static double mPosChangeRateDegrees = 40;
     protected double TurretSyncOffset = 0.0;
     protected long lastVisionTimestamp;
     protected boolean autoSetAction;
@@ -45,7 +45,7 @@ public abstract class Turret_Base implements Subsystem {
     public static boolean manualAngleEnable = false;
     public enum autoTrackType { autoTrackEnabled, autoTrackOdoDisabled, autoTrackDisabled };
     public static autoTrackType autoTrack;
-    public static double userInputExponent = 1;
+    public static double userInputExponent = 2;
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target) {
         mOp = opMode;
@@ -69,9 +69,9 @@ public abstract class Turret_Base implements Subsystem {
         autoSetAction = false;
         autoSetAngle = 0;
         visionLocked = false;
-        autoTrack = autoTrackType.autoTrackEnabled;
+        autoTrack = autoTrackType.autoTrackOdoDisabled;
         disableOdoTrackWithCircle = new Debouncer(Constants.debounceLong);
-        disableVisionTrackWithCircle = new Debouncer(Constants.debounceLong * 2);
+        disableVisionTrackWithCircle = new Debouncer(Constants.debounceLong * 10);
         triangleDebounce = new Debouncer(1);
         this.imu = imu;
         first = true;
@@ -166,7 +166,7 @@ public abstract class Turret_Base implements Subsystem {
             // get the robot's heading, offset by 180 because the turret is on the back
             double robotHeading = Math.toDegrees(currentPose.heading.toDouble()) - 180;
             // calculate the angle of the turret to point at the goal
-            NewAngle = Clamp(servoFbPosition + MathUtils.normalizeDegrees(robotHeading - angleToGoal, true)); //ToDo: Shout the zero to full be false? what if angle was 360?
+            NewAngle = Clamp(MathUtils.normalizeDegrees(robotHeading - angleToGoal, false)); //ToDo: Shout the zero to full be false? what if angle was 360?
             applyUpdate = true;
         } else if (manualAngleEnable) {
             NewAngle = manualAngle;
@@ -193,7 +193,7 @@ public abstract class Turret_Base implements Subsystem {
             visionLocked = false;
         }
         //mOp.mTelemetry.addData("AutoPos", autoSetPos);
-        //mOp.mTelemetry.addData("AutoAction", autoSetAction);
+        mOp.mTelemetry.addData("TurretSetAngle", NewAngle);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
         mOp.mTelemetry.addData("AutoTrack", autoTrack);
     }
@@ -232,7 +232,14 @@ public abstract class Turret_Base implements Subsystem {
     }
 
     protected boolean VisionTrackingEnabled() {
-        return autoTrack != autoTrackType.autoTrackOdoDisabled;
+        switch (autoTrack) {
+            case autoTrackDisabled:
+                return false;
+            case autoTrackEnabled:
+            case autoTrackOdoDisabled:
+            default:
+                return true;
+        }
     }
 
 
