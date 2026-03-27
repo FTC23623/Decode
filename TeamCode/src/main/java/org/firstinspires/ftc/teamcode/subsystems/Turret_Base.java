@@ -69,7 +69,7 @@ public abstract class Turret_Base implements Subsystem {
         autoSetAction = false;
         autoSetAngle = 0;
         visionLocked = false;
-        autoTrack = autoTrackType.autoTrackOdoDisabled;
+        autoTrack = autoTrackType.autoTrackEnabled;
         disableOdoTrackWithCircle = new Debouncer(Constants.debounceLong);
         disableVisionTrackWithCircle = new Debouncer(Constants.debounceLong * 10);
         triangleDebounce = new Debouncer(1);
@@ -154,7 +154,7 @@ public abstract class Turret_Base implements Subsystem {
                             first = true;
                         }
                     }
-                    NewAngle = servoFbPosition + rotate;
+                    NewAngle = getPosition() + rotate;
                     //mOp.mTelemetry.addData("Turret Pos V", NewPos);
                 } else {
                     visionLocked = true;
@@ -226,6 +226,7 @@ public abstract class Turret_Base implements Subsystem {
     }
 
     protected abstract void SetTurretAngle(double angle);
+    protected abstract double getPosition();
 
     protected boolean OdometryTrackingEnabled() {
         return autoTrack == autoTrackType.autoTrackEnabled;

@@ -44,4 +44,9 @@ public class Turret extends Turret_Base {
         double servoPosition = Range.scale(angle, -Constants.TurretRange / 2, Constants.TurretRange / 2, 0, 1);
         TurretServo.setPosition(servoPosition);
     }
+
+    @Override
+    protected double getPosition() {
+        return TurretServo.getPosition();
+    }
 }
