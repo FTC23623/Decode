@@ -188,10 +188,10 @@ public class Intake implements Subsystem {
 
         mOp.mTelemetry.addData("intakerpm", intakerpm);
 
-        ticksPerMin = transfersetrpm * Constants.linearLaunchMotTicksPerRev;
+        ticksPerMin = transfersetrpm * Constants.TransferMotorTickperRev;
         ticksPerSecond = ticksPerMin / 60;
         transferMotor.setVelocity(ticksPerSecond);
-        ticksPerMin = intakesetrpm * Constants.linearLaunchMotTicksPerRev;
+        ticksPerMin = intakesetrpm * Constants.IntakeMotorTickperRev;
         ticksPerSecond = ticksPerMin / 60;
         intakeMotor.setVelocity(ticksPerSecond);
 

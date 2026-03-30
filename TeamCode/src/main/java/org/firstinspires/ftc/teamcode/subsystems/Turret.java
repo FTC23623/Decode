@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
@@ -19,20 +20,21 @@ public class Turret extends Turret_Base {
     public Turret(HydraOpMode opMode, Imu imu, VisionMode target) {
         super(opMode, imu, target);
         TurretServo = mOp.mHardwareMap.get(Servo.class,"TurretServo");
+    //    TurretServo.setDirection(Servo.Direction.REVERSE);
         InitTimer = new ElapsedTime();
     }
 
     @Override
     public boolean Init() {
-        //TurretEncoder.overrideResetPos(0); // Assumes Turret is at Zero on Init
+    // Zero Absolute Encoder with Turret is in Home Position ToDo: HyDrive has a call to GoHome before OpMode Start
         if (!started) {
             started = true;
             InitTimer.reset();
-            SetTurretAngle(0); // Send Turret Home
+            TurretServo.setPosition(0.5); // Send Turret Home
         }
         // Wait a bit for Turret to get home.
         if (InitTimer.milliseconds() > 1000) {
-            TurretEncoder.overrideResetPos(0); // Assumes Turret is at Zero on Init
+            TurretEncoder.overrideResetPos(0);
             return true;
         } else{
             return false;
@@ -42,11 +44,13 @@ public class Turret extends Turret_Base {
     @Override
     protected void SetTurretAngle(double angle) {
         double servoPosition = Range.scale(angle, -Constants.TurretRange / 2, Constants.TurretRange / 2, 0, 1);
+        mOp.mTelemetry.addData("TurretServoSetPos", servoPosition);
         TurretServo.setPosition(servoPosition);
     }
 
     @Override
     protected double getPosition() {
-        return TurretServo.getPosition();
+        return TurretEncoder.getPosition() * Constants.TurretDegreesPerTick; //Degrees
+        //return MathUtils.normalizeDegrees(TurretEncoder.getPosition() * Constants.TurretDegreesPerTick, false);
     }
 }

@@ -45,7 +45,7 @@ public class Launcher implements Subsystem {
     private final double piddMed = 0;
     private final double piddNear = 0;
     public static double pidF = 0.000242;
-    private final double pidfFar = 0.000215;
+    private final double pidfFar = 0.000219;
     private final double pidfMed = 0.000219;
     private final double pidfNear = 0.000223;
     private final PIDFController pid;
@@ -118,7 +118,7 @@ public class Launcher implements Subsystem {
         boolean AutoLaunch = false;
         if(turret != null) {
             if (autoLaunchDebounce.Out()) {
-                turret.ForceUnlock();
+                turret.ForceUnlock(); // Todo: *Review* Identify if this is necessary since the turret being locked is handled separately. Could delay launch.
                 autoLaunchDebounce.Used();
             }
             AutoLaunch = autoLaunchPressed && (autoLaunchStarted || turret.Locked());

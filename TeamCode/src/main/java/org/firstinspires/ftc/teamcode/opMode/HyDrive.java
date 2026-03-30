@@ -84,7 +84,7 @@ public abstract class HyDrive extends OpMode_Base {
     SetLynxHubsManual();
     InitializeAllSystems();
     final double headingOffset = DriverHeadingFromRobotPose(pinpointStart);
-    mImu.SetYawOffset(headingOffset);
+    mImu.SetYawOffset(headingOffset); //Todo: *Question*: What does this do compared to line 61 & 63 where Pinpoint is initialized with default heading?
     telemetry.addData("Auto Yaw", headingOffset);
     telemetry.update();
     // set the vision up for targeting

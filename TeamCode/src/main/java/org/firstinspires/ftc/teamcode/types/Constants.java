@@ -33,16 +33,17 @@ public final class Constants {
     public static  double TransfertoLaunchPower = 1600000; //ToDo: Find Value that works
     public static  double TransferFromIntakePower = 1600000;
     public static final double TransferToIntakePower = -500000;
-    public static final double TransferMotorTickperRev = 28*3.17; // 3.7:1 Motor ratio
-    public static final double IntakeMotorTickperRev = 28*7.8; // 5.2:1 Motor ratio + 24/16 belt ratio
+    public static final double TransferMotorTickperRev = 103.8; // from goBilda for 1620rpm motor
+    public static final double IntakeMotorTickperRev = 145.1 * 1.5; // from gobilda for 1150rpm Motor * 24/16 belt ratio
     //Turret Constants
-    public static final double TurretGearRatioTurretToEncoder = 1/3.15; // ratio from Turret to Encoder 80/252
-    public static final double TurretGearRatioTurretToServo = 0.65625;// turret to servo 252/80*20/96
-    //Set based Offset angle of Axon feedback at turret zero position. Note: Turret Zero should be set close to 180deg so the +/- rotation does not go through Axon 0 deg.
-    public static final double TurretEncoderOffset = 180.0 / TurretGearRatioTurretToServo ; //Degrees ToDo: Set based on angle of Servo at zero Turret angle.
+    public static final double TurretGearRatioTurretToEncoder = 54.0/251; // ratio from Turret to Encoder 54/251
+    public static final double TurretGearRatioTurretToServo = 0.9683642;// turret to servo 251/54*20/96
+    public static double TurretAnalogEncoderBias = 0;//degrees Static offset between analog feedback and true zero
+    public static final double TurretEncoderOffset = 180.0 / TurretGearRatioTurretToServo + TurretAnalogEncoderBias ; //Degrees ToDo: Set based on angle of Servo at zero Turret angle.
+
     public static double TurretMinPower = -0.2;
     public static double TurretMaxPower = 0.2; // Todo: Adjust based on tuning.
-    public static double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 80T side. Todo: Check Math
+    public static double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 54T side.
     public static double TurretMaxAngle = 118; //Degrees
     public static double TurretMinAngle = -118; //Degrees
     public static double TurretDeadbandDegrees = 1; // Tolerance wrt turret

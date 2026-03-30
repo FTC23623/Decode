@@ -59,10 +59,10 @@ public abstract class Turret_Base implements Subsystem {
         }
         AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb", Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
                 .zero(Constants.TurretEncoderOffset)
-                .setReversed(true)
+                //.setReversed(true)
         ;
         TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder
-                .setDirection(Motor.Direction.REVERSE) // ToDo: Set based on Encoder orientation and Positive rotation convention
+                .setDirection(Motor.Direction.REVERSE) // ToDo: *Setup*: Set based on Encoder orientation and Positive rotation convention
                 .overrideResetPos((int) TurretSyncOffset)
         ;
         lastVisionTimestamp = 0;
@@ -118,8 +118,7 @@ public abstract class Turret_Base implements Subsystem {
         if (imu != null) {
             currentPose = imu.GetPose();
         }
-        //double servoFbPosition = GetPositionFromFb();
-        double servoFbPosition = TurretEncoder.getPosition() * Constants.TurretDegreesPerTick; //Degrees
+        double servoFbPosition = TurretEncoder.getPosition() * Constants.TurretDegreesPerTick; //Degrees ToDo: *Review* May need to apply filter due to spikes seen in data.
         double TurretAnalogPositon = MathUtils.normalizeDegrees(AnalogTurretEncoder.getCurrentPosition(), false)/Constants.TurretGearRatioTurretToServo; //Degrees
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
         mOp.mTelemetry.addData("TurretAnalogPos", TurretAnalogPositon);
@@ -144,16 +143,17 @@ public abstract class Turret_Base implements Subsystem {
                 double rotate = vision.GetXOffset();
                 //mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
-                if (Math.abs(rotate) > 1) {
-                    if (first) {
-                        firstUpdate = rotate;
-                        first = false;
-                    } else {
-                        if (Math.abs(rotate - firstUpdate) < 1) {
-                            applyUpdate = true;
-                            first = true;
-                        }
-                    }
+                if (Math.abs(rotate) > Constants.TurretDeadbandDegrees) {
+                    applyUpdate = true;
+//                    if (first) {
+//                        firstUpdate = rotate;
+//                        first = false;
+//                    } else {
+//                        if (Math.abs(rotate - firstUpdate) < 1) {
+//                            applyUpdate = true;
+//                            first = true;
+//                        }
+//                    }
                     NewAngle = getPosition() + rotate;
                     //mOp.mTelemetry.addData("Turret Pos V", NewPos);
                 } else {
@@ -166,7 +166,7 @@ public abstract class Turret_Base implements Subsystem {
             // get the robot's heading, offset by 180 because the turret is on the back
             double robotHeading = Math.toDegrees(currentPose.heading.toDouble()) - 180;
             // calculate the angle of the turret to point at the goal
-            NewAngle = Clamp(MathUtils.normalizeDegrees(robotHeading - angleToGoal, false)); //ToDo: Shout the zero to full be false? what if angle was 360?
+            NewAngle = Clamp(MathUtils.normalizeDegrees(robotHeading - angleToGoal, false));
             applyUpdate = true;
         } else if (manualAngleEnable) {
             NewAngle = manualAngle;
@@ -183,14 +183,16 @@ public abstract class Turret_Base implements Subsystem {
                 applyUpdate = true;
             }
         }
+
         if (applyUpdate) {
-            // TODO: might need fancier logic for this
-            visionLocked = Math.abs(NewAngle - servoFbPosition) < 1;
+            // TODO: *Review* might need fancier logic for this
+            visionLocked = Math.abs(NewAngle - servoFbPosition) < Constants.TurretDeadbandDegrees; //Todo *Review* Do we want to indicate locked if we are not checking vision? What if there is an offset in Odometry?
             NewAngle = Clamp(NewAngle);
             SetTurretAngle(NewAngle);
         }
+
         if (!VisionTrackingEnabled() || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
-            visionLocked = false;
+            visionLocked = false; //ToDo: *Review* are we only allowing auto launch when vision tracking is enabled?
         }
         //mOp.mTelemetry.addData("AutoPos", autoSetPos);
         mOp.mTelemetry.addData("TurretSetAngle", NewAngle);
@@ -233,14 +235,15 @@ public abstract class Turret_Base implements Subsystem {
     }
 
     protected boolean VisionTrackingEnabled() {
-        switch (autoTrack) {
-            case autoTrackDisabled:
-                return false;
-            case autoTrackEnabled:
-            case autoTrackOdoDisabled:
-            default:
-                return true;
-        }
+        return autoTrack != autoTrackType.autoTrackDisabled;
+//        switch (autoTrack) {
+//            case autoTrackDisabled:
+//                return false;
+//            case autoTrackEnabled:
+//            case autoTrackOdoDisabled:
+//            default:
+//                return true;
+//        }
     }
 
 
