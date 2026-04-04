@@ -128,14 +128,13 @@ public abstract class HydrAuto extends OpMode_Base {
     }
     
     protected void InitializeRRPinpoint() {
-        /*
         if (mDrive.localizer instanceof PinpointLocalizer) {
             PinpointLocalizer ppl = (PinpointLocalizer) mDrive.localizer;
-            while (!Imu_Pinpoint.InitPinpoint(ppl, mOpMode.mTelemetry)) {
+            while (!Imu_Pinpoint.InitPinpoint(ppl, mOpMode.mTelemetry, false) && !isStarted() && !isStopRequested()) {
                 mOpMode.mTelemetry.update();
                 mOpMode.mTelemetry.addLine("Initializing pinpoint...");
             }
-        }*/
+        }
     }
 
     protected static double HeadingRad(double degrees) {

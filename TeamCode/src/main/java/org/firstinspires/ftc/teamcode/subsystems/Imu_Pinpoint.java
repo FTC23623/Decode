@@ -38,12 +38,12 @@ public class Imu_Pinpoint extends Imu_Base {
     @Override
     public boolean Init() {
         if (!isInit) {
-            isInit = InitPinpoint(mPinpoint, mOpMode.mTelemetry);
+            isInit = InitPinpoint(mPinpoint, mOpMode.mTelemetry, true);
         }
         return isInit;
     }
 
-    public static boolean InitPinpoint(PinpointLocalizer pinpoint, Telemetry telemetry) {
+    public static boolean InitPinpoint(PinpointLocalizer pinpoint, Telemetry telemetry, boolean limitTransferSize) {
         boolean retval = false;
         final GoBildaPinpointDriver driver = pinpoint.driver;
         pinpoint.update();
@@ -59,11 +59,13 @@ public class Imu_Pinpoint extends Imu_Base {
                         break;
                     case 2:
                         driver.setErrorDetectionType(GoBildaPinpointDriver.ErrorDetectionType.CRC);
-                        // If V2, have Pinpoint only transfer what we need.
-                        driver.setBulkReadScope(GoBildaPinpointDriver.Register.X_POSITION, GoBildaPinpointDriver.Register.Y_POSITION,
-                                GoBildaPinpointDriver.Register.H_ORIENTATION, GoBildaPinpointDriver.Register.X_VELOCITY,
-                                GoBildaPinpointDriver.Register.Y_VELOCITY, GoBildaPinpointDriver.Register.H_VELOCITY,
-                                GoBildaPinpointDriver.Register.DEVICE_STATUS);
+                        if (limitTransferSize) {
+                            // If V2, have Pinpoint only transfer what we need.
+                            driver.setBulkReadScope(GoBildaPinpointDriver.Register.X_POSITION, GoBildaPinpointDriver.Register.Y_POSITION,
+                                    GoBildaPinpointDriver.Register.H_ORIENTATION, GoBildaPinpointDriver.Register.X_VELOCITY,
+                                    GoBildaPinpointDriver.Register.Y_VELOCITY, GoBildaPinpointDriver.Register.H_VELOCITY,
+                                    GoBildaPinpointDriver.Register.DEVICE_STATUS);
+                        }
                         break;
                 }
                 retval = true;
