@@ -160,6 +160,12 @@ public class Launcher implements Subsystem {
     }
 
     public void Tune() {
+        if (targetRPMtune > Constants.LauncherMedRPMThreshold) {
+            double dist = turret.lastVisionDistance;
+            // TODO: move these to constants file
+            dist = Math.max(dist, 120);
+            targetRPMtune = (dist - 120) * 20 + 2925;
+        }
         if (pid.getSetPoint() != targetRPMtune) {
             if (targetRPMtune < Constants.LauncherLowRPMThreshold) {
                 pidF = pidfNear;

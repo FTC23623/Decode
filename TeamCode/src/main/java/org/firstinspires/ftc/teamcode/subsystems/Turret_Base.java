@@ -59,6 +59,7 @@ public abstract class Turret_Base implements Subsystem {
     public static double odometry_P = 1, odometry_I = 0, odometry_D = 0, odometry_F = 0;
     public static double turretAngleCntlrILimit = 5;
     private boolean visionUsedLast = false;
+    public double lastVisionDistance = 0;
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target) {
         mOp = opMode;
@@ -179,7 +180,8 @@ public abstract class Turret_Base implements Subsystem {
             mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
-            TurretKinematics.CalcDistanceToTag(vision);
+            lastVisionDistance = TurretKinematics.CalcDistanceToTag(vision);
+            mOp.mTelemetry.addData("Distance", lastVisionDistance);
             if ((vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) && RobotVelocityOK()) {
                 mOp.mTelemetry.addData("VisionLatency", vision.GetLatency()); //Checking latency.
                 mOp.mTelemetry.addData("Visiontimestamp", vision.GetTimestamp());

@@ -19,14 +19,14 @@ public final class Constants {
     public static final double nsToMs = 1.0e-6;
     public static final double intakeMotorMaxIn = -1600000;
     public static final double intakeMotorMaxOut = 800000;
-    public static final double LauncherTopRPMTele = 2925;
+    public static final double LauncherTopRPMTele = 3200; //distance 135 - 3200, distance 120 - 2925, distance 125 - 3025
     public static final double LauncherTopRPMAuto = 2825;
     public static final double LauncherMedRPMThreshold = 2600;
-    public static final double LauncherMedRPMTele = 2425;
+    public static final double LauncherMedRPMTele = 2475;
     public static final double LauncherMedRPMAuto = 2450;
     // don't adjust low RPM above this threshold
     public static final double LauncherLowRPMThreshold = 2250;
-    public static final double LauncherLowRPMTele = 2175;
+    public static final double LauncherLowRPMTele = 2225;
     public static final double LauncherLowRPMAuto = 2175;
     public static final double LauncherIdleRPM = 500;
     public static final double LaunchServoRun = 1;
