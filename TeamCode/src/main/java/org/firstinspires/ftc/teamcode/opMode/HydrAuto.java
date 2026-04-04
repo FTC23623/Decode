@@ -28,6 +28,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret_Base;
 import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
+import org.firstinspires.ftc.teamcode.types.TurretTrackMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public abstract class HydrAuto extends OpMode_Base {
         mIntake = new Intake(mOpMode, true);
         mDrive = new MecanumDrive(hardwareMap, mBeginPose);
         mSystems = new ArrayList<>();
-        mTurret = new Turret(mOpMode, null , mVisionTarget);
+        mTurret = new Turret(mOpMode, null , mVisionTarget, TurretTrackMode.VisionOnly);
         mVision = new LimelightVision(mOpMode);
         mLauncher = new Launcher(mOpMode, mTurret, 0);
         mIndicator = new Indicator(mOpMode, mLauncher, null, mTurret);

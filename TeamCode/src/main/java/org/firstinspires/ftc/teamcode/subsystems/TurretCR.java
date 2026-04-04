@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
 import com.seattlesolvers.solverslib.util.MathUtils;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
+import org.firstinspires.ftc.teamcode.types.TurretTrackMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 @Config
@@ -18,8 +19,8 @@ public class TurretCR extends Turret_Base {
     public static PIDFCoefficients TurretPIDFCoefficients = new PIDFCoefficients(0.007, 0.0, 0.0005,0.07); //ToDo Set Turret PIDF Coefficients based on Units and Tuning.
     public static double TurretFF = 0.00; // 0.029 Power Acts as feedforward term when turret PIDF is non zero
 
-    public TurretCR(HydraOpMode opMode, Imu imu, VisionMode target) {
-        super(opMode, imu, target);
+    public TurretCR(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode) {
+        super(opMode, imu, target, trackingMode);
         //Continuous Rotation Dual Servo
         //Setup as Single Servo. The Servo output will be split to two power injector ports to run two servos.
         //Alternative is to setup a ServoExGroup to run both from C-Hub

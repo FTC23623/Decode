@@ -17,10 +17,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.HydraPIDFController;
-import org.firstinspires.ftc.teamcode.objects.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
 import org.firstinspires.ftc.teamcode.types.Constants;
+import org.firstinspires.ftc.teamcode.types.TurretTrackMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public abstract class Turret_Base implements Subsystem {
@@ -45,8 +45,8 @@ public abstract class Turret_Base implements Subsystem {
     private double firstUpdate;
     public static double manualAngle = 0;
     public static boolean manualAngleEnable = false;
-    public enum autoTrackType { autoTrackEnabled, autoTrackOdoDisabled, autoTrackDisabled };
-    public static autoTrackType autoTrack;
+    protected TurretTrackMode trackMode;
+    protected final TurretTrackMode initialTrackMode;
     public static double userInputExponent = 2;
     //public static double TurretRateLimit = 10; // degrees per second
     public static double TurretRobotAngVelThresh = 10; // degrees/s
@@ -61,7 +61,7 @@ public abstract class Turret_Base implements Subsystem {
     private boolean visionUsedLast = false;
     public double lastVisionDistance = 0;
 
-    public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target) {
+    public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode) {
         mOp = opMode;
         voltageSensor = mOp.mHardwareMap.get(VoltageSensor.class, "Control Hub");
         // Adjust target location for alliance
@@ -83,7 +83,8 @@ public abstract class Turret_Base implements Subsystem {
         autoSetAction = false;
         autoSetAngle = 0;
         visionLocked = false;
-        autoTrack = autoTrackType.autoTrackEnabled;
+        initialTrackMode = trackingMode;
+        this.trackMode = trackingMode;
         disableOdoTrackWithCircle = new Debouncer(Constants.debounceLong);
         disableVisionTrackWithCircle = new Debouncer(Constants.debounceLong * 10);
         triangleDebounce = new Debouncer(1);
@@ -101,20 +102,20 @@ public abstract class Turret_Base implements Subsystem {
         disableOdoTrackWithCircle.In(mOp.mOperatorGamepad.circle);
         if (disableOdoTrackWithCircle.Out()) {
             disableOdoTrackWithCircle.Used();
-            if (autoTrack == autoTrackType.autoTrackEnabled) {
-                autoTrack = autoTrackType.autoTrackOdoDisabled;
+            if (trackMode == TurretTrackMode.OdoAndVision) {
+                trackMode = TurretTrackMode.VisionOnly;
             } else {
-                autoTrack = autoTrackType.autoTrackEnabled;
+                trackMode = TurretTrackMode.OdoAndVision;
             }
             mOp.mOperatorGamepad.rumbleBlips(1);
         }
         disableVisionTrackWithCircle.In(mOp.mOperatorGamepad.circle);
         if (disableVisionTrackWithCircle.Out()) {
             disableVisionTrackWithCircle.Used();
-            if (autoTrack == autoTrackType.autoTrackDisabled) {
-                autoTrack = autoTrackType.autoTrackEnabled;
+            if (trackMode == TurretTrackMode.Disabled) {
+                trackMode = TurretTrackMode.OdoAndVision;
             } else {
-                autoTrack = autoTrackType.autoTrackDisabled;
+                trackMode = TurretTrackMode.Disabled;
             }
             mOp.mOperatorGamepad.rumbleBlips(2);
         }
@@ -269,7 +270,7 @@ public abstract class Turret_Base implements Subsystem {
         }
         //mOp.mTelemetry.addData("AutoPos", autoSetPos);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
-        mOp.mTelemetry.addData("AutoTrack", autoTrack);
+        mOp.mTelemetry.addData("AutoTrack", trackMode);
         double Prev_servoFbPosition = servoFbPosition;
     }
 
@@ -304,11 +305,11 @@ public abstract class Turret_Base implements Subsystem {
     protected abstract double getPosition();
 
     protected boolean OdometryTrackingEnabled() {
-        return autoTrack == autoTrackType.autoTrackEnabled;
+        return trackMode == TurretTrackMode.OdoAndVision;
     }
 
     protected boolean VisionTrackingEnabled() {
-        return autoTrack != autoTrackType.autoTrackDisabled;
+        return trackMode != TurretTrackMode.Disabled;
 //        switch (autoTrack) {
 //            case autoTrackDisabled:
 //                return false;
@@ -388,9 +389,9 @@ public abstract class Turret_Base implements Subsystem {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (disable) {
-                autoTrack = autoTrackType.autoTrackDisabled;
+                trackMode = TurretTrackMode.Disabled;
             } else {
-                autoTrack = autoTrackType.autoTrackEnabled;
+                trackMode = initialTrackMode;
             }
             return false;
         }

@@ -9,6 +9,7 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
+import org.firstinspires.ftc.teamcode.types.TurretTrackMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 @Config
@@ -18,8 +19,8 @@ public class Turret extends Turret_Base {
     private final ElapsedTime InitTimer;
     private boolean started = false;
 
-    public Turret(HydraOpMode opMode, Imu imu, VisionMode target) {
-        super(opMode, imu, target);
+    public Turret(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode) {
+        super(opMode, imu, target, trackingMode);
         //TurretServo = mOp.mHardwareMap.get(ServoEx.class,"TurretServo");
         TurretServo = new ServoEx(mOp.mHardwareMap,"TurretServo");
     //    TurretServo.setDirection(Servo.Direction.REVERSE);

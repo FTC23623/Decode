@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.TurretCR;
 import org.firstinspires.ftc.teamcode.subsystems.Turret_Base;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
+import org.firstinspires.ftc.teamcode.types.TurretTrackMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public abstract class HyDrive extends OpMode_Base {
     mImu = new Imu_Pinpoint(mOpMode, pinpointStart, mVisionTarget);
     mDrive = new Drive_Manual(mOpMode, mImu);
     mIntake = new Intake(mOpMode, true);
-    mTurret = new Turret(mOpMode, mImu, mVisionTarget);
+    mTurret = new Turret(mOpMode, mImu, mVisionTarget, TurretTrackMode.OdoAndVision);
     mVision = new LimelightVision(mOpMode);
     mLauncher = new Launcher(mOpMode, mTurret, 0);
     mSysMon = new SystemMonitor(mOpMode);
