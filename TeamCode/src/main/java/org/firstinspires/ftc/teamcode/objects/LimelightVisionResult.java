@@ -35,4 +35,12 @@ public class LimelightVisionResult implements VisionResult {
     public long GetTimestamp() {
         return result.getControlHubTimeStamp();
     }
+    @Override
+    public double GetLatency() {
+        return result.getParseLatency() + result.getTargetingLatency() + result.getCaptureLatency();
+    }
+    @Override
+    public boolean isValid() {
+        return result.isValid();
+    }
 }

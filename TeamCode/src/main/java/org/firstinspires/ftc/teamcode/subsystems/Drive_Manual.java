@@ -52,7 +52,7 @@ public class Drive_Manual extends Drive {
         mLeftBumper.In(mGamepad.left_bumper);
         VisionResult vision = mOp.mVision.GetResult();
         if (vision != null) {
-            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
+            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass()); // ToDo: *Review* This is also done in Turret. Consider removing Vision from Drive.
             mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
         }
         // if the target is visible, turn towards it

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -57,6 +59,11 @@ public class Imu_Pinpoint extends Imu_Base {
                         break;
                     case 2:
                         driver.setErrorDetectionType(GoBildaPinpointDriver.ErrorDetectionType.CRC);
+                        // If V2, have Pinpoint only transfer what we need.
+                        driver.setBulkReadScope(GoBildaPinpointDriver.Register.X_POSITION, GoBildaPinpointDriver.Register.Y_POSITION,
+                                GoBildaPinpointDriver.Register.H_ORIENTATION, GoBildaPinpointDriver.Register.X_VELOCITY,
+                                GoBildaPinpointDriver.Register.Y_VELOCITY, GoBildaPinpointDriver.Register.H_VELOCITY,
+                                GoBildaPinpointDriver.Register.DEVICE_STATUS);
                         break;
                 }
                 retval = true;
@@ -102,5 +109,10 @@ public class Imu_Pinpoint extends Imu_Base {
     @Override
     public Pose2d GetPose() {
         return mPinpoint.getPose();
+    }
+
+    @Override
+    public PoseVelocity2d GetPoseVelocity() {
+        return mPinpoint.update();
     }
 }

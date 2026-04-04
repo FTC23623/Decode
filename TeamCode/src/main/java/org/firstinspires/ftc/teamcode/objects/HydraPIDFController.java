@@ -221,6 +221,8 @@ public class HydraPIDFController {
         return kP * errorVal_p + iTerm + kD * errorVal_v + kStatic;
     }
 
+    public double getITerm() {return Math.min(maxIntegral, Math.max(minIntegral, kI * totalError));} // Make Integral effort viewable
+
     public void setPIDF(double kp, double ki, double kd, double kf) {
         kP = kp;
         kI = ki;

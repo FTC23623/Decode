@@ -7,4 +7,6 @@ public interface VisionResult {
     public abstract double GetYOffset();
     public abstract DecodeAprilTag GetTagClass();
     public abstract long GetTimestamp();
+    public abstract double GetLatency();
+    public abstract boolean isValid();
 }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 
 public abstract class Imu_Base implements Imu {
     protected double mOffset;
@@ -27,6 +28,10 @@ public abstract class Imu_Base implements Imu {
 
     @Override
     public Pose2d GetPose() {
+        return null;
+    }
+    @Override
+    public PoseVelocity2d GetPoseVelocity() {
         return null;
     }
 
