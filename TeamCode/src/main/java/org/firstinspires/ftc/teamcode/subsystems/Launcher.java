@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.LaunchMotor;
+import org.firstinspires.ftc.teamcode.objects.VisionResult;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
 
@@ -94,7 +95,7 @@ public class Launcher implements Subsystem {
         long timeNow = System.nanoTime();
         double timeDifMs = (timeNow - lastTime) * nsToMs;
         if (timeDifMs >= motorRpmIntervalMs) {
-            Tune();
+            SetSetpoint();
             // get rpm of each motor
             double rpm0 = motors.get(0).GetRPM();
             // motors.get(1).GetRPM();
@@ -159,12 +160,18 @@ public class Launcher implements Subsystem {
         }
     }
 
-    public void Tune() {
-        if (targetRPMtune > Constants.LauncherMedRPMThreshold) {
-            double dist = turret.lastVisionDistance;
-            // TODO: move these to constants file
-            dist = Math.max(dist, 120);
-            targetRPMtune = (dist - 120) * 20 + 2925;
+    public void SetSetpoint() {
+        if (mOp.mVision != null) {
+            VisionResult vision = mOp.mVision.GetResult();
+            if (vision != null) {
+                double dist = TurretKinematics.CalcDistanceToTag(vision);
+                if (targetRPMtune > Constants.LauncherMedRPMThreshold) {
+                    // TODO: move these to constants file
+                    dist = Math.max(dist, 120);
+                    targetRPMtune = (dist - 120) * 20 + 2925;
+                    mOp.mTelemetry.addData("Distance", dist);
+                }
+            }
         }
         if (pid.getSetPoint() != targetRPMtune) {
             if (targetRPMtune < Constants.LauncherLowRPMThreshold) {
