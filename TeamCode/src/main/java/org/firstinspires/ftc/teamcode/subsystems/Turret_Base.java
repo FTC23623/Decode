@@ -318,9 +318,9 @@ public abstract class Turret_Base implements Subsystem {
     }
     //Check if moving too fast to use vision
     protected boolean RobotVelocityOK(){
-        //if (imu == null) {
-        //    return true;
-        //}
+        if (imu == null) {
+            return true;
+        }
         PoseVelocity2d velocity = imu.GetPoseVelocity();
         // Check if linear velocity is less than thresh inches/s and angular is less than thresh degrees/s
         mOp.mTelemetry.addData("RobotLinearVelocity", velocity.linearVel.norm());
