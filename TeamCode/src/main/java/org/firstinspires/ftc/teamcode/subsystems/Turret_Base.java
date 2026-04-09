@@ -60,7 +60,7 @@ public abstract class Turret_Base implements Subsystem {
     public static double turretAngleCntlrILimit = 5;
     private boolean visionUsedLast = false;
 
-    public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode) {
+    public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder) {
         mOp = opMode;
         voltageSensor = mOp.mHardwareMap.get(VoltageSensor.class, "Control Hub");
         // Adjust target location for alliance
@@ -75,9 +75,13 @@ public abstract class Turret_Base implements Subsystem {
                 //.setReversed(true)
         ;
         TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder
-                .setDirection(Motor.Direction.REVERSE) // ToDo: *Setup*: Set based on Encoder orientation and Positive rotation convention
                 .overrideResetPos((int) TurretSyncOffset)
         ;
+        if (flipEncoder) {
+            TurretEncoder.setDirection(Motor.Direction.REVERSE);
+        } else {
+            TurretEncoder.setDirection(Motor.Direction.FORWARD);
+        }
         lastVisionTimestamp = 0;
         autoSetAction = false;
         autoSetAngle = 0;
