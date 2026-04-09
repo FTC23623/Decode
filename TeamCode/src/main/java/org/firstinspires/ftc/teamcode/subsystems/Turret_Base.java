@@ -281,7 +281,8 @@ public abstract class Turret_Base implements Subsystem {
     public void ForceUnlock(){
         visionLocked = false;
         // reset the timestamp so we can use the very next update from the camera
-        lastVisionTimestamp -= (VisionRefreshTimeMs - 1);
+        lastVisionTimestamp += 50;
+        TurretAngleController.clearTotalError();
     }
 
     protected static double AutoTangent(Vector2d start, Vector2d end) {
@@ -392,6 +393,7 @@ public abstract class Turret_Base implements Subsystem {
                 trackMode = TurretTrackMode.Disabled;
             } else {
                 trackMode = initialTrackMode;
+                ForceUnlock();
             }
             return false;
         }
