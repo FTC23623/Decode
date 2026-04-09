@@ -54,9 +54,9 @@ public abstract class Turret_Base implements Subsystem {
     private double visionSetpoint = 0.0;
     private double odometrySetpoint = 0.0;
     public HydraPIDFController TurretAngleController;
-    public static double default_P = 1, default_I = 0, default_D = 0, default_F = 0;
+    public static double default_P = 0.98, default_I = 0, default_D = 0, default_F = 0;
     public static double vision_P = 0.95, vision_I = 0.6, vision_D = 0, vision_F = 0.5;
-    public static double odometry_P = 1, odometry_I = 0, odometry_D = 0, odometry_F = 0;
+    public static double odometry_P = 0.98, odometry_I = 0, odometry_D = 0, odometry_F = 0;
     public static double turretAngleCntlrILimit = 5;
     private boolean visionUsedLast = false;
 
@@ -173,7 +173,7 @@ public abstract class Turret_Base implements Subsystem {
         boolean applyUpdate = false;
         double NewAngle = 0;
         if (autoSetAction) {
-            SetAngleController(autoSetAngle, odometry_P, odometry_I, odometry_D, odometry_F);
+            SetAngleController(autoSetAngle, default_P, default_I, default_D, default_F);
             //NewAngle = autoSetAngle;
             applyUpdate = true;
         } else if (VisionTrackingEnabled() && vision != null && vision.isValid()) {
