@@ -65,7 +65,7 @@ public final class Constants {
     public static double goalHeightInches = 38.5;
     public static int LimelightPollRateHz = 100;
     public static double LaunchWheelRpmDeadband = 50;
-    public static double LauncherAutoLaunchTimeMs = 1300;
+    public static double LauncherAutoLaunchTimeMs = 950;
     public static int LauncherSpeedChangeWaitTimeMs = 6000;
     public static int IntakeRejectionTimeMs = 1000;
     public static int IntakeReversalTimeMs = 50;
