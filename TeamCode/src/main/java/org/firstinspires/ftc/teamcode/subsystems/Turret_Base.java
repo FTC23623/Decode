@@ -194,30 +194,6 @@ public abstract class Turret_Base implements Subsystem {
                 }
                 SetAngleController(visionSetpoint, vision_P, vision_I, vision_D, vision_F);
                 visionUsedLast = true;
-                //NewAngle = visionSetpoint;
-                //visionLocked = false;
-                mOp.mTelemetry.addData("TurretVisionNewAngle", NewAngle);
-
-//                if (Math.abs(rotate) > Constants.TurretDeadbandDegrees) {
-//                    applyUpdate = true;
-////                    if (first) {
-////                        firstUpdate = rotate;
-////                        first = false;
-////                    } else {
-////                        if (Math.abs(rotate - firstUpdate) < 1) {
-////                            applyUpdate = true;
-////                            first = true;
-////                        }
-////                    }
-//                    //rotate = VisionUpdateRateLimiter.calculate(rotate);
-//                    //NewAngle = servoFbPosition + rotate;
-//                    NewAngle = rotate;
-//                    visionLocked = false;
-//                    mOp.mTelemetry.addData("TurretVisionNewAngle", NewAngle);
-//
-//                } else {
-//                    visionLocked = true;
-//                }
             }
         } else if (OdometryTrackingEnabled() && currentPose != null) {
             if (visionUsedLast) {
