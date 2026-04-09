@@ -164,6 +164,7 @@ public abstract class Turret_Base implements Subsystem {
             odometrySetpoint = MathUtils.normalizeDegrees(robotHeading - angleToGoal, false); // removed Clamp so we can see what the odometery really wants
             mOp.mTelemetry.addData("OdometrySetpoint", odometrySetpoint);
         }
+        mOp.mTelemetry.addData("AutoSetAngle", autoSetAngle);
 
         // Order of priorities
         // 1) Auto sets a desired position
@@ -174,6 +175,8 @@ public abstract class Turret_Base implements Subsystem {
         double NewAngle = 0;
         if (autoSetAction) {
             SetAngleController(autoSetAngle, default_P, default_I, default_D, default_F);
+            TurretAngleController.clearTotalError(); // Reset Integrator
+            visionUsedLast = false;
             //NewAngle = autoSetAngle;
             applyUpdate = true;
         } else if (VisionTrackingEnabled() && vision != null && vision.isValid()) {
