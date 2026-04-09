@@ -64,6 +64,7 @@ public abstract class AutoFar extends HydrAuto {
         // Pickup spike and launch
         SequentialAction ret =  new SequentialAction(
                 mTurret.GetDisableAction(true),
+                mTurret.GetSetAction(0),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
@@ -76,7 +77,10 @@ public abstract class AutoFar extends HydrAuto {
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 LoadingZoneSequence(Launch, true, false),
                 mTurret.GetDisableAction(true),
-                fetchGPP,
+                new ParallelAction(
+                    fetchGPP,
+                    mTurret.GetSetAction(0)
+                ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
                     mTurret.GetLockAction(),
@@ -90,7 +94,10 @@ public abstract class AutoFar extends HydrAuto {
             ret = new SequentialAction(
                 ret,
                 mTurret.GetDisableAction(true),
-                fetchPGP,
+                new ParallelAction(
+                    fetchPGP,
+                    mTurret.GetSetAction(0)
+                ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
                     mTurret.GetLockAction(),

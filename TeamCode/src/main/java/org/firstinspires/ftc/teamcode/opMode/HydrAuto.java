@@ -182,7 +182,10 @@ public abstract class HydrAuto extends OpMode_Base {
         if (driveToLaunch) {
             return new SequentialAction(
                     mTurret.GetDisableAction(true),
-                    goToLaunch,
+                    new ParallelAction(
+                        goToLaunch,
+                        mTurret.GetSetAction(0)
+                    ),
                     mTurret.GetDisableAction(false),
                     new ParallelAction(
                             mTurret.GetLockAction(),
