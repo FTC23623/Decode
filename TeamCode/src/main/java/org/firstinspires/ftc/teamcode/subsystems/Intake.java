@@ -144,6 +144,7 @@ public class Intake implements Subsystem {
             }
             if (transferFull) {
                 intakeIn = false;
+                intakeOut = intakeInSave;
             }
         }
         //mOp.mTelemetry.addData("intakeIn", intakeIn);
