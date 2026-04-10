@@ -165,11 +165,14 @@ public class Launcher implements Subsystem {
             VisionResult vision = mOp.mVision.GetResult();
             if (vision != null) {
                 double dist = TurretKinematics.CalcDistanceToTag(vision);
-                if (targetRPMtune > Constants.LauncherMedRPMThreshold) {
+                mOp.mTelemetry.addData("Distance", dist);
+                if (dist > 115) {
                     // TODO: move these to constants file
                     dist = Math.max(dist, 120);
                     targetRPMtune = (dist - 120) * 20 + 2925;
                     mOp.mTelemetry.addData("Distance", dist);
+                } else {
+                    targetRPMtune = dist * 7.5 + 1962.5;
                 }
             }
         }
