@@ -61,7 +61,7 @@ public abstract class HyDrive extends OpMode_Base {
     Pose2d pinpointStart = OpmodeHeading.GetOffset();
     if (pinpointStart == null && mStart != null) {
       pinpointStart = mStart;
-    } else {
+    } else if (pinpointStart == null){
       pinpointStart = new Pose2d(0, 0, Math.toRadians(DriverHeadingDefault()));
     }
     mImu = new Imu_Pinpoint(mOpMode, pinpointStart, mVisionTarget);
@@ -87,16 +87,20 @@ public abstract class HyDrive extends OpMode_Base {
     // manual bulk caching
     SetLynxHubsManual();
     InitializeAllSystems();
-    final double headingOffset = DriverHeadingFromRobotPose(pinpointStart);
-    mImu.SetYawOffset(headingOffset); //Todo: *Question*: What does this do compared to line 61 & 63 where Pinpoint is initialized with default heading?
-    telemetry.addData("Auto Yaw", headingOffset);
-    telemetry.update();
+    //final double headingOffset = DriverHeadingFromRobotPose(pinpointStart);
+    //mImu.SetYawOffset(headingOffset); //Todo: *Question*: What does this do compared to line 61 & 63 where Pinpoint is initialized with default heading?
+    //telemetry.addData("Auto Yaw", headingOffset);
+    //telemetry.update();
+    mImu.SetYawOffset(0);
     // set the vision up for targeting
     mVision.SetMode(mVisionTarget);
     while (!isStarted() && !isStopRequested()) {
       ClearLynxHubCaches();
       mIndicator.WaitForStart(mVisionTarget, DecodeAprilTag.DecodeTag_Unknown);
       mSysMon.Process();
+      telemetry.addData("PoseX", mImu.GetPose().position.x);
+      telemetry.addData("PoseY", mImu.GetPose().position.y);
+      telemetry.addData("Heading", mImu.GetPose().heading.toDouble());
       telemetry.update();
       idle();
     }
