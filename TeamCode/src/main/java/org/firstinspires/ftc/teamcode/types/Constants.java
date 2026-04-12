@@ -34,7 +34,7 @@ public final class Constants {
     public static  double TransferFromIntakePower = 1600000;
     public static final double TransferToIntakePower = -500000;
     public static final double TransferMotorTickperRev = 103.8; // from goBilda for 1620rpm motor
-    public static final double IntakeMotorTickperRev = 145.1 * 1.5; // from gobilda for 1150rpm Motor * 24/16 belt ratio
+    public static final double IntakeMotorTickperRev = 145.1 / 1.5; // from gobilda for 1150rpm Motor * 24/16 belt ratio
     //Turret Constants
     public static final double TurretGearRatioTurretToEncoder = 54.0/251; // ratio from Turret to Encoder 54/251
     public static final double TurretGearRatioTurretToServo = 0.9683642;// turret to servo 251/54*20/96
