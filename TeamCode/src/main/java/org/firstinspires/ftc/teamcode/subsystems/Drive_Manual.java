@@ -39,12 +39,12 @@ public class Drive_Manual extends Drive {
         // get the yaw input from the gyro
         double yaw = 0;
         if (!mImu.Connected()) {
-            mOp.mTelemetry.addData("Yaw", "disconnected");
+            //mOp.mTelemetry.addData("Yaw", "disconnected");
         } else if (mImu.Calibrating()) {
-            mOp.mTelemetry.addData("Yaw", "cal");
+            //mOp.mTelemetry.addData("Yaw", "cal");
         } else {
             yaw = mImu.GetYaw();
-            mOp.mTelemetry.addData("Yaw", yaw);
+            //mOp.mTelemetry.addData("Yaw", yaw);
         }
         // Get driver controller input
         drive = mGamepad.left_stick_y;
@@ -139,9 +139,9 @@ public class Drive_Manual extends Drive {
         //mMotDrBkRt.setPower(rearRightPower * driveMaxPower);
         //mMotDrFrLt.setPower(frontLeftPower * driveMaxPower);
         //mMotDrFrRt.setPower(frontRightPower * driveMaxPower);
-        mOp.mTelemetry.addData("LeftFront", frontLeftPower);
-        mOp.mTelemetry.addData("RightFront", frontRightPower);
-        mOp.mTelemetry.addData("LeftRear", rearLeftPower);
-        mOp.mTelemetry.addData("RightRear", rearRightPower);
+        //mOp.mTelemetry.addData("LeftFront", frontLeftPower);
+        //mOp.mTelemetry.addData("RightFront", frontRightPower);
+        //mOp.mTelemetry.addData("LeftRear", rearLeftPower);
+        //mOp.mTelemetry.addData("RightRear", rearRightPower);
     }
 }

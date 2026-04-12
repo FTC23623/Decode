@@ -156,7 +156,7 @@ public abstract class Turret_Base implements Subsystem {
         if (vision != null) {
             visionSetpoint = servoFbPosition + vision.GetXOffset();
             // visionSetpoint = Prev_servoFbPosition + vision.GetXOffset(); // May need to use previous position due to Vision lag
-            mOp.mTelemetry.addData("VisionOffset", vision.GetXOffset());
+            //mOp.mTelemetry.addData("VisionOffset", vision.GetXOffset());
             mOp.mTelemetry.addData("VisionSetpoint", visionSetpoint);
         }
         if (currentPose != null) {
@@ -168,7 +168,7 @@ public abstract class Turret_Base implements Subsystem {
             odometrySetpoint = MathUtils.normalizeDegrees(robotHeading - angleToGoal, false); // removed Clamp so we can see what the odometery really wants
             mOp.mTelemetry.addData("OdometrySetpoint", odometrySetpoint);
         }
-        mOp.mTelemetry.addData("AutoSetAngle", autoSetAngle);
+        //mOp.mTelemetry.addData("AutoSetAngle", autoSetAngle);
 
         // Order of priorities
         // 1) Auto sets a desired position
@@ -184,12 +184,12 @@ public abstract class Turret_Base implements Subsystem {
             //NewAngle = autoSetAngle;
             applyUpdate = true;
         } else if (VisionTrackingEnabled() && vision != null && vision.isValid()) {
-            mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
+            //mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
             if ((vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) && RobotVelocityOK()) {
-                mOp.mTelemetry.addData("VisionLatency", vision.GetLatency()); //Checking latency.
-                mOp.mTelemetry.addData("Visiontimestamp", vision.GetTimestamp());
+                //mOp.mTelemetry.addData("VisionLatency", vision.GetLatency()); //Checking latency.
+                //mOp.mTelemetry.addData("Visiontimestamp", vision.GetTimestamp());
                 //double rotate = vision.GetXOffset();
                 //mOp.mTelemetry.addData("rotate", rotate);
                 lastVisionTimestamp = vision.GetTimestamp();
@@ -236,7 +236,7 @@ public abstract class Turret_Base implements Subsystem {
             TurretAngleController.clearTotalError();
         }
         SetTurretAngle(servoFbPosition + turretAdjustment);
-        mOp.mTelemetry.addData("TurretCntrlrIterm", TurretAngleController.getITerm());
+        //mOp.mTelemetry.addData("TurretCntrlrIterm", TurretAngleController.getITerm());
 
         mOp.mTelemetry.addData("TurretAdjustment", turretAdjustment);
         mOp.mTelemetry.addData("VisionUsedLast",visionUsedLast);
@@ -307,7 +307,7 @@ public abstract class Turret_Base implements Subsystem {
         }
         PoseVelocity2d velocity = imu.GetPoseVelocity();
         // Check if linear velocity is less than thresh inches/s and angular is less than thresh degrees/s
-        mOp.mTelemetry.addData("RobotLinearVelocity", velocity.linearVel.norm());
+        //mOp.mTelemetry.addData("RobotLinearVelocity", velocity.linearVel.norm());
         mOp.mTelemetry.addData("RobotAngularVelocity", Math.toDegrees(velocity.angVel));
         return velocity.linearVel.norm() < TurretRobotVelThresh && Math.abs(velocity.angVel) < Math.toRadians(TurretRobotAngVelThresh);
     }

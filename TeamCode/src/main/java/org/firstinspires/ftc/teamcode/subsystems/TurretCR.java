@@ -76,9 +76,9 @@ public class TurretCR extends Turret_Base {
         double voltage = voltageSensor.getVoltage();
         power = TurretController.calculate(getPosition()); // PIDF positional control output
         power += TurretFF * (Constants.DefaultVoltage /voltage) * Math.signum(power); // kstatic feedforward output scaled relative to voltage
-        mOp.mTelemetry.addData("Turret servo power", power);
+        //mOp.mTelemetry.addData("Turret servo power", power);
         boolean hardStop = (getPosition() >= Constants.TurretMaxAngle || getPosition() <= Constants.TurretMinAngle) && (Math.signum(power) == Math.signum(getPosition()));
-        mOp.mTelemetry.addData("Turret hard stop", hardStop);
+        //mOp.mTelemetry.addData("Turret hard stop", hardStop);
         if (hardStop) {
             // don't push the turret even further in that direction if it is already past the hardware limits
             TurretCRServo.set(0);
