@@ -172,7 +172,7 @@ public class Launcher implements Subsystem {
                     targetRPMtune = (dist - 120) * 20 + 2925;
                     mOp.mTelemetry.addData("Distance", dist);
                 } else {
-                    targetRPMtune = dist * 7.5 + 1962.5;
+                    targetRPMtune = dist * 7.5 + 1925;
                 }
             }
         }
