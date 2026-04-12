@@ -42,6 +42,7 @@ public abstract class HyDrive extends OpMode_Base {
   protected Lift mLift;
   protected SystemMonitor mSysMon;
   protected ElapsedTime mLoopSleep;
+  protected Pose2d mStart;
 
   public HyDrive(VisionMode target) {
     super(target);
@@ -58,7 +59,9 @@ public abstract class HyDrive extends OpMode_Base {
     mOpMode = new HydraOpMode(telemetry, hardwareMap, gamepad1, gamepad2);
     //mImu = new Imu_Hub(mOpMode);
     Pose2d pinpointStart = OpmodeHeading.GetOffset();
-    if (pinpointStart == null) {
+    if (pinpointStart == null && mStart != null) {
+      pinpointStart = mStart;
+    } else {
       pinpointStart = new Pose2d(0, 0, Math.toRadians(DriverHeadingDefault()));
     }
     mImu = new Imu_Pinpoint(mOpMode, pinpointStart, mVisionTarget);
