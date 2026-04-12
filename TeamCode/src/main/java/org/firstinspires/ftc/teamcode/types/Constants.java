@@ -34,13 +34,12 @@ public final class Constants {
     public static  double TransferFromIntakePower = 1600000;
     public static final double TransferToIntakePower = -500000;
     public static final double TransferMotorTickperRev = 103.8; // from goBilda for 1620rpm motor
-    public static final double IntakeMotorTickperRev = 145.1 * 1.5; // from gobilda for 1150rpm Motor * 24/16 belt ratio
+    public static final double IntakeMotorTickperRev = 145.1 / 1.5; // from gobilda for 1150rpm Motor / (24/16) belt ratio (Speed of Intake Shaft)
     //Turret Constants
     public static final double TurretGearRatioTurretToEncoder = 54.0/251; // ratio from Turret to Encoder 54/251
     public static final double TurretGearRatioTurretToServo = 0.9683642;// turret to servo 251/54*20/96
     public static double TurretAnalogEncoderBias = 7;//degrees Static offset between analog feedback and true zero
     public static final double TurretEncoderOffset = 180.0 / TurretGearRatioTurretToServo - TurretAnalogEncoderBias ; //Degrees ToDo: Set based on angle of Servo at zero Turret angle.
-
     public static double TurretMinPower = -0.2;
     public static double TurretMaxPower = 0.2; // Todo: Adjust based on tuning.
     public static double TurretDegreesPerTick = 360/8192.0 * TurretGearRatioTurretToEncoder; //CPR = 8192, encoder is on 54T side.
