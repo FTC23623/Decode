@@ -122,7 +122,7 @@ public class Launcher implements Subsystem {
                 turret.ForceUnlock(); // Todo: *Review* Identify if this is necessary since the turret being locked is handled separately. Could delay launch.
                 autoLaunchDebounce.Used();
             }
-            AutoLaunch = autoLaunchPressed && (autoLaunchStarted || turret.Locked());
+            AutoLaunch = autoLaunchPressed && (autoLaunchStarted || (turret.Locked() && AtSpeed()));
             autoLaunchStarted = AutoLaunch;
         }
         if (RunLaunchServo || AutoLaunch){
