@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
+import org.firstinspires.ftc.teamcode.objects.MotorSlewRate;
 import org.firstinspires.ftc.teamcode.types.Constants;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
 
@@ -130,10 +131,14 @@ public class Drive_Manual extends Drive {
         rearRightPower = rearRightPower - rotate;
         rearRightPower = rearRightPower / max;
         // Set power to the motors
-        mMotDrBkLt.setPower(rearLeftPower * driveMaxPower);
-        mMotDrBkRt.setPower(rearRightPower * driveMaxPower);
-        mMotDrFrLt.setPower(frontLeftPower * driveMaxPower);
-        mMotDrFrRt.setPower(frontRightPower * driveMaxPower);
+        MotorSlewRate.Set(mMotDrBkLt, rearLeftPower * driveMaxPower, Constants.driveMotorSlewRate);
+        MotorSlewRate.Set(mMotDrBkRt, rearRightPower * driveMaxPower, Constants.driveMotorSlewRate);
+        MotorSlewRate.Set(mMotDrFrLt, frontLeftPower * driveMaxPower, Constants.driveMotorSlewRate);
+        MotorSlewRate.Set(mMotDrFrRt, frontRightPower * driveMaxPower, Constants.driveMotorSlewRate);
+        //mMotDrBkLt.setPower(rearLeftPower * driveMaxPower);
+        //mMotDrBkRt.setPower(rearRightPower * driveMaxPower);
+        //mMotDrFrLt.setPower(frontLeftPower * driveMaxPower);
+        //mMotDrFrRt.setPower(frontRightPower * driveMaxPower);
         mOp.mTelemetry.addData("LeftFront", frontLeftPower);
         mOp.mTelemetry.addData("RightFront", frontRightPower);
         mOp.mTelemetry.addData("LeftRear", rearLeftPower);

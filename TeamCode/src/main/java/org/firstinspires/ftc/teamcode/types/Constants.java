@@ -70,5 +70,6 @@ public final class Constants {
     public static int IntakeRejectionTimeMs = 1000;
     public static int IntakeReversalTimeMs = 50;
     public static int ArtifactDetectionTimeMs = 100;
+    public static double driveMotorSlewRate = 0.2;
 
 }
