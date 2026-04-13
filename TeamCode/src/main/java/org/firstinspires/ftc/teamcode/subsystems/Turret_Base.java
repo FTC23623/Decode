@@ -41,8 +41,6 @@ public abstract class Turret_Base implements Subsystem {
     protected double UserInput = 0;
     public static int VisionRefreshTimeMs = 0; //seems to be better with zero.
     protected final Vector2d goalPosition;
-    private boolean first;
-    private double firstUpdate;
     public static double manualAngle = 0;
     public static boolean manualAngleEnable = false;
     protected TurretTrackMode trackMode;
@@ -77,6 +75,7 @@ public abstract class Turret_Base implements Subsystem {
         TurretEncoder = new Motor(mOp.mHardwareMap, "leftBack").encoder
                 .overrideResetPos((int) TurretSyncOffset)
         ;
+        // Fix issue caused by Road Runner having different encoder direction than HyDrive.
         if (flipEncoder) {
             TurretEncoder.setDirection(Motor.Direction.REVERSE);
         } else {
@@ -92,7 +91,6 @@ public abstract class Turret_Base implements Subsystem {
         disableVisionTrackWithCircle = new Debouncer(Constants.debounceLong * 10);
         triangleDebounce = new Debouncer(1);
         this.imu = imu;
-        first = true;
         TurretAngleController = new HydraPIDFController(default_P, default_I, default_D, default_F);
         TurretAngleController.setTolerance(1);
         TurretAngleController.setIntegrationBounds(-turretAngleCntlrILimit,turretAngleCntlrILimit);
@@ -152,7 +150,7 @@ public abstract class Turret_Base implements Subsystem {
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
         //mOp.mTelemetry.addData("TurretAnalogPos", TurretAnalogPositon);
 
-    // Attempt to get continous vision and Odometry setpoints
+        // Attempt to get continous vision and Odometry setpoints
         if (vision != null) {
             visionSetpoint = servoFbPosition + vision.GetXOffset();
             // visionSetpoint = Prev_servoFbPosition + vision.GetXOffset(); // May need to use previous position due to Vision lag
@@ -175,14 +173,11 @@ public abstract class Turret_Base implements Subsystem {
         // 2) if a tag is visible, track it
         // 3) turn the turret towards the target using odometry
         // 4) take user input
-        boolean applyUpdate = false;
-        double NewAngle = 0;
         if (autoSetAction) {
             SetAngleController(autoSetAngle, default_P, default_I, default_D, default_F);
             TurretAngleController.clearTotalError(); // Reset Integrator
             visionUsedLast = false;
-            //NewAngle = autoSetAngle;
-            applyUpdate = true;
+
         } else if (VisionTrackingEnabled() && vision != null && vision.isValid()) {
             //mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
@@ -206,12 +201,10 @@ public abstract class Turret_Base implements Subsystem {
             SetAngleController(odometrySetpoint, odometry_P, odometry_I, odometry_D, odometry_F);
             visionUsedLast = false;
 
-            applyUpdate = true;
-
         } else if (manualAngleEnable) { // Todo: !!!! Need to update Manual Override for new Turret Control Setup !!!!
             SetAngleController(manualAngle, default_P, default_I, default_D, default_F);
             visionUsedLast = false;
-            applyUpdate = true;
+
         } else {
             // scale user input
             double userInputMagnitude = Math.abs(UserInput);
@@ -222,36 +215,32 @@ public abstract class Turret_Base implements Subsystem {
                 // get the last set position and calculate the new position
                 SetAngleController(servoFbPosition + position_change, default_P, default_I, default_D, default_F);
                 visionUsedLast = false;
-                applyUpdate = true;
             }
         }
-        // Apply update to turret servo
-//        if (applyUpdate) {
-//            NewAngle = Clamp(NewAngle);
-//            SetTurretAngle(NewAngle);
-//        }
-        double turretAdjustment = TurretAngleController.calculate(servoFbPosition);
+
         // Don't let the Integrator wind-up
         if(servoFbPosition <= Constants.TurretMinAngle || servoFbPosition >= Constants.TurretMaxAngle ){
             TurretAngleController.clearTotalError();
         }
+        double turretAdjustment = TurretAngleController.calculate(servoFbPosition);
+        // Command Turret Servo
         SetTurretAngle(servoFbPosition + turretAdjustment);
-        //mOp.mTelemetry.addData("TurretCntrlrIterm", TurretAngleController.getITerm());
-
-        mOp.mTelemetry.addData("TurretAdjustment", turretAdjustment);
-        mOp.mTelemetry.addData("VisionUsedLast",visionUsedLast);
 
         // TODO: *Review* might need fancier logic for this
-        visionLocked = Math.abs(visionSetpoint - servoFbPosition) < Constants.TurretDeadbandDegrees; //Todo *Review* Do we want to indicate locked if we are not checking vision? What if there is an offset in Odometry?
-        //visionLocked = TurretAngleController.atSetPoint();
+        visionLocked = Math.abs(visionSetpoint - servoFbPosition) < Constants.TurretDeadbandDegrees;
 
+        // Clear vision locked
         if (!VisionTrackingEnabled() || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
             visionLocked = false;
         }
+
+        //mOp.mTelemetry.addData("TurretCntrlrIterm", TurretAngleController.getITerm());
+        mOp.mTelemetry.addData("TurretAdjustment", turretAdjustment);
+        mOp.mTelemetry.addData("VisionUsedLast",visionUsedLast);
         //mOp.mTelemetry.addData("AutoPos", autoSetPos);
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
         mOp.mTelemetry.addData("AutoTrack", trackMode);
-        double Prev_servoFbPosition = servoFbPosition;
+        //double Prev_servoFbPosition = servoFbPosition;
     }
 
     public boolean Locked() {
