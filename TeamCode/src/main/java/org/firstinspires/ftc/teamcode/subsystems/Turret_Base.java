@@ -57,6 +57,8 @@ public abstract class Turret_Base implements Subsystem {
     public static double odometry_P = 0.98, odometry_I = 0, odometry_D = 0, odometry_F = 0;
     public static double turretAngleCntlrILimit = 5;
     private boolean visionUsedLast = false;
+    public static double TurretVelocityThresh = 10; // Degrees/s
+
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder) {
         mOp = opMode;
@@ -227,7 +229,7 @@ public abstract class Turret_Base implements Subsystem {
         SetTurretAngle(servoFbPosition + turretAdjustment);
 
         // TODO: *Review* might need fancier logic for this
-        visionLocked = Math.abs(visionSetpoint - servoFbPosition) < Constants.TurretDeadbandDegrees;
+        visionLocked = Math.abs(visionSetpoint - servoFbPosition) < Constants.TurretDeadbandDegrees && TurretVelocityOK() && visionUsedLast;
 
         // Clear vision locked
         if (!VisionTrackingEnabled() || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
@@ -299,6 +301,14 @@ public abstract class Turret_Base implements Subsystem {
         //mOp.mTelemetry.addData("RobotLinearVelocity", velocity.linearVel.norm());
         mOp.mTelemetry.addData("RobotAngularVelocity", Math.toDegrees(velocity.angVel));
         return velocity.linearVel.norm() < TurretRobotVelThresh && Math.abs(velocity.angVel) < Math.toRadians(TurretRobotAngVelThresh);
+    }
+
+    /**
+     *
+     * @return false if the turret is moving too fast
+     */
+    protected boolean TurretVelocityOK(){
+        return (Math.abs(TurretEncoder.getCorrectedVelocity() * Constants.TurretDegreesPerTick) < TurretVelocityThresh);
     }
 
     public void SetAngleController(double setPoint,double P, double I, double D, double F) {
