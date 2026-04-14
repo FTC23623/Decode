@@ -364,6 +364,7 @@ public class MeepMeepTesting {
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos, flip));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos, flip));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(110, flip));
+
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .splineToLinearHeading(Launch1, FlipTangent(180, flip))
                 .waitSeconds(2)
@@ -398,12 +399,12 @@ public class MeepMeepTesting {
             );
         } else {
             ret = new SequentialAction(
-                    ret//,
-                   // LoadingZoneSequence(myBot, Launch1, true, flip),
-                  //  LoadingZoneSequence(myBot, Launch2, true, flip)
+                    ret,
+                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2),
+                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2)
             );
         }
-      //  ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch1, false, flip));
+        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch2, false, flip, Launch2));
         return ret;
     }
 

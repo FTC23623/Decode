@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -223,6 +224,25 @@ public abstract class HydrAuto extends OpMode_Base {
             return degrees;
         } else {
             return -degrees;
+        }
+    }
+
+    protected Vector2d FlipCoordinate(double x, double y) {
+        if (mFlip) {
+            return new Vector2d(x, -y);
+        }
+        return new Vector2d(x, y);
+    }
+
+    protected double AutoTangent(Vector2d start, Vector2d end) {
+        double dx = end.x - start.x;
+        double dy = end.y - start.y;
+        double ret;
+        ret = Math.atan2(dy, dx);
+        if (mFlip) {
+            return ret;
+        } else {
+            return ret;
         }
     }
 }
