@@ -319,7 +319,7 @@ public class MeepMeepTesting {
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
 
         // cap velocity when going into the corner of the field
-        final double maxVelToCorner = 25;
+        final double maxVelToCorner = 50;
 
         // fetch and drive to waypoint
         Action fetch = mDrive.getDrive().actionBuilder(StartPos)
@@ -353,11 +353,11 @@ public class MeepMeepTesting {
     }
 
     private static SequentialAction BuildFarAutoNoTurn(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
-        Pose2d beginPose = FlipPose(62, 15.0, 90, flip);
+        Pose2d beginPose = FlipPose(64, 24.0, 90, flip);
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch1 = FlipPose(55, 15, 90, flip);
+        //Pose2d Launch1 = FlipPose(55, 15, 90, flip);
         Vector2d GPPPos = FlipCoordinate(34, 56, flip);
         Vector2d PGPPos = FlipCoordinate(12, 56, flip);
         Vector2d Launch2Pos = FlipCoordinate(55, 15, flip);
@@ -366,7 +366,7 @@ public class MeepMeepTesting {
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(110, flip));
 
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
-                .splineToLinearHeading(Launch1, FlipTangent(180, flip))
+                //.splineToLinearHeading(Launch1, FlipTangent(180, flip))
                 .waitSeconds(2)
                 .build();
 
@@ -389,7 +389,7 @@ public class MeepMeepTesting {
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
                 launchPreload,
-                LoadingZoneSequence(myBot, Launch2, true, flip, Launch1),
+                LoadingZoneSequence(myBot, Launch2, true, flip, beginPose),
                 fetchGPP
         );
         if (spikeCount > 1) {

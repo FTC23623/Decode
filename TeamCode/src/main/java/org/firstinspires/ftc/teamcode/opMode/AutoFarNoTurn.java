@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 public abstract class AutoFarNoTurn extends HydrAuto {
     public AutoFarNoTurn(VisionMode target, boolean flip, int spikeCount) {
         super(target, flip, spikeCount, 0);
-        mBeginPose = FlipPose(60.0, 15.0, 90.0);
+        mBeginPose = FlipPose(64.0, 24.0, 90.0);
     }
 
     @Override

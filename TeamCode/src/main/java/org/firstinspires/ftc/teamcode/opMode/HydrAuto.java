@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -151,10 +152,11 @@ public abstract class HydrAuto extends OpMode_Base {
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
 
+        final double maxVelToCorner = 50;
+
         IntakeActions rejectAction = IntakeActions.IntakeReject;
         if (!reject) {
             rejectAction = IntakeActions.IntakeLoadArtifacts;
-
         }
 
         // fetch and drive to waypoint
@@ -162,8 +164,8 @@ public abstract class HydrAuto extends OpMode_Base {
                 .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
+                //.afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
                 .build();
 
@@ -172,8 +174,8 @@ public abstract class HydrAuto extends OpMode_Base {
                 .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
-                .splineToSplineHeading(LoadingZone, FlipTangent(-90))
-                .afterTime(.75, mIntake.GetAction(rejectAction))
+                .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
+                //.afterTime(.75, mIntake.GetAction(rejectAction))
                 .splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90))
                 .build();
@@ -185,7 +187,7 @@ public abstract class HydrAuto extends OpMode_Base {
                     mTurret.GetDisableAction(true),
                     new ParallelAction(
                         goToLaunch,
-                        mTurret.GetSetAction(0)
+                        mTurret.GetSetAction(FlipTurret(90))
                     ),
                     mTurret.GetDisableAction(false),
                     new ParallelAction(
