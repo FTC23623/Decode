@@ -75,7 +75,7 @@ public abstract class AutoFar extends HydrAuto {
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                LoadingZoneSequence(Launch, true, false),
+                LoadingZoneSequence(Launch, true, false, Launch),
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchGPP,
@@ -108,14 +108,14 @@ public abstract class AutoFar extends HydrAuto {
         } else {
             ret = new SequentialAction(
                 ret,
-                LoadingZoneSequence(Launch, true, true),
-                LoadingZoneSequence(Launch, true, true)
+                LoadingZoneSequence(Launch, true, true, Launch),
+                LoadingZoneSequence(Launch, true, true, Launch)
             );
         }
         // for one or two spikes, pickup from loading zone at the end
         ret = new SequentialAction(
             ret,
-            LoadingZoneSequence(Launch, false, true)
+            LoadingZoneSequence(Launch, false, true, Launch)
         );
         return ret;
     }

@@ -331,10 +331,10 @@ public class MeepMeepTesting {
 
         // drive to launch position
         Action goToLaunch =  mDrive.getDrive().actionBuilder(StartPos)
-                .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
+                .setTangent(FlipTangent(180, flip))
+                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
-                .splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90, flip))
+                //.splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90, flip))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90, flip))
                 .waitSeconds(launchTimeS)
                 .build();
@@ -353,22 +353,22 @@ public class MeepMeepTesting {
     }
 
     private static SequentialAction BuildFarAutoNoTurn(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
-        Pose2d beginPose = FlipPose(64, 24.0, 90, flip);
+        Pose2d beginPose = FlipPose(64, 28.5, 90, flip);
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         //Pose2d Launch1 = FlipPose(55, 15, 90, flip);
         Vector2d GPPPos = FlipCoordinate(34, 56, flip);
         Vector2d PGPPos = FlipCoordinate(12, 56, flip);
-        Vector2d Launch2Pos = FlipCoordinate(55, 15, flip);
+        Vector2d Launch2Pos = FlipCoordinate(59, 15, flip);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos, flip));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos, flip));
-        Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(110, flip));
+        Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90, flip));
 
-        Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
+        //Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
                 //.splineToLinearHeading(Launch1, FlipTangent(180, flip))
-                .waitSeconds(2)
-                .build();
+        //        .waitSeconds(2)
+        //        .build();
 
         Action fetchGPP = myBot.getDrive().actionBuilder(Launch2)
                 .setTangent(GPP.heading)
@@ -388,7 +388,7 @@ public class MeepMeepTesting {
 
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
-                launchPreload,
+        //        launchPreload,
                 LoadingZoneSequence(myBot, Launch2, true, flip, beginPose),
                 fetchGPP
         );

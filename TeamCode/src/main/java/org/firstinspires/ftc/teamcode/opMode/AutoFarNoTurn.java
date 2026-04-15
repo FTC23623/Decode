@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 public abstract class AutoFarNoTurn extends HydrAuto {
     public AutoFarNoTurn(VisionMode target, boolean flip, int spikeCount) {
         super(target, flip, spikeCount, 0);
-        mBeginPose = FlipPose(64.0, 24.0, 90.0);
+        mBeginPose = FlipPose(64.0, 28.5, 90.0);
     }
 
     @Override
@@ -21,18 +21,18 @@ public abstract class AutoFarNoTurn extends HydrAuto {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch1 = FlipPose(55, 15, 90);
+        //Pose2d Launch1 = FlipPose(55, 15, 90);
         Vector2d GPPPos = FlipCoordinate(34, 56);
         Vector2d PGPPos = FlipCoordinate(12, 56);
-        Vector2d Launch2Pos = FlipCoordinate(55, 15);
+        Vector2d Launch2Pos = FlipCoordinate(59, 15);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(110));
 
-        Action launchPreload = mDrive.actionBuilder(mBeginPose)
-                .setTangent(FlipTangent(180))
-                .splineToSplineHeading(Launch1, FlipTangent(180))
-                .build();
+        //Action launchPreload = mDrive.actionBuilder(mBeginPose)
+        //        .setTangent(FlipTangent(180))
+        //        .splineToSplineHeading(Launch1, FlipTangent(180))
+        //        .build();
 
         // Action to fetch artifacts from first spike and launch
         Action fetchGPP = mDrive.actionBuilder(Launch2)
@@ -58,22 +58,22 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         // Pickup spike and launch
         SequentialAction ret =  new SequentialAction(
                 mTurret.GetDisableAction(true),
-                mTurret.GetSetAction(FlipTurret(90)),
+                mTurret.GetSetAction(FlipTurret(110)),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
                     new SequentialAction(
-                            launchPreload,
+          //                  launchPreload,
                             mTurret.GetDisableAction(false),
                             mTurret.GetLockAction()
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                LoadingZoneSequence(Launch2, true, false),
+                LoadingZoneSequence(Launch2, true, false, mBeginPose),
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchGPP,
-                    mTurret.GetSetAction(FlipTurret(90))
+                    mTurret.GetSetAction(FlipTurret(110))
                 ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
@@ -90,7 +90,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchPGP,
-                    mTurret.GetSetAction(90)
+                    mTurret.GetSetAction(110)
                 ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
@@ -102,14 +102,14 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         } else {
             ret = new SequentialAction(
                 ret,
-                LoadingZoneSequence(Launch2, true, true),
-                LoadingZoneSequence(Launch2, true, true)
+                LoadingZoneSequence(Launch2, true, true, Launch2),
+                LoadingZoneSequence(Launch2, true, true, Launch2)
             );
         }
         // for one or two spikes, pickup from loading zone at the end
         ret = new SequentialAction(
             ret,
-            LoadingZoneSequence(Launch2, false, true)
+            LoadingZoneSequence(Launch2, false, true, Launch2)
         );
         return ret;
     }
