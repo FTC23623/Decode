@@ -2,13 +2,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
-
+import com.acmerobotics.roadrunner.Vector2d;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
-import org.firstinspires.ftc.teamcode.types.DecodeAprilTag;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 public class Imu_Pinpoint extends Imu_Base {
@@ -16,6 +15,7 @@ public class Imu_Pinpoint extends Imu_Base {
     protected final PinpointLocalizer mPinpoint;
     protected final double mAllianceOffsetDeg;
     private boolean isInit;
+    private PoseVelocity2d mPoseVelocity;
 
     public Imu_Pinpoint(HydraOpMode opMode, Pose2d initialPose, VisionMode target) {
         super();
@@ -33,6 +33,7 @@ public class Imu_Pinpoint extends Imu_Base {
                 break;
         }
         isInit = false;
+        mPoseVelocity = new PoseVelocity2d(new Vector2d(0, 0), 0);
     }
 
     @Override
@@ -90,7 +91,7 @@ public class Imu_Pinpoint extends Imu_Base {
 
     @Override
     public void Process() {
-        mPinpoint.update();
+        mPoseVelocity = mPinpoint.update();
     }
 
     @Override
@@ -115,6 +116,6 @@ public class Imu_Pinpoint extends Imu_Base {
 
     @Override
     public PoseVelocity2d GetPoseVelocity() {
-        return mPinpoint.update();
+        return mPoseVelocity;
     }
 }
