@@ -83,7 +83,7 @@ public class Imu_Pinpoint extends Imu_Base {
             case FAULT_NO_PODS_DETECTED:
             case FAULT_X_POD_NOT_DETECTED:
             case FAULT_Y_POD_NOT_DETECTED:
-                telemetry.addLine("Pinpoint critical error");
+                telemetry.addLine("Pinpoint critical error: " + status.toString());
                 break;
         }
         return retval;
