@@ -57,6 +57,9 @@ public abstract class Turret_Base implements Subsystem {
     public static double odometry_P = 0.98, odometry_I = 0, odometry_D = 0, odometry_F = 0;
     public static double turretAngleCntlrILimit = 5;
     private boolean visionUsedLast = false;
+    public static double turretVisionLockVelThresh = 10; // Degrees/s
+    public static double turretVisionSetPointVelThresh = 10; // Degrees/s
+
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder) {
         mOp = opMode;
@@ -178,11 +181,12 @@ public abstract class Turret_Base implements Subsystem {
             TurretAngleController.clearTotalError(); // Reset Integrator
             visionUsedLast = false;
 
-        } else if (VisionTrackingEnabled() && vision != null && vision.isValid()) {
+            // Use Vision Tracking if enabled, valid and Robot and Turret are moving slow. ToDo: there could be issues with checking Turret velocity since vision setpoint may be reason turret is moving fast.
+        } else if (VisionTrackingEnabled() && vision != null && vision.isValid() && RobotVelocityOK() && TurretVelocityOK(turretVisionSetPointVelThresh)){
             //mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
-            if ((vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs) && RobotVelocityOK()) {
+            if ((vision.GetTimestamp() > lastVisionTimestamp + VisionRefreshTimeMs)){ //&& RobotVelocityOK() && TurretVelocityOK(turretVisionSetPointVelThresh)) {
                 //mOp.mTelemetry.addData("VisionLatency", vision.GetLatency()); //Checking latency.
                 //mOp.mTelemetry.addData("Visiontimestamp", vision.GetTimestamp());
                 //double rotate = vision.GetXOffset();
@@ -201,7 +205,7 @@ public abstract class Turret_Base implements Subsystem {
             SetAngleController(odometrySetpoint, odometry_P, odometry_I, odometry_D, odometry_F);
             visionUsedLast = false;
 
-        } else if (manualAngleEnable) { // Todo: !!!! Need to update Manual Override for new Turret Control Setup !!!!
+        } else if (manualAngleEnable) {
             SetAngleController(manualAngle, default_P, default_I, default_D, default_F);
             visionUsedLast = false;
 
@@ -227,7 +231,7 @@ public abstract class Turret_Base implements Subsystem {
         SetTurretAngle(servoFbPosition + turretAdjustment);
 
         // TODO: *Review* might need fancier logic for this
-        visionLocked = Math.abs(visionSetpoint - servoFbPosition) < Constants.TurretDeadbandDegrees;
+        visionLocked = Math.abs(visionSetpoint - servoFbPosition) < Constants.TurretDeadbandDegrees && TurretVelocityOK(turretVisionLockVelThresh) && visionUsedLast;
 
         // Clear vision locked
         if (!VisionTrackingEnabled() || System.currentTimeMillis() - lastVisionTimestamp > Constants.TurretVisionLockTimeoutMs) {
@@ -299,6 +303,14 @@ public abstract class Turret_Base implements Subsystem {
         //mOp.mTelemetry.addData("RobotLinearVelocity", velocity.linearVel.norm());
         mOp.mTelemetry.addData("RobotAngularVelocity", Math.toDegrees(velocity.angVel));
         return velocity.linearVel.norm() < TurretRobotVelThresh && Math.abs(velocity.angVel) < Math.toRadians(TurretRobotAngVelThresh);
+    }
+
+    /**
+     *
+     * @return false if the turret is moving too fast
+     */
+    protected boolean TurretVelocityOK(double threshold){
+        return (Math.abs(TurretEncoder.getCorrectedVelocity() * Constants.TurretDegreesPerTick) < threshold);
     }
 
     public void SetAngleController(double setPoint,double P, double I, double D, double F) {
