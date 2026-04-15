@@ -7,6 +7,6 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 @Autonomous(name = "RedFarNoTurn2", preselectTeleOp = "TeleRed", group = "Red")
 public class AutoFarNoTurnRed2 extends AutoFarNoTurn {
     public AutoFarNoTurnRed2() {
-        super(VisionMode.VisionMode_RedGoal, true, 2);
+        super(VisionMode.VisionMode_RedGoal, false, 2);
     }
 }
