@@ -27,7 +27,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         Vector2d Launch2Pos = FlipCoordinate(59, 15);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos));
-        Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(110));
+        Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
 
         //Action launchPreload = mDrive.actionBuilder(mBeginPose)
         //        .setTangent(FlipTangent(180))
