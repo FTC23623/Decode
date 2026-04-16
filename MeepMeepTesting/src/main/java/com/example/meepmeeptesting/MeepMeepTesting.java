@@ -361,8 +361,8 @@ public class MeepMeepTesting {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         //Pose2d Launch1 = FlipPose(55, 15, 90, flip);
-        Vector2d GPPPos = FlipCoordinate(28, 54, flip);
-        Vector2d PGPPos = FlipCoordinate(6, 48, flip);
+        Vector2d GPPPos = FlipCoordinate(36, 48, flip);
+        Vector2d PGPPos = FlipCoordinate(12, 48, flip);
         Vector2d Launch2Pos = FlipCoordinate(63, 15, flip);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos, flip));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos, flip));
