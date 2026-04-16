@@ -24,7 +24,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         //Pose2d Launch1 = FlipPose(55, 15, 90);
         Vector2d GPPPos = FlipCoordinate(28, 54);
         Vector2d PGPPos = FlipCoordinate(6, 48);
-        Vector2d Launch2Pos = FlipCoordinate(59, 15);
+        Vector2d Launch2Pos = FlipCoordinate(62, 15);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
@@ -58,7 +58,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         // Pickup spike and launch
         SequentialAction ret =  new SequentialAction(
                 mTurret.GetDisableAction(true),
-                mTurret.GetSetAction(FlipTurret(-110)),
+                mTurret.GetSetAction(FlipTurret(-105)),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
@@ -73,7 +73,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchGPP,
-                    mTurret.GetSetAction(FlipTurret(-110))
+                    mTurret.GetSetAction(FlipTurret(-105))
                 ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
@@ -90,7 +90,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchPGP,
-                    mTurret.GetSetAction(FlipTurret(-110))
+                    mTurret.GetSetAction(FlipTurret(-105))
                 ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(

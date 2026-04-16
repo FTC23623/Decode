@@ -148,7 +148,7 @@ public abstract class HydrAuto extends OpMode_Base {
     }
 
     protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject, Pose2d StartPos) {
-        Pose2d LoadingZone = FlipPose(59,53,90);
+        Pose2d LoadingZone = FlipPose(62,51,90);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
 
@@ -187,7 +187,7 @@ public abstract class HydrAuto extends OpMode_Base {
                     mTurret.GetDisableAction(true),
                     new ParallelAction(
                         goToLaunch,
-                        mTurret.GetSetAction(FlipTurret(-110))
+                        mTurret.GetSetAction(FlipTurret(-105))
                     ),
                     mTurret.GetDisableAction(false),
                     new ParallelAction(
