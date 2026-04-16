@@ -166,7 +166,7 @@ public class Launcher implements Subsystem {
             if (vision != null) {
                 double dist = TurretKinematics.CalcDistanceToTag(vision);
                 //mOp.mTelemetry.addData("Distance", dist);
-                if (dist > 115) {
+                if (dist > 95) {
                     // TODO: move these to constants file
                     dist = Math.max(dist, 120);
                     targetRPMtune = (dist - 120) * 20 + 3025;
