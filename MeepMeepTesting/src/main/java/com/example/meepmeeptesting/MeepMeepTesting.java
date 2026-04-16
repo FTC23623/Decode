@@ -314,13 +314,13 @@ public class MeepMeepTesting {
     }
 
     private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip, Pose2d StartPos) {
-        Pose2d LoadingZone = FlipPose(64,51,90, flip);
+        Pose2d LoadingZone = FlipPose(64,56,90, flip);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
         Pose2d Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
 
         // cap velocity when going into the corner of the field
-        final double maxVelToCorner = 10;
+        final double maxVelToCorner = 25;
 
         // fetch and drive to waypoint
         Action fetch = mDrive.getDrive().actionBuilder(StartPos)
@@ -378,7 +378,7 @@ public class MeepMeepTesting {
         Action fetchGPP = myBot.getDrive().actionBuilder(Launch2)
                 .setTangent(GPP.heading)
                 .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
-                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(10))
+                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(25))
                 .setTangent(AutoTangent(GPPPos, Launch2Pos, flip))
                 .splineToLinearHeading(Launch2, AutoTangent(GPPPos, Launch2Pos, flip))
                 .waitSeconds(launchTimeS)
@@ -387,7 +387,7 @@ public class MeepMeepTesting {
         Action fetchPGP = myBot.getDrive().actionBuilder(Launch2)
                 .setTangent(PGP.heading)
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
-                .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(10))
+                .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(25))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos, flip))
                 .splineToLinearHeading(Launch2, AutoTangent(PGPPos, Launch2Pos, flip))
                 .waitSeconds(launchTimeS)

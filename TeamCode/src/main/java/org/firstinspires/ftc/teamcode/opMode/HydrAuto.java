@@ -148,12 +148,12 @@ public abstract class HydrAuto extends OpMode_Base {
     }
 
     protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject, Pose2d StartPos) {
-        Pose2d LoadingZone = FlipPose(64,51,90);
+        Pose2d LoadingZone = FlipPose(64,56,90);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
         Pose2d Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
 
-        final double maxVelToCorner = 10;
+        final double maxVelToCorner = 25;
 
         IntakeActions rejectAction = IntakeActions.IntakeReject;
         if (!reject) {
@@ -251,7 +251,7 @@ public abstract class HydrAuto extends OpMode_Base {
         }
     }
 
-    private static Pose2d Waypoint(Pose2d start, Pose2d end, double fraction) {
+    protected static Pose2d Waypoint(Pose2d start, Pose2d end, double fraction) {
         double slowdown_x = start.position.x + fraction * (end.position.x - start.position.x);
         double slowdown_y = start.position.y + fraction * (end.position.y - start.position.y);
         return new Pose2d(slowdown_x, slowdown_y, end.heading.toDouble());

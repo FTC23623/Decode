@@ -32,7 +32,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
 
-        double slowdownspeed = 10;
+        double slowdownspeed = 25;
 
         //Action launchPreload = mDrive.actionBuilder(mBeginPose)
         //        .setTangent(FlipTangent(180))
