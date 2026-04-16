@@ -46,8 +46,7 @@ public abstract class Turret_Base implements Subsystem {
     protected TurretTrackMode trackMode;
     protected final TurretTrackMode initialTrackMode;
     public static double userInputExponent = 2;
-    //public static double TurretRateLimit = 10; // degrees per second
-    public static double TurretRobotAngVelThresh = 10; // degrees/s
+    public static double TurretRobotAngVelThresh = 6; // degrees/s
     public static double TurretRobotVelThresh = 1000.0; // inches/s
     private double visionSetpoint = 0.0;
     private double odometrySetpoint = 0.0;
@@ -55,9 +54,9 @@ public abstract class Turret_Base implements Subsystem {
     public static double default_P = 0.98, default_I = 0, default_D = 0, default_F = 0;
     public static double vision_P = 0.95, vision_I = 0.6, vision_D = 0, vision_F = 0.5;
     public static double odometry_P = 0.98, odometry_I = 0, odometry_D = 0, odometry_F = 0;
-    public static double turretAngleCntlrILimit = 5;
+    public static double turretAngleCntlrILimit = 3;
     private boolean visionUsedLast = false;
-    public static double turretVisionLockVelThresh = 10; // Degrees/s
+    public static double turretVisionLockVelThresh = 6; // Degrees/s
     public static double turretVisionSetPointVelThresh = 10; // Degrees/s
 
 
@@ -95,7 +94,7 @@ public abstract class Turret_Base implements Subsystem {
         triangleDebounce = new Debouncer(1);
         this.imu = imu;
         TurretAngleController = new HydraPIDFController(default_P, default_I, default_D, default_F);
-        TurretAngleController.setTolerance(1);
+        TurretAngleController.setTolerance(0.5);
         TurretAngleController.setIntegrationBounds(-turretAngleCntlrILimit,turretAngleCntlrILimit);
     }
 
@@ -182,7 +181,7 @@ public abstract class Turret_Base implements Subsystem {
             visionUsedLast = false;
 
             // Use Vision Tracking if enabled, valid and Robot and Turret are moving slow. ToDo: there could be issues with checking Turret velocity since vision setpoint may be reason turret is moving fast.
-        } else if (VisionTrackingEnabled() && vision != null && vision.isValid() && RobotVelocityOK() && TurretVelocityOK(turretVisionSetPointVelThresh)){
+        } else if (VisionTrackingEnabled() && vision != null && vision.isValid() && RobotVelocityOK()){ //&& TurretVelocityOK(turretVisionSetPointVelThresh)){
             //mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
@@ -310,6 +309,7 @@ public abstract class Turret_Base implements Subsystem {
      * @return false if the turret is moving too fast
      */
     protected boolean TurretVelocityOK(double threshold){
+        mOp.mTelemetry.addData("TurretVelocity", TurretEncoder.getCorrectedVelocity() * Constants.TurretDegreesPerTick);
         return (Math.abs(TurretEncoder.getCorrectedVelocity() * Constants.TurretDegreesPerTick) < threshold);
     }
 
