@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 
 import org.firstinspires.ftc.teamcode.types.IntakeActions;
@@ -28,6 +29,10 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
+        Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
+        Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
+
+        double slowdownspeed = 10;
 
         //Action launchPreload = mDrive.actionBuilder(mBeginPose)
         //        .setTangent(FlipTangent(180))
@@ -38,7 +43,8 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         Action fetchGPP = mDrive.actionBuilder(Launch2)
                 .setTangent(GPP.heading)
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToLinearHeading(GPP, GPP.heading)
+                .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
+                .splineToLinearHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(GPPPos, Launch2Pos))
                 .splineToLinearHeading(Launch2, AutoTangent(GPPPos, Launch2Pos))
                 .build();
@@ -47,7 +53,8 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         Action fetchPGP = mDrive.actionBuilder(Launch2)
                 .setTangent(PGP.heading)
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .splineToLinearHeading(PGP, PGP.heading)
+                .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
+                .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos))
                 .splineToLinearHeading(Launch2, AutoTangent(PGPPos, Launch2Pos))
 //                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))

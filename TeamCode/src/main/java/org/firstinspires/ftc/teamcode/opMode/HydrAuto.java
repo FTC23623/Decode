@@ -151,8 +151,9 @@ public abstract class HydrAuto extends OpMode_Base {
         Pose2d LoadingZone = FlipPose(64,51,90);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
+        Pose2d Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
 
-        final double maxVelToCorner = 50;
+        final double maxVelToCorner = 10;
 
         IntakeActions rejectAction = IntakeActions.IntakeReject;
         if (!reject) {
@@ -164,6 +165,7 @@ public abstract class HydrAuto extends OpMode_Base {
                 .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
+                .splineToSplineHeading(Slowdown_Pose, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
                 //.afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
                 //.splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
@@ -174,6 +176,7 @@ public abstract class HydrAuto extends OpMode_Base {
                 .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
+                .splineToSplineHeading(Slowdown_Pose, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
                 //.afterTime(.75, mIntake.GetAction(rejectAction))
                 //.splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90))
@@ -246,5 +249,11 @@ public abstract class HydrAuto extends OpMode_Base {
         } else {
             return ret;
         }
+    }
+
+    private static Pose2d Waypoint(Pose2d start, Pose2d end, double fraction) {
+        double slowdown_x = start.position.x + fraction * (end.position.x - start.position.x);
+        double slowdown_y = start.position.y + fraction * (end.position.y - start.position.y);
+        return new Pose2d(slowdown_x, slowdown_y, end.heading.toDouble());
     }
 }
