@@ -65,7 +65,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         // Pickup spike and launch
         SequentialAction ret =  new SequentialAction(
                 mTurret.GetDisableAction(true),
-                mTurret.GetSetAction(FlipTurret(-105)),
+                mTurret.GetSetAction(FlipTurret(-102)),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
@@ -80,7 +80,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchGPP,
-                    mTurret.GetSetAction(FlipTurret(-105))
+                    mTurret.GetSetAction(FlipTurret(-109))
                 ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
@@ -97,7 +97,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchPGP,
-                    mTurret.GetSetAction(FlipTurret(-105))
+                    mTurret.GetSetAction(FlipTurret(-109))
                 ),
                 mTurret.GetDisableAction(false),
                 new ParallelAction(

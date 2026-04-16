@@ -190,7 +190,7 @@ public abstract class HydrAuto extends OpMode_Base {
                     mTurret.GetDisableAction(true),
                     new ParallelAction(
                         goToLaunch,
-                        mTurret.GetSetAction(FlipTurret(-105))
+                        mTurret.GetSetAction(FlipTurret(-109))
                     ),
                     mTurret.GetDisableAction(false),
                     new ParallelAction(
