@@ -148,7 +148,7 @@ public abstract class HydrAuto extends OpMode_Base {
     }
 
     protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject, Pose2d StartPos) {
-        Pose2d LoadingZone = FlipPose(62,51,90);
+        Pose2d LoadingZone = FlipPose(64,51,90);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
 
@@ -161,7 +161,7 @@ public abstract class HydrAuto extends OpMode_Base {
 
         // fetch and drive to waypoint
         Action fetch = mDrive.actionBuilder(StartPos)
-                .setTangent(FlipTangent(180))
+                .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
@@ -171,7 +171,7 @@ public abstract class HydrAuto extends OpMode_Base {
 
         // fetch and launch
         Action goToLaunch =  mDrive.actionBuilder(StartPos)
-                .setTangent(FlipTangent(180))
+                .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))

@@ -314,7 +314,7 @@ public class MeepMeepTesting {
     }
 
     private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip, Pose2d StartPos) {
-        Pose2d LoadingZone = FlipPose(62,51,90, flip);
+        Pose2d LoadingZone = FlipPose(64,51,90, flip);
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
 
@@ -324,14 +324,14 @@ public class MeepMeepTesting {
         // fetch and drive to waypoint
         Action fetch = mDrive.getDrive().actionBuilder(StartPos)
                 .setTangent(FlipTangent(90, flip))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
+                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
-                .splineToSplineHeading(LoadingZone_WP, FlipTangent(-90, flip))
+                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(-90, flip))
                 .build();
 
         // drive to launch position
         Action goToLaunch =  mDrive.getDrive().actionBuilder(StartPos)
-                .setTangent(FlipTangent(180, flip))
+                .setTangent(FlipTangent(90, flip))
                 //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
                 //.splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90, flip))
@@ -360,7 +360,7 @@ public class MeepMeepTesting {
         //Pose2d Launch1 = FlipPose(55, 15, 90, flip);
         Vector2d GPPPos = FlipCoordinate(28, 54, flip);
         Vector2d PGPPos = FlipCoordinate(6, 48, flip);
-        Vector2d Launch2Pos = FlipCoordinate(62, 15, flip);
+        Vector2d Launch2Pos = FlipCoordinate(63, 15, flip);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos, flip));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos, flip));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90, flip));
@@ -404,7 +404,7 @@ public class MeepMeepTesting {
                     LoadingZoneSequence(myBot, Launch2, true, flip, Launch2)
             );
         }
-        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch2, false, flip, Launch2));
+        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch2, true, flip, Launch2));
         return ret;
     }
 

@@ -24,7 +24,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         //Pose2d Launch1 = FlipPose(55, 15, 90);
         Vector2d GPPPos = FlipCoordinate(28, 54);
         Vector2d PGPPos = FlipCoordinate(6, 48);
-        Vector2d Launch2Pos = FlipCoordinate(62, 15);
+        Vector2d Launch2Pos = FlipCoordinate(63, 15);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
@@ -109,7 +109,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         // for one or two spikes, pickup from loading zone at the end
         ret = new SequentialAction(
             ret,
-            LoadingZoneSequence(Launch2, false, true, Launch2)
+            LoadingZoneSequence(Launch2, true, true, Launch2)
         );
         return ret;
     }
