@@ -65,10 +65,10 @@ public abstract class Turret_Base implements Subsystem {
         voltageSensor = mOp.mHardwareMap.get(VoltageSensor.class, "Control Hub");
         // Adjust target location for alliance
         if (target == VisionMode.VisionMode_BlueGoal) {
-            goalPosition = new Vector2d(-58.341337, -55.642570); // Tag is located at roughly 58.341337, -55.642570 Back of goal -72, -72
+            goalPosition = new Vector2d(-59, -55.189); // Per CAD Tag is located at 59, -55.189 Back of goal -72, -72
         }
         else {
-            goalPosition = new Vector2d(-58.341337, 55.642570);
+            goalPosition = new Vector2d(-59, 55.189);
         }
         AnalogTurretEncoder = new AbsoluteAnalogEncoder(mOp.mHardwareMap,"TurretServoFb", Constants.TurretServoAnalogRangeVolts, AngleUnit.DEGREES)
                 .zero(Constants.TurretEncoderOffset)
@@ -152,7 +152,7 @@ public abstract class Turret_Base implements Subsystem {
         mOp.mTelemetry.addData("TurretServoFb", servoFbPosition);
         //mOp.mTelemetry.addData("TurretAnalogPos", TurretAnalogPositon);
 
-        // Attempt to get continous vision and Odometry setpoints
+        // Attempt to get continuous vision and Odometry setpoints
         if (vision != null) {
             visionSetpoint = servoFbPosition + vision.GetXOffset();
             // visionSetpoint = Prev_servoFbPosition + vision.GetXOffset(); // May need to use previous position due to Vision lag
