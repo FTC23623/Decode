@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
 import org.firstinspires.ftc.teamcode.types.TurretTrackMode;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
+import org.firstinspires.ftc.teamcode.subsystems.SystemMonitor;
 
 import java.util.ArrayList;
 
@@ -43,6 +44,7 @@ public abstract class HydrAuto extends OpMode_Base {
     protected Turret_Base mTurret;
     protected Launcher mLauncher;
     protected Indicator mIndicator;
+    protected SystemMonitor mSysMon;
     protected ElapsedTime mTimeSinceStart;
     protected SequentialAction mAutoSeq;
     protected DecodeAprilTag mMotif;
@@ -68,11 +70,13 @@ public abstract class HydrAuto extends OpMode_Base {
         mTurret = new Turret(mOpMode, null , mVisionTarget, TurretTrackMode.VisionOnly, false);
         mVision = new LimelightVision(mOpMode);
         mLauncher = new Launcher(mOpMode, mTurret, 0);
+        mSysMon = new SystemMonitor(mOpMode);
         mIndicator = new Indicator(mOpMode, mLauncher, null, mTurret);
         mSystems.add(mIntake);
         mSystems.add(mVision);
         mSystems.add(mTurret);
         mSystems.add(mLauncher);
+        mSystems.add(mSysMon);
         mSystems.add(mIndicator);
         mOpMode.mVision = mVision;
         mTimeSinceStart = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
