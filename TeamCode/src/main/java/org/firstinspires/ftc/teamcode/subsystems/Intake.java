@@ -34,7 +34,7 @@ public class Intake implements Subsystem {
     private boolean rejecting;
     private final Debouncer disableAutoReject;
 
-    public Intake(HydraOpMode opmode, boolean enableSensorReject) {
+    public Intake(HydraOpMode opmode) {
         mOp = opmode;
         intakeMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -50,7 +50,7 @@ public class Intake implements Subsystem {
         intakeInSpeed = Constants.intakeMotorMaxIn;
         transferForward = false;
         transferReverse = false;
-        this.sensorRejectEnabled = enableSensorReject;
+        this.sensorRejectEnabled = true;
         artifactSensors = new ArrayList<>(3);
         artifactSensors.add(new ArtifactSensor(mOp.mHardwareMap.get(DigitalChannel.class, "artifactSensor1")));
         artifactSensors.add(new ArtifactSensor(mOp.mHardwareMap.get(DigitalChannel.class, "artifactSensor2")));

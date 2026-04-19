@@ -64,7 +64,7 @@ public abstract class HydrAuto extends OpMode_Base {
         OpmodeHeading.SetOffset(null);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         mOpMode = new HydraOpMode(telemetry, hardwareMap, null, null);
-        mIntake = new Intake(mOpMode, true);
+        mIntake = new Intake(mOpMode);
         mDrive = new MecanumDrive(hardwareMap, mBeginPose);
         mSystems = new ArrayList<>();
         mTurret = new Turret(mOpMode, null , mVisionTarget, TurretTrackMode.VisionOnly, false);
