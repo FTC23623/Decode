@@ -33,7 +33,7 @@ public final class Constants {
     public static  double TransfertoLaunchPower = 1600000; //ToDo: Find Value that works
     public static  double TransferFromIntakePower = 1600000;
     public static final double TransferToIntakePower = -500000;
-    public static final double TransferMotorTickperRev = 103.8; // from goBilda for 1620rpm motor
+    public static final double TransferMotorTickperRev = 145.1; // 103.8 for 1620rpm motor 145.1 for 1160rpm
     public static final double IntakeMotorTickperRev = 145.1 / 1.5; // from gobilda for 1150rpm Motor / (24/16) belt ratio (Speed of Intake Shaft)
     //Turret Constants
     public static final double TurretGearRatioTurretToEncoder = 54.0/251; // ratio from Turret to Encoder 54/251
