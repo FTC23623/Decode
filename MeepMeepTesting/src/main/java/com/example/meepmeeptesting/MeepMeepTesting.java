@@ -315,15 +315,17 @@ public class MeepMeepTesting {
 
     private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip, Pose2d StartPos, boolean straight) {
         Pose2d LoadingZone;
+        Pose2d Slowdown_Pose;
         if (straight) {
             LoadingZone = FlipPose(StartPos.position.x,56,90, flip);
+            Slowdown_Pose = FlipPose(StartPos.position.x, 49, 90, flip);
         }
         else {
             LoadingZone = FlipPose(64,56,90, flip);
+            Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
         }
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
-        Pose2d Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
 
         // cap velocity when going into the corner of the field
         final double maxVelToCorner = 25;
