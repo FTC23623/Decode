@@ -46,6 +46,11 @@ public abstract class Imu_Base implements Imu {
     }
 
     @Override
+    public double GetSnapHeading() {
+        return 0;
+    }
+
+    @Override
     public void Close() {
     }
 }

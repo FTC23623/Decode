@@ -118,4 +118,9 @@ public class Imu_Pinpoint extends Imu_Base {
     public PoseVelocity2d GetPoseVelocity() {
         return mPoseVelocity;
     }
+
+    @Override
+    public double GetSnapHeading() {
+        return -mAllianceOffsetDeg;
+    }
 }
