@@ -151,8 +151,14 @@ public abstract class HydrAuto extends OpMode_Base {
         return null;
     }
 
-    protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject, Pose2d StartPos) {
-        Pose2d LoadingZone = FlipPose(64,53,90);
+    protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject, Pose2d StartPos, boolean straight) {
+        Pose2d LoadingZone;
+        if (straight) {
+            LoadingZone = FlipPose(StartPos.position.x, 53, 90);
+        } else
+        {
+            LoadingZone = FlipPose(64, 53, 90);
+        }
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
         Pose2d Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);

@@ -164,7 +164,7 @@ public class MeepMeepTesting {
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
                 launchPreload,
-                LoadingZoneSequence(myBot, Launch, true, flip,Launch),
+                LoadingZoneSequence(myBot, Launch, true, flip,Launch, false),
                 fetchGPP
         );
         if (spikeCount > 1) {
@@ -175,11 +175,11 @@ public class MeepMeepTesting {
         } else {
             ret = new SequentialAction(
                     ret,
-                    LoadingZoneSequence(myBot, Launch, true, flip, Launch),
-                    LoadingZoneSequence(myBot, Launch, true, flip, Launch)
+                    LoadingZoneSequence(myBot, Launch, true, flip, Launch, false),
+                    LoadingZoneSequence(myBot, Launch, true, flip, Launch, false)
             );
         }
-        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch, false, flip, Launch));
+        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch, false, flip, Launch, false));
         return ret;
     }
 
@@ -295,7 +295,7 @@ public class MeepMeepTesting {
 
         SequentialAction ret =  new SequentialAction(
                 launchPreload,
-                LoadingZoneSequence(myBot, Launch, true, flip, Launch)
+                LoadingZoneSequence(myBot, Launch, true, flip, Launch, false)
         );
         int count = spikeCount;
         while (count > 0) {
@@ -307,14 +307,20 @@ public class MeepMeepTesting {
             ret = new SequentialAction(
                     ret,
                     myBot.getDrive().actionBuilder(Launch).waitSeconds(waitTime).build(),
-                    LoadingZoneSequence(myBot, Launch, count > 0, flip, Launch)
+                    LoadingZoneSequence(myBot, Launch, count > 0, flip, Launch, false)
             );
         }
         return ret;
     }
 
-    private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip, Pose2d StartPos) {
-        Pose2d LoadingZone = FlipPose(64,56,90, flip);
+    private static SequentialAction LoadingZoneSequence(RoadRunnerBotEntity mDrive, Pose2d LaunchPos, boolean driveToLaunch, boolean flip, Pose2d StartPos, boolean straight) {
+        Pose2d LoadingZone;
+        if (straight) {
+            LoadingZone = FlipPose(StartPos.position.x,56,90, flip);
+        }
+        else {
+            LoadingZone = FlipPose(64,56,90, flip);
+        }
         Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
         Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
         Pose2d Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
@@ -396,7 +402,7 @@ public class MeepMeepTesting {
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
         //        launchPreload,
-                LoadingZoneSequence(myBot, Launch2, true, flip, beginPose),
+                LoadingZoneSequence(myBot, Launch2, true, flip, beginPose, false),
                 fetchGPP
         );
         if (spikeCount > 1) {
@@ -407,11 +413,14 @@ public class MeepMeepTesting {
         } else {
             ret = new SequentialAction(
                     ret,
-                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2),
-                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2)
+                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true),
+                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true),
+                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true)
             );
         }
-        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch2, true, flip, Launch2));
+        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch2, false, flip, Launch2, true));
+        return ret;
+    }
         return ret;
     }
 
