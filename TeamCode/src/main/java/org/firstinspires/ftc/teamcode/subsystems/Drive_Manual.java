@@ -66,7 +66,7 @@ public class Drive_Manual extends Drive {
         squareButton.In(mGamepad.square);
         if (squareButton.Out() && Constants.fieldCentricDrive) {
             // snap heading to square robot in base zone
-            double snapHeading = 0;
+            double snapHeading = 90;
             rotate = -Math.sin((yaw - snapHeading) * Math.PI / 180) * 1.1;
         } else {
             rotate = -mGamepad.right_stick_x;
