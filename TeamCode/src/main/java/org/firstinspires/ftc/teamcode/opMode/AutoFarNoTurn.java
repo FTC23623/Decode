@@ -25,7 +25,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         //Pose2d Launch1 = FlipPose(55, 15, 90);
         Vector2d GPPPos = FlipCoordinate(36, 48);
         Vector2d PGPPos = FlipCoordinate(12, 48);
-        Vector2d Launch2Pos = FlipCoordinate(63, 15);
+        Vector2d Launch2Pos = FlipCoordinate(55, 15);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
@@ -33,6 +33,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
 
         double slowdownspeed = 20;
+        int lzcount = 0;
 
         // Action to fetch artifacts from first spike and launch
         Action fetchGPP = mDrive.actionBuilder(Launch2)
@@ -69,7 +70,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                LoadingZoneSequence(Launch2, true, mBeginPose, false),
+                LoadingZoneSequence(Launch2, true, mBeginPose, false, lzcount++),
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchGPP,
@@ -102,15 +103,15 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         } else {
             ret = new SequentialAction(
                 ret,
-                LoadingZoneSequence(Launch2, true, Launch2, true),
-                LoadingZoneSequence(Launch2, true, Launch2, true)
+                LoadingZoneSequence(Launch2, true, Launch2, true, lzcount++),
+                LoadingZoneSequence(Launch2, true, Launch2, true, lzcount++)
             );
         }
         // for one or two spikes, pickup from loading zone at the end
         ret = new SequentialAction(
             ret,
-            LoadingZoneSequence(Launch2, true, Launch2, true),
-            LoadingZoneSequence(Launch2, false, Launch2, true)
+            LoadingZoneSequence(Launch2, true, Launch2, true, lzcount++),
+            LoadingZoneSequence(Launch2, false, Launch2, true, 0)
         );
         return ret;
     }

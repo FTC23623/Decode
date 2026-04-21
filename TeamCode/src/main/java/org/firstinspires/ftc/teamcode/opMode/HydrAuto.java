@@ -151,12 +151,12 @@ public abstract class HydrAuto extends OpMode_Base {
         return null;
     }
 
-    protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, Pose2d StartPos, boolean straight) {
+    protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, Pose2d StartPos, boolean straight, int count) {
         Pose2d LoadingZone;
         Pose2d Slowdown_Pose;
         if (straight) {
-            LoadingZone = FlipPose(StartPos.position.x, 53, 90);
-            Slowdown_Pose = FlipPose(StartPos.position.x, 49, 90);
+            LoadingZone = FlipPose(StartPos.position.x - 10 * count, 53, 90);
+            Slowdown_Pose = FlipPose(LoadingZone.position.x, 49, 90);
         } else
         {
             LoadingZone = FlipPose(64, 53, 90);
@@ -175,11 +175,11 @@ public abstract class HydrAuto extends OpMode_Base {
 
         // fetch and launch
         Action goToLaunch =  mDrive.actionBuilder(StartPos)
-                .setTangent(FlipTangent(90))
+                .setTangent(AutoTangent(StartPos.position, Slowdown_Pose.position))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(Slowdown_Pose, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
-                .splineToSplineHeading(LaunchPos, FlipTangent(-90))
+                .splineToLinearHeading(LaunchPos, FlipTangent(-90))
                 .build();
 
         // if we're launching, continue to launch point, re-enable turret and launch

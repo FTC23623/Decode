@@ -39,7 +39,7 @@ public abstract class AutoLoadingZone extends HydrAuto {
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                LoadingZoneSequence(Launch, true, Launch, false)
+                LoadingZoneSequence(Launch, true, Launch, false, 0)
         );
         int count = mSpikeCount;
         while (count > 0) {
@@ -51,7 +51,7 @@ public abstract class AutoLoadingZone extends HydrAuto {
             ret = new SequentialAction(
                     ret,
                     mDrive.actionBuilder(Launch).waitSeconds(waitTime).build(),
-                    LoadingZoneSequence(Launch, count > 0, Launch, false)
+                    LoadingZoneSequence(Launch, count > 0, Launch, false, 0)
             );
         }
         return ret;
