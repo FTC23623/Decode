@@ -371,12 +371,16 @@ public class MeepMeepTesting {
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
 
+        Action launchPreloads = myBot.getDrive().actionBuilder(beginPose)
+                .waitSeconds(3)
+                .build();
+
         Action fetchGPP = myBot.getDrive().actionBuilder(Launch2)
                 .setTangent(GPP.heading)
                 .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
                 .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(25))
                 .setTangent(AutoTangent(GPPPos, Launch2Pos, flip))
-                .splineToLinearHeading(Launch2, AutoTangent(GPPPos, Launch2Pos, flip))
+                .splineToSplineHeading(Launch2, AutoTangent(GPPPos, Launch2Pos, flip))
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -385,12 +389,13 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(25))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos, flip))
-                .splineToLinearHeading(Launch2, AutoTangent(PGPPos, Launch2Pos, flip))
+                .splineToSplineHeading(Launch2, AutoTangent(PGPPos, Launch2Pos, flip))
                 .waitSeconds(launchTimeS)
                 .build();
 
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
+                launchPreloads,
                 LoadingZoneSequence(myBot, Launch2, true, flip, beginPose, false),
                 fetchGPP
         );
@@ -403,11 +408,14 @@ public class MeepMeepTesting {
             ret = new SequentialAction(
                     ret,
                     LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true),
-                    LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true),
                     LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true)
             );
         }
-        ret = new SequentialAction(ret, LoadingZoneSequence(myBot, Launch2, false, flip, Launch2, true));
+        ret = new SequentialAction(
+                ret,
+                LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true),
+                LoadingZoneSequence(myBot, Launch2, false, flip, Launch2, true));
+
         return ret;
     }
         return ret;

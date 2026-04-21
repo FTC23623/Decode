@@ -151,7 +151,7 @@ public abstract class HydrAuto extends OpMode_Base {
         return null;
     }
 
-    protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, boolean reject, Pose2d StartPos, boolean straight) {
+    protected SequentialAction LoadingZoneSequence(Pose2d LaunchPos, boolean driveToLaunch, Pose2d StartPos, boolean straight) {
         Pose2d LoadingZone;
         Pose2d Slowdown_Pose;
         if (straight) {
@@ -164,11 +164,6 @@ public abstract class HydrAuto extends OpMode_Base {
         }
 
         final double maxVelToCorner = 20;
-
-        IntakeActions rejectAction = IntakeActions.IntakeReject;
-        if (!reject) {
-            rejectAction = IntakeActions.IntakeLoadArtifacts;
-        }
 
         // fetch and drive to waypoint
         Action fetch = mDrive.actionBuilder(StartPos)

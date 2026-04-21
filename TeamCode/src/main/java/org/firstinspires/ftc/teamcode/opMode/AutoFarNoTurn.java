@@ -39,9 +39,9 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 .setTangent(GPP.heading)
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
-                .splineToLinearHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
+                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(GPPPos, Launch2Pos))
-                .splineToLinearHeading(Launch2, AutoTangent(GPPPos, Launch2Pos))
+                .splineToSplineHeading(Launch2, AutoTangent(GPPPos, Launch2Pos))
                 .build();
 
         // Action to fetch artifacts from second spike and launch
@@ -51,7 +51,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos))
-                .splineToLinearHeading(Launch2, AutoTangent(PGPPos, Launch2Pos))
+                .splineToSplineHeading(Launch2, AutoTangent(PGPPos, Launch2Pos))
                 .build();
 
         // Launch preloads
@@ -69,7 +69,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                LoadingZoneSequence(Launch2, true, false, mBeginPose, false),
+                LoadingZoneSequence(Launch2, true, mBeginPose, false),
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     fetchGPP,
@@ -102,15 +102,15 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         } else {
             ret = new SequentialAction(
                 ret,
-                LoadingZoneSequence(Launch2, true, true, Launch2, true),
-                LoadingZoneSequence(Launch2, true, true, Launch2, true),
-                LoadingZoneSequence(Launch2, true, true, Launch2, true)
+                LoadingZoneSequence(Launch2, true, Launch2, true),
+                LoadingZoneSequence(Launch2, true, Launch2, true)
             );
         }
         // for one or two spikes, pickup from loading zone at the end
         ret = new SequentialAction(
             ret,
-            LoadingZoneSequence(Launch2, false, true, Launch2, true)
+            LoadingZoneSequence(Launch2, true, Launch2, true),
+            LoadingZoneSequence(Launch2, false, Launch2, true)
         );
         return ret;
     }
