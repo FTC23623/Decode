@@ -162,8 +162,6 @@ public abstract class HydrAuto extends OpMode_Base {
             LoadingZone = FlipPose(64, 53, 90);
             Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
         }
-        Pose2d LoadingZone_WP= FlipPose(59, 40, 90);
-        Pose2d LoadingZone_WP2= FlipPose(59, 50, 90);
 
         final double maxVelToCorner = 20;
 
@@ -176,22 +174,16 @@ public abstract class HydrAuto extends OpMode_Base {
         Action fetch = mDrive.actionBuilder(StartPos)
                 .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
                 .splineToSplineHeading(Slowdown_Pose, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
-                //.afterTime(.75, mIntake.GetAction(IntakeActions.IntakeReject))
-                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(-90))
                 .build();
 
         // fetch and launch
         Action goToLaunch =  mDrive.actionBuilder(StartPos)
                 .setTangent(FlipTangent(90))
                 .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90))
                 .splineToSplineHeading(Slowdown_Pose, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
-                //.afterTime(.75, mIntake.GetAction(rejectAction))
-                //.splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90))
                 .build();
 

@@ -34,11 +34,6 @@ public abstract class AutoFarNoTurn extends HydrAuto {
 
         double slowdownspeed = 20;
 
-        //Action launchPreload = mDrive.actionBuilder(mBeginPose)
-        //        .setTangent(FlipTangent(180))
-        //        .splineToSplineHeading(Launch1, FlipTangent(180))
-        //        .build();
-
         // Action to fetch artifacts from first spike and launch
         Action fetchGPP = mDrive.actionBuilder(Launch2)
                 .setTangent(GPP.heading)
@@ -57,7 +52,6 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos))
                 .splineToLinearHeading(Launch2, AutoTangent(PGPPos, Launch2Pos))
-//                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeReject))
                 .build();
 
         // Launch preloads
@@ -70,7 +64,6 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunFast),
                     new SequentialAction(
-          //                  launchPreload,
                             mTurret.GetDisableAction(false),
                             mTurret.GetLockAction()
                     )

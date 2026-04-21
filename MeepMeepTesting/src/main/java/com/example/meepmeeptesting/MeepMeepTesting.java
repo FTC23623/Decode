@@ -324,28 +324,21 @@ public class MeepMeepTesting {
             LoadingZone = FlipPose(64,56,90, flip);
             Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
         }
-        Pose2d LoadingZone_WP= FlipPose(59, 40, 90, flip);
-        Pose2d LoadingZone_WP2= FlipPose(59, 50, 90, flip);
-
         // cap velocity when going into the corner of the field
         final double maxVelToCorner = 25;
 
         // fetch and drive to waypoint
         Action fetch = mDrive.getDrive().actionBuilder(StartPos)
                 .setTangent(FlipTangent(90, flip))
-                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(Slowdown_Pose, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
-                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(-90, flip))
                 .build();
 
         // drive to launch position
         Action goToLaunch =  mDrive.getDrive().actionBuilder(StartPos)
                 .setTangent(FlipTangent(90, flip))
-                //.splineToSplineHeading(LoadingZone_WP, FlipTangent(90, flip))
                 .splineToSplineHeading(Slowdown_Pose, FlipTangent(90, flip))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90, flip), new TranslationalVelConstraint(maxVelToCorner))
-                //.splineToSplineHeading(LoadingZone_WP2, FlipTangent(-90, flip))
                 .splineToSplineHeading(LaunchPos, FlipTangent(-90, flip))
                 .waitSeconds(launchTimeS)
                 .build();
@@ -378,11 +371,6 @@ public class MeepMeepTesting {
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
 
-        //Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
-                //.splineToLinearHeading(Launch1, FlipTangent(180, flip))
-        //        .waitSeconds(2)
-        //        .build();
-
         Action fetchGPP = myBot.getDrive().actionBuilder(Launch2)
                 .setTangent(GPP.heading)
                 .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
@@ -403,7 +391,6 @@ public class MeepMeepTesting {
 
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
-        //        launchPreload,
                 LoadingZoneSequence(myBot, Launch2, true, flip, beginPose, false),
                 fetchGPP
         );
