@@ -26,7 +26,7 @@ public abstract class AutoNearNoTurn extends HydrAuto {
         Vector2d PPGPos = FlipCoordinate(-12, 48);
         Vector2d PGPPos = FlipCoordinate(12, 48);
         Vector2d GPPPos = FlipCoordinate(36, 48);
-        Pose2d Gate = FlipPose(0, 52, 90);
+        Pose2d Gate = FlipPose(-4, 53, 90);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos));
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos));
@@ -40,13 +40,11 @@ public abstract class AutoNearNoTurn extends HydrAuto {
         // Action to fetch artifacts from first spike and launch
         Action launchPreload = mDrive.actionBuilder(mBeginPose)
                 .setTangent(preloadtangent)
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToLinearHeading(Launch1, preloadtangent)
                 .build();
 
         Action fetchPPG = mDrive.actionBuilder(Launch1)
                 .setTangent(PPG.heading)
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(PPGSlowdownPose, PPG.heading)
                 .splineToSplineHeading(PPG, PPG.heading)
                 .setTangent(FlipTangent(0))
@@ -81,9 +79,10 @@ public abstract class AutoNearNoTurn extends HydrAuto {
         // Pickup spike and launch
         SequentialAction ret =  new SequentialAction(
                 mTurret.GetDisableAction(true),
+                mIntake.GetRejectDisableAction(true),
                 new ParallelAction(
                     launchPreload,
-                    mTurret.GetSetAction(FlipTurret(90)),
+                    mTurret.GetSetAction(FlipTurret(-90)),
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunSlow)
                 ),
@@ -91,6 +90,8 @@ public abstract class AutoNearNoTurn extends HydrAuto {
                 mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
+                mIntake.GetRejectDisableAction(false),
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 fetchPPG,
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
@@ -99,6 +100,7 @@ public abstract class AutoNearNoTurn extends HydrAuto {
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 fetchPGP,
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
@@ -107,6 +109,7 @@ public abstract class AutoNearNoTurn extends HydrAuto {
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mTurret.GetDisableAction(true),
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                 fetchGPP,
                 mTurret.GetDisableAction(false),
                 new ParallelAction(

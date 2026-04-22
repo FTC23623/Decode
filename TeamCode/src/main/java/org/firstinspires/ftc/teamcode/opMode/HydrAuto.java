@@ -155,11 +155,10 @@ public abstract class HydrAuto extends OpMode_Base {
         Pose2d LoadingZone;
         Pose2d Slowdown_Pose;
         if (straight) {
-            LoadingZone = FlipPose(StartPos.position.x - 10 * count, 53, 90);
+            LoadingZone = FlipPose(StartPos.position.x - 10 * count, 56, 90);
             Slowdown_Pose = FlipPose(LoadingZone.position.x, 49, 90);
-        } else
-        {
-            LoadingZone = FlipPose(64, 53, 90);
+        } else {
+            LoadingZone = FlipPose(64, 56, 90);
             Slowdown_Pose = Waypoint(StartPos, LoadingZone, 0.75);
         }
 
@@ -168,7 +167,6 @@ public abstract class HydrAuto extends OpMode_Base {
         // fetch and drive to waypoint
         Action fetch = mDrive.actionBuilder(StartPos)
                 .setTangent(FlipTangent(90))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(Slowdown_Pose, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
                 .build();
@@ -176,7 +174,6 @@ public abstract class HydrAuto extends OpMode_Base {
         // fetch and launch
         Action goToLaunch =  mDrive.actionBuilder(StartPos)
                 .setTangent(AutoTangent(StartPos.position, Slowdown_Pose.position))
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(Slowdown_Pose, FlipTangent(90))
                 .splineToSplineHeading(LoadingZone, FlipTangent(-90), new TranslationalVelConstraint(maxVelToCorner))
                 .splineToLinearHeading(LaunchPos, FlipTangent(-90))
@@ -187,6 +184,7 @@ public abstract class HydrAuto extends OpMode_Base {
         if (driveToLaunch) {
             return new SequentialAction(
                     mTurret.GetDisableAction(true),
+                    mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                     new ParallelAction(
                         goToLaunch,
                         mTurret.GetSetAction(FlipTurret(-109))
@@ -201,6 +199,7 @@ public abstract class HydrAuto extends OpMode_Base {
         } else {
             return new SequentialAction(
                     mTurret.GetDisableAction(true),
+                    mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                     fetch,
                     mTurret.GetDisableAction(false)
             );

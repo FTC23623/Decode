@@ -436,7 +436,7 @@ public class MeepMeepTesting {
         Vector2d PPGPos = FlipCoordinate(-12, 48, flip);
         Vector2d PGPPos = FlipCoordinate(12, 48, flip);
         Vector2d GPPPos = FlipCoordinate(36, 48, flip);
-        Pose2d Gate = FlipPose(0, 52, 90, flip);
+        Pose2d Gate = FlipPose(-4, 53, 90, flip);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos, flip));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos, flip));
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos, flip));

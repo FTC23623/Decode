@@ -220,6 +220,13 @@ public class Intake implements Subsystem {
         }
     }
 
+    private void ResetFull() {
+        transferFull = false;
+        for (ArtifactSensor sensor : artifactSensors) {
+            sensor.Reset();
+        }
+    }
+
     /*
      * ROAD RUNNER API
      */
@@ -230,6 +237,9 @@ public class Intake implements Subsystem {
      */
     public Action GetAction(IntakeActions action) {
         return new RunAction(action);
+    }
+    public Action GetRejectDisableAction(boolean disable) {
+        return new RunDisableAction(disable);
     }
     /**
      * Runs the supplied action until completion
@@ -292,6 +302,21 @@ public class Intake implements Subsystem {
         }
     }
 
+    public class RunDisableAction implements Action {
+        boolean disable;
+
+        public RunDisableAction(boolean disable) {
+            this.disable = disable;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            sensorRejectEnabled = !disable;
+            ResetFull();
+            return false;
+        }
+    }
+
     private class ArtifactSensor {
         private final DigitalChannel sensor;
         private final ElapsedTime timer;
@@ -322,6 +347,10 @@ public class Intake implements Subsystem {
             }
             // beam is not broken or time has not elapsed
             return false;
+        }
+
+        public void Reset() {
+            wasFull = false;
         }
     }
 }

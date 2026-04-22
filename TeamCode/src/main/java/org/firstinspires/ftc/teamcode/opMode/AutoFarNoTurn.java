@@ -38,7 +38,6 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         // Action to fetch artifacts from first spike and launch
         Action fetchGPP = mDrive.actionBuilder(Launch2)
                 .setTangent(GPP.heading)
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
                 .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(GPPPos, Launch2Pos))
@@ -48,7 +47,6 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         // Action to fetch artifacts from second spike and launch
         Action fetchPGP = mDrive.actionBuilder(Launch2)
                 .setTangent(PGP.heading)
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos))
@@ -60,6 +58,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
         // Pickup spike and launch
         SequentialAction ret =  new SequentialAction(
                 mTurret.GetDisableAction(true),
+                mIntake.GetRejectDisableAction(true),
                 mTurret.GetSetAction(FlipTurret(-102)),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
@@ -70,9 +69,11 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                     )
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mIntake.GetRejectDisableAction(false),
                 LoadingZoneSequence(Launch2, true, mBeginPose, false, lzcount++),
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
+                    mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                     fetchGPP,
                     mTurret.GetSetAction(FlipTurret(-109))
                 ),
@@ -90,6 +91,7 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 ret,
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
+                    mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
                     fetchPGP,
                     mTurret.GetSetAction(FlipTurret(-109))
                 ),
