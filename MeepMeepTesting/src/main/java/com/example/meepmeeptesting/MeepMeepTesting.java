@@ -22,7 +22,7 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"AutoNoTurnRed", "AutoNoTurnBlue", "FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
+        String[] autos = {"NearNoTurnRed", "NearNoTurnBlue", "AutoNoTurnRed", "AutoNoTurnBlue", "FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
@@ -94,6 +94,12 @@ public class MeepMeepTesting {
                         break;
                     case "AutoNoTurnBlue":
                         myBot.runAction(BuildFarAutoNoTurn(myBot, true, spikeCount));
+                        break;
+                    case "NearNoTurnRed":
+                        myBot.runAction(BuildNearAutoNoTurn(myBot, false, spikeCount));
+                        break;
+                    case "NearNoTurnBlue":
+                        myBot.runAction(BuildNearAutoNoTurn(myBot, true, spikeCount));
                         break;
                 }
 
@@ -420,6 +426,72 @@ public class MeepMeepTesting {
 
         return ret;
     }
+
+    private static SequentialAction BuildNearAutoNoTurn(RoadRunnerBotEntity myBot, boolean flip, int spikeCount) {
+        Pose2d beginPose = FlipPose(-62.5, 39, 0, flip);
+
+        // All poses defined for autos on the red side
+        // FlipPose and FlipTangent auto adjust for blue
+        Pose2d Launch1 = FlipPose(-20, 28, 45, flip);
+        Vector2d PPGPos = FlipCoordinate(-12, 48, flip);
+        Vector2d PGPPos = FlipCoordinate(12, 48, flip);
+        Vector2d GPPPos = FlipCoordinate(36, 48, flip);
+        Pose2d Gate = FlipPose(0, 52, 90, flip);
+        Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos, flip));
+        Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos, flip));
+        Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos, flip));
+        Pose2d PPGSlowdownPose = Waypoint(Launch1, PPG, 0.75);
+        Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
+        Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
+
+        double preloadtangent = AutoTangent(beginPose.position, Launch1.position, flip);
+        double gatetangent = AutoTangent(Gate.position, Launch1.position, flip);
+
+        Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
+                .setTangent(preloadtangent)
+                .splineToLinearHeading(Launch1, preloadtangent)
+                .waitSeconds(2)
+                .build();
+
+        Action fetchPPG = myBot.getDrive().actionBuilder(Launch1)
+                .setTangent(PPG.heading)
+                .splineToSplineHeading(PPGSlowdownPose, PPG.heading)
+                .splineToSplineHeading(PPG, PPG.heading)
+                .setTangent(FlipTangent(0, flip))
+                .splineToLinearHeading(Gate, FlipTangent(90, flip))
+                .waitSeconds(0.5)
+                .setTangent(gatetangent)
+                .splineToLinearHeading(Launch1, gatetangent)
+                .waitSeconds(launchTimeS)
+                .build();
+
+        Action fetchPGP = myBot.getDrive().actionBuilder(Launch1)
+                .setTangent(PGP.heading)
+                .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
+                .splineToSplineHeading(PGP, PGP.heading)
+                .setTangent(FlipTangent(180, flip))
+                .splineToLinearHeading(Gate, FlipTangent(90, flip))
+                .waitSeconds(0.5)
+                .setTangent(gatetangent)
+                .splineToSplineHeading(Launch1, gatetangent)
+                .waitSeconds(launchTimeS)
+                .build();
+
+        Action fetchGPP = myBot.getDrive().actionBuilder(Launch1)
+                .setTangent(GPP.heading)
+                .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
+                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(25))
+                .splineToSplineHeading(Launch1, AutoTangent(GPPPos, Launch1.position, flip))
+                .waitSeconds(launchTimeS)
+                .build();
+
+        // This logic mirrors the construction in your AutoFar.java
+        SequentialAction ret =  new SequentialAction(
+                launchPreload,
+                fetchPPG,
+                fetchPGP,
+                fetchGPP
+        );
         return ret;
     }
 

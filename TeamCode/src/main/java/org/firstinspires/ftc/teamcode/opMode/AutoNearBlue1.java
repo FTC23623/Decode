@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.types.VisionMode;
 
 @Disabled
 @Autonomous(name = "BlueNear1", preselectTeleOp = "TeleBlue", group = "Blue")
-public class AutoNearBlue1 extends AutoNear {
+public class AutoNearBlue1 extends AutoNearNoTurn {
     public AutoNearBlue1() {
-        super(VisionMode.VisionMode_BlueGoal, true, 1, 0);
+        super(VisionMode.VisionMode_BlueGoal, true, 1);
     }
 }
