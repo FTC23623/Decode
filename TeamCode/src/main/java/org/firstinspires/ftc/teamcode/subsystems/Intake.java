@@ -148,7 +148,7 @@ public class Intake implements Subsystem {
             }
         }
         //mOp.mTelemetry.addData("intakeIn", intakeIn);
-        //mOp.mTelemetry.addData("rejecting", rejecting);
+        mOp.mTelemetry.addData("rejecting", rejecting);
         mOp.mTelemetry.addData("transferFull", transferFull);
         double intakesetrpm;
         if (intakeIn) {
@@ -207,6 +207,7 @@ public class Intake implements Subsystem {
                 full = false;
             }
             mOp.mTelemetry.addData("Sensor" + artifactSensors.indexOf(sensor), sensor.Full());
+            mOp.mTelemetry.addData("SensorTime" + artifactSensors.indexOf(sensor), sensor.timer.milliseconds());
         }
         if (!transferFull && full) {
             // rising edge, capture the state and return true

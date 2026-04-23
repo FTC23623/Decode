@@ -40,7 +40,7 @@ public class Turret extends Turret_Base {
         if (InitTimer.milliseconds() > 600) {
             TurretEncoder.overrideResetPos(0);
             return true;
-        } else{
+        } else {
             return false;
         }
     }
