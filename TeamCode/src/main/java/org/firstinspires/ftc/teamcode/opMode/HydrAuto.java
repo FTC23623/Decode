@@ -162,7 +162,15 @@ public abstract class HydrAuto extends OpMode_Base {
         Pose2d LoadingZone;
         Pose2d Slowdown_Pose;
         if (straight) {
-            LoadingZone = FlipPose(StartPos.position.x - 10 * count, 56, 90);
+            double x = StartPos.position.x;
+            if (count > 0) {
+                if ((count & 1) != 0) {
+                    x -= 6;
+                } else {
+                    x -= 12;
+                }
+            }
+            LoadingZone = FlipPose(x, 56, 90);
             Slowdown_Pose = FlipPose(LoadingZone.position.x, 49, 90);
         } else {
             LoadingZone = FlipPose(64, 56, 90);

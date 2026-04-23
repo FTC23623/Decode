@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
-public abstract class AutoNearNoTurn extends HydrAuto {
-    public AutoNearNoTurn(VisionMode target, boolean flip, int spikeCount) {
+public abstract class AutoNear extends HydrAuto {
+    public AutoNear(VisionMode target, boolean flip, int spikeCount) {
         super(target, flip, spikeCount, 0);
         mBeginPose = FlipPose(-62.5, 39, 0);
     }

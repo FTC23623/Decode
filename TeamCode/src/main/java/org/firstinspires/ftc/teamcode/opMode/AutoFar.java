@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.types.IntakeActions;
 import org.firstinspires.ftc.teamcode.types.LauncherActions;
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
-public abstract class AutoFarNoTurn extends HydrAuto {
-    public AutoFarNoTurn(VisionMode target, boolean flip, int spikeCount) {
+public abstract class AutoFar extends HydrAuto {
+    public AutoFar(VisionMode target, boolean flip, int spikeCount) {
         super(target, flip, spikeCount, 0);
         mBeginPose = FlipPose(64.0, 28.5, 90.0);
     }
@@ -70,7 +70,11 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
                 mIntake.GetRejectDisableAction(false),
-                LoadingZoneSequence(Launch2, true, mBeginPose, false, lzcount++),
+                LoadingZoneSequence(Launch2, true, mBeginPose, false, lzcount++)
+        );
+        if (mSpikeCount > 0) {
+            ret = new SequentialAction(
+                ret,
                 mTurret.GetDisableAction(true),
                 new ParallelAction(
                     mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
@@ -83,7 +87,8 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher)
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
-        );
+            );
+        }
         // If more than one spike, add another fetch from the second spike and launch
         // Else pickup and launch from loading zone twice
         if (mSpikeCount > 1) {
@@ -102,17 +107,18 @@ public abstract class AutoFarNoTurn extends HydrAuto {
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
-        } else {
+        }
+
+        int lzPickups = 5 - mSpikeCount;
+        for (int i = 0; i < lzPickups; ++i) {
             ret = new SequentialAction(
                 ret,
-                LoadingZoneSequence(Launch2, true, Launch2, true, lzcount++),
                 LoadingZoneSequence(Launch2, true, Launch2, true, lzcount++)
             );
         }
-        // for one or two spikes, pickup from loading zone at the end
+
         ret = new SequentialAction(
             ret,
-            LoadingZoneSequence(Launch2, true, Launch2, true, lzcount++),
             LoadingZoneSequence(Launch2, false, Launch2, true, 0)
         );
         return ret;
