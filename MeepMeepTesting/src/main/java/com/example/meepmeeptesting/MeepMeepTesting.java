@@ -104,7 +104,7 @@ public class MeepMeepTesting {
                     x -= 12;
                 }
             }
-            LoadingZone = FlipPose(x,56,90, flip);
+            LoadingZone = FlipPose(StartPos.position.x,56,90, flip);
             Slowdown_Pose = FlipPose(LoadingZone.position.x, 49, 90, flip);
         }
         else {

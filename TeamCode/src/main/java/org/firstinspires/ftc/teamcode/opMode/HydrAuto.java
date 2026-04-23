@@ -170,7 +170,7 @@ public abstract class HydrAuto extends OpMode_Base {
                     x -= 12;
                 }
             }
-            LoadingZone = FlipPose(x, 56, 90);
+            LoadingZone = FlipPose(StartPos.position.x, 56, 90);
             Slowdown_Pose = FlipPose(LoadingZone.position.x, 49, 90);
         } else {
             LoadingZone = FlipPose(64, 56, 90);
