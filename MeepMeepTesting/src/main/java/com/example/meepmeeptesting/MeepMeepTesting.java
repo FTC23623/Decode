@@ -218,7 +218,7 @@ public class MeepMeepTesting {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch1 = FlipPose(-20, 28, 45, flip);
+        Pose2d Launch1 = FlipPose(-16, 24, 45, flip);
         Vector2d PPGPos = FlipCoordinate(-12, 48, flip);
         Vector2d PGPPos = FlipCoordinate(12, 50, flip);
         Vector2d GPPPos = FlipCoordinate(36, 48, flip);
@@ -230,6 +230,7 @@ public class MeepMeepTesting {
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
 
+        double slowdownspeed = 20;
         double preloadtangent = AutoTangent(beginPose.position, Launch1.position, flip);
         double gatetangent = AutoTangent(Gate.position, Launch1.position, flip);
 
@@ -242,7 +243,7 @@ public class MeepMeepTesting {
         Action fetchPPG = myBot.getDrive().actionBuilder(Launch1)
                 .setTangent(PPG.heading)
                 .splineToSplineHeading(PPGSlowdownPose, PPG.heading)
-                .splineToSplineHeading(PPG, PPG.heading)
+                .splineToSplineHeading(PPG, PPG.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(FlipTangent(0, flip))
                 .splineToLinearHeading(Gate, FlipTangent(90, flip))
                 .waitSeconds(0.5)
@@ -254,7 +255,7 @@ public class MeepMeepTesting {
         Action fetchPGP = myBot.getDrive().actionBuilder(Launch1)
                 .setTangent(PGP.heading)
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
-                .splineToSplineHeading(PGP, PGP.heading)
+                .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(FlipTangent(180, flip))
                 .splineToLinearHeading(Gate, FlipTangent(90, flip))
                 .waitSeconds(0.5)
@@ -266,7 +267,8 @@ public class MeepMeepTesting {
         Action fetchGPP = myBot.getDrive().actionBuilder(Launch1)
                 .setTangent(GPP.heading)
                 .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
-                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(25))
+                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
+                .setTangent(AutoTangent(GPPPos, Launch1.position, flip))
                 .splineToSplineHeading(Launch1, AutoTangent(GPPPos, Launch1.position, flip))
                 .waitSeconds(launchTimeS)
                 .build();

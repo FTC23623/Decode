@@ -34,6 +34,7 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
 
+        double slowdownspeed = 20;
         double preloadtangent = AutoTangent(mBeginPose.position, Launch1.position);
         double gatetangent = AutoTangent(Gate.position, Launch1.position);
 
@@ -46,7 +47,7 @@ public abstract class AutoNear extends HydrAuto {
         Action fetchPPG = mDrive.actionBuilder(Launch1)
                 .setTangent(PPG.heading)
                 .splineToSplineHeading(PPGSlowdownPose, PPG.heading)
-                .splineToSplineHeading(PPG, PPG.heading)
+                .splineToSplineHeading(PPG, PPG.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(FlipTangent(0))
                 .splineToLinearHeading(Gate, FlipTangent(90))
                 .waitSeconds(0.5)
@@ -56,9 +57,8 @@ public abstract class AutoNear extends HydrAuto {
 
         Action fetchPGP = mDrive.actionBuilder(Launch1)
                 .setTangent(PGP.heading)
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
-                .splineToSplineHeading(PGP, PGP.heading)
+                .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(FlipTangent(180))
                 .splineToLinearHeading(Gate, FlipTangent(90))
                 .waitSeconds(0.5)
@@ -68,9 +68,9 @@ public abstract class AutoNear extends HydrAuto {
 
         Action fetchGPP = mDrive.actionBuilder(Launch1)
                 .setTangent(GPP.heading)
-                .afterTime(1, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
                 .splineToSplineHeading(GPPSlowdownPose, GPP.heading)
-                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(25))
+                .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
+                .setTangent(AutoTangent(GPPPos, Launch1.position))
                 .splineToSplineHeading(Launch1, AutoTangent(GPPPos, Launch1.position))
                 .build();
 
