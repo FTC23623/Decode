@@ -51,6 +51,10 @@ public abstract class Imu_Base implements Imu {
     }
 
     @Override
+    public double DistanceToTarget() {
+        return 0;
+    }
+    @Override
     public void Close() {
     }
 }

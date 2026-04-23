@@ -61,8 +61,11 @@ public class Launcher implements Subsystem {
     private boolean autoLaunchStarted;
     private final Debouncer autoLaunchDebounce;
     private final Turret_Base turret;
+    private final Imu mImu;
+    private final Debouncer autoRangeDisable;
+    private boolean autoRangeEnabled;
 
-    public Launcher(HydraOpMode Opmode, Turret_Base turret, double targetRPM) {
+    public Launcher(HydraOpMode Opmode, Turret_Base turret, Imu imu, double targetRPM) {
         mOp = Opmode;
         motors = new ArrayList<>(2);
         motors.add(new LaunchMotor("left", mOp, Opmode.mHardwareMap.get(DcMotorEx.class, "left"), DcMotorSimple.Direction.FORWARD, linearLaunchMotTicksPerRev, samplesToAverage));
@@ -82,6 +85,8 @@ public class Launcher implements Subsystem {
             lastRpmMeasure.add(0.0);
             lastPwrSetting.add(0.0);
         }
+        mImu = imu;
+        autoRangeEnabled = true;
     }
 
     @Override
@@ -158,22 +163,36 @@ public class Launcher implements Subsystem {
         else if (D_pad_Down){
             targetRPMtune = Constants.LauncherLowRPMTele;
         }
+
+        autoRangeDisable.In(mOp.mDriverGamepad.triangle);
+        if (autoRangeDisable.Out()) {
+            autoRangeDisable.Used();
+            autoRangeEnabled = !autoRangeEnabled;
+            mOp.mOperatorGamepad.rumbleBlips(1);
+            mOp.mDriverGamepad.rumbleBlips(1);
+        }
     }
 
     public void SetSetpoint() {
-        if (mOp.mVision != null) {
+        double dist = 0;
+        if (mImu != null) {
+            dist = mImu.DistanceToTarget();
+            mOp.mTelemetry.addData("Distance - Odo", dist);
+        } else if (mOp.mVision != null) {
             VisionResult vision = mOp.mVision.GetResult();
             if (vision != null) {
-                double dist = TurretKinematics.CalcDistanceToTag(vision);
+                dist = TurretKinematics.CalcDistanceToTag(vision, mOp);
+            }
+            mOp.mTelemetry.addData("Distance - Vision", dist);
+        }
+        if (autoRangeEnabled) {
+            if (dist > 95) {
+                // TODO: move these to constants file
+                dist = Math.max(dist, 120);
+                targetRPMtune = (dist - 120) * 20 + 3025;
                 //mOp.mTelemetry.addData("Distance", dist);
-                if (dist > 95) {
-                    // TODO: move these to constants file
-                    dist = Math.max(dist, 120);
-                    targetRPMtune = (dist - 120) * 20 + 2925;
-                    //mOp.mTelemetry.addData("Distance", dist);
-                } else {
-                    targetRPMtune = dist * 7.5 + 1925;
-                }
+            } else if (dist > 0) {
+                targetRPMtune = dist * 7.5 + 1975;
             }
         }
         if (pid.getSetPoint() != targetRPMtune) {

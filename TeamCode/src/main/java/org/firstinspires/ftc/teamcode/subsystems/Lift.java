@@ -58,7 +58,7 @@ public class Lift implements Subsystem {
                 servo.setPosition(position);
             }
         }
-        //opMode.mTelemetry.addData("LiftEngaged", engaged);
+        opMode.mTelemetry.addData("LiftEngaged", engaged);
     }
 
     @Override

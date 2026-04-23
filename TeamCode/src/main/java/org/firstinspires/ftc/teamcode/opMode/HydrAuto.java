@@ -20,7 +20,9 @@ import org.firstinspires.ftc.teamcode.objects.OpmodeHeading;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.Vision;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
+import org.firstinspires.ftc.teamcode.subsystems.Imu;
 import org.firstinspires.ftc.teamcode.subsystems.Imu_Pinpoint;
+import org.firstinspires.ftc.teamcode.subsystems.Imu_Pinpoint_ReadOnly;
 import org.firstinspires.ftc.teamcode.subsystems.Indicator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
@@ -69,7 +71,12 @@ public abstract class HydrAuto extends OpMode_Base {
         mSystems = new ArrayList<>();
         mTurret = new Turret(mOpMode, null , mVisionTarget, TurretTrackMode.VisionOnly, false);
         mVision = new LimelightVision(mOpMode);
-        mLauncher = new Launcher(mOpMode, mTurret, 0);
+        Imu pp = null;
+        if (mDrive.localizer instanceof PinpointLocalizer) {
+            PinpointLocalizer ppl = (PinpointLocalizer) mDrive.localizer;
+            pp = new Imu_Pinpoint_ReadOnly(mVisionTarget, ppl);
+        }
+        mLauncher = new Launcher(mOpMode, mTurret, pp, 0);
         mSysMon = new SystemMonitor(mOpMode);
         mIndicator = new Indicator(mOpMode, mLauncher, null, mTurret);
         mSystems.add(mIntake);

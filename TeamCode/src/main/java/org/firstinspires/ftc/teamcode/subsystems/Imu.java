@@ -14,5 +14,6 @@ public interface Imu extends Subsystem {
     public Pose2d GetPose();
     public double GetSnapHeading();
 
-    PoseVelocity2d GetPoseVelocity();
+    public PoseVelocity2d GetPoseVelocity();
+    public double DistanceToTarget();
 }

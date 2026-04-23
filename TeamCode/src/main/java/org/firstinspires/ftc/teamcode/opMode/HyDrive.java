@@ -69,7 +69,7 @@ public abstract class HyDrive extends OpMode_Base {
     mIntake = new Intake(mOpMode);
     mTurret = new Turret(mOpMode, mImu, mVisionTarget, TurretTrackMode.OdoAndVision, true);
     mVision = new LimelightVision(mOpMode);
-    mLauncher = new Launcher(mOpMode, mTurret, 0);
+    mLauncher = new Launcher(mOpMode, mTurret, mImu, 0);
     mSysMon = new SystemMonitor(mOpMode);
     mLift = new Lift(mOpMode);
     mIndicator = new Indicator(mOpMode, mLauncher, mLift, mTurret);

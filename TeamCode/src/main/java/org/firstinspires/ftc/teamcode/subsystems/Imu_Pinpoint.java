@@ -16,6 +16,7 @@ public class Imu_Pinpoint extends Imu_Base {
     protected final double mAllianceOffsetDeg;
     private boolean isInit;
     private PoseVelocity2d mPoseVelocity;
+    private final Vector2d targetPose;
 
     public Imu_Pinpoint(HydraOpMode opMode, Pose2d initialPose, VisionMode target) {
         super();
@@ -23,12 +24,15 @@ public class Imu_Pinpoint extends Imu_Base {
         mPinpoint = new PinpointLocalizer(opMode.mHardwareMap, MecanumDrive.PARAMS.inPerTick, initialPose);
         switch (target) {
             case VisionMode_RedGoal:
+                targetPose = new Vector2d(-59, 55.189);
                 mAllianceOffsetDeg = 90;
                 break;
             case VisionMode_BlueGoal:
+                targetPose = new Vector2d(-59, -55.189);
                 mAllianceOffsetDeg = -90;
                 break;
             default:
+                targetPose = new Vector2d(-59, -55.189);
                 mAllianceOffsetDeg = 0;
                 break;
         }
@@ -122,5 +126,11 @@ public class Imu_Pinpoint extends Imu_Base {
     @Override
     public double GetSnapHeading() {
         return -mAllianceOffsetDeg;
+    }
+
+    @Override
+    public double DistanceToTarget() {
+        Vector2d pos = mPinpoint.getPose().position;
+        return Math.sqrt(Math.pow(targetPose.x - pos.x, 2) + Math.pow(targetPose.y - pos.y, 2));
     }
 }

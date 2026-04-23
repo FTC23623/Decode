@@ -32,7 +32,7 @@ public class Intake implements Subsystem {
     private boolean transferFull;
     private final ElapsedTime rejectionTimer;
     private boolean rejecting;
-    private final Debouncer disableAutoReject;
+    //private final Debouncer disableAutoReject;
 
     public Intake(HydraOpMode opmode) {
         mOp = opmode;
@@ -58,7 +58,7 @@ public class Intake implements Subsystem {
         transferFull = false;
         rejectionTimer = new ElapsedTime();
         rejecting = false;
-        disableAutoReject = new Debouncer(3);
+        //disableAutoReject = new Debouncer(3);
     }
 
     /**
@@ -74,13 +74,13 @@ public class Intake implements Subsystem {
         intakeOutSpeed = Constants.intakeMotorMaxOut * left;
         transferForward = mOp.mOperatorGamepad.right_bumper || mOp.mOperatorGamepad.square;
         transferReverse = mOp.mOperatorGamepad.left_bumper;
-        disableAutoReject.In(mOp.mDriverGamepad.triangle);
+        /*disableAutoReject.In(mOp.mDriverGamepad.triangle);
         if (disableAutoReject.Out()) {
             disableAutoReject.Used();
             sensorRejectEnabled = !sensorRejectEnabled;
             mOp.mOperatorGamepad.rumbleBlips(1);
             mOp.mDriverGamepad.rumbleBlips(1);
-        }
+        }*/
     }
 
     /**
