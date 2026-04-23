@@ -22,7 +22,7 @@ public class MeepMeepTesting {
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
-        String[] autos = {"NearNoTurnRed", "NearNoTurnBlue", "AutoNoTurnRed", "AutoNoTurnBlue", "FarFetch", "AutoFarBlue", "AutoFarRed", "AutoNearBlue", "AutoNearRed", "AutoNearBlueGate", "AutoNearRedGate"};
+        String[] autos = {"RedNear", "BlueNear", "RedFar", "BlueFar" };
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
@@ -68,16 +68,16 @@ public class MeepMeepTesting {
 
                 // Run the selected auto
                 switch (selectedAuto) {
-                    case "AutoNoTurnRed":
+                    case "RedFar":
                         myBot.runAction(BuildFarAuto(myBot, false, spikeCount));
                         break;
-                    case "AutoNoTurnBlue":
+                    case "BlueFar":
                         myBot.runAction(BuildFarAuto(myBot, true, spikeCount));
                         break;
-                    case "NearNoTurnRed":
+                    case "RedNear":
                         myBot.runAction(BuildNearAuto(myBot, false, spikeCount));
                         break;
-                    case "NearNoTurnBlue":
+                    case "BlueNear":
                         myBot.runAction(BuildNearAuto(myBot, true, spikeCount));
                         break;
                 }
@@ -271,12 +271,26 @@ public class MeepMeepTesting {
                 .waitSeconds(launchTimeS)
                 .build();
 
+        Action park = myBot.getDrive().actionBuilder(Launch1)
+                .setTangent(PPG.heading)
+                .splineToLinearHeading(PPG, PPG.heading)
+                .build();
+
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
                 launchPreload,
                 fetchPPG,
-                fetchPGP,
+                fetchPGP
+        );
+        if (spikeCount > 2) {
+            ret = new SequentialAction(
+                ret,
                 fetchGPP
+            );
+        }
+        ret = new SequentialAction(
+                ret,
+                park
         );
         return ret;
     }

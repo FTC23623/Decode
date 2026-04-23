@@ -74,6 +74,11 @@ public abstract class AutoNear extends HydrAuto {
                 .splineToSplineHeading(Launch1, AutoTangent(GPPPos, Launch1.position))
                 .build();
 
+        Action park = mDrive.actionBuilder(Launch1)
+                .setTangent(PPG.heading)
+                .splineToLinearHeading(PPG, PPG.heading)
+                .build();
+
         // Launch preloads
         // Pickup from loading zone and launch
         // Pickup spike and launch
@@ -107,16 +112,25 @@ public abstract class AutoNear extends HydrAuto {
                         mTurret.GetLockAction(),
                         mIntake.GetAction(IntakeActions.IntakePushToLauncher)
                 ),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                mTurret.GetDisableAction(true),
-                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                fetchGPP,
-                mTurret.GetDisableAction(false),
-                new ParallelAction(
-                        mTurret.GetLockAction(),
-                        mIntake.GetAction(IntakeActions.IntakePushToLauncher)
-                ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch)
+        );
+        if (mSpikeCount > 2) {
+            ret = new SequentialAction(
+                    ret,
+                    mTurret.GetDisableAction(true),
+                    mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
+                    fetchGPP,
+                    mTurret.GetDisableAction(false),
+                    new ParallelAction(
+                            mTurret.GetLockAction(),
+                            mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                    ),
+                    mLauncher.GetAction(LauncherActions.LauncherLaunch)
+            );
+        }
+        ret = new SequentialAction(
+                ret,
+                park
         );
         return ret;
     }
