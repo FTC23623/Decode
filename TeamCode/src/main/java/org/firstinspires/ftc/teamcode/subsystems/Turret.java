@@ -37,7 +37,7 @@ public class Turret extends Turret_Base {
             TurretServo.set(0.5); // Send Turret Home
         }
         // Wait a bit for Turret to get home.
-        if (InitTimer.milliseconds() > 1000) {
+        if (InitTimer.milliseconds() > 600) {
             TurretEncoder.overrideResetPos(0);
             return true;
         } else{

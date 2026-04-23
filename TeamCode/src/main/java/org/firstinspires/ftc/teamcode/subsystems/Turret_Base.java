@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.HydraPIDFController;
+import org.firstinspires.ftc.teamcode.objects.LowPassFilter;
 import org.firstinspires.ftc.teamcode.objects.Subsystem;
 import org.firstinspires.ftc.teamcode.objects.VisionResult;
 import org.firstinspires.ftc.teamcode.types.Constants;
@@ -58,6 +59,8 @@ public abstract class Turret_Base implements Subsystem {
     private boolean visionUsedLast = false;
     public static double turretVisionLockVelThresh = 6; // Degrees/s
     public static double turretVisionSetPointVelThresh = 10; // Degrees/s
+    public LowPassFilter FiltVisionSP;
+    private static double visionFiltGain = 0.5;
 
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder) {
@@ -96,6 +99,7 @@ public abstract class Turret_Base implements Subsystem {
         TurretAngleController = new HydraPIDFController(default_P, default_I, default_D, default_F);
         TurretAngleController.setTolerance(0.5);
         TurretAngleController.setIntegrationBounds(-turretAngleCntlrILimit,turretAngleCntlrILimit);
+        FiltVisionSP = new LowPassFilter(visionFiltGain);
     }
 
     @Override
@@ -180,8 +184,8 @@ public abstract class Turret_Base implements Subsystem {
             TurretAngleController.clearTotalError(); // Reset Integrator
             visionUsedLast = false;
 
-            // Use Vision Tracking if enabled, valid and Robot and Turret are moving slow. ToDo: there could be issues with checking Turret velocity since vision setpoint may be reason turret is moving fast.
-        } else if (VisionTrackingEnabled() && vision != null && vision.isValid() && RobotVelocityOK()){ //&& TurretVelocityOK(turretVisionSetPointVelThresh)){
+            // Use Vision Tracking if enabled, valid and Robot is moving slow.
+        } else if (VisionTrackingEnabled() && vision != null && vision.isValid() && RobotVelocityOK()){
             //mOp.mTelemetry.addData("AprilTag", vision.GetTagClass());
             //mOp.mTelemetry.addData("AprilTag", vision.GetXOffset());
             //mOp.mTelemetry.addData("AprilTag", vision.GetYOffset());
@@ -193,7 +197,12 @@ public abstract class Turret_Base implements Subsystem {
                 lastVisionTimestamp = vision.GetTimestamp();
                 if (!visionUsedLast) {
                     TurretAngleController.clearTotalError();
+                    FiltVisionSP.reset();
+                    FiltVisionSP.update(servoFbPosition, visionFiltGain); //Seed the Filter with the current position
                 }
+                FiltVisionSP.update(visionSetpoint,visionFiltGain);
+                mOp.mTelemetry.addData("FiltVisionSP", FiltVisionSP);
+                //visionSetpoint = FiltVisionSP.getValue(); //ToDo: evaluate filter performance before using.
                 SetAngleController(visionSetpoint, vision_P, vision_I, vision_D, vision_F);
                 visionUsedLast = true;
             }
