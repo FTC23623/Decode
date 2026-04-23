@@ -87,6 +87,7 @@ public class Launcher implements Subsystem {
         }
         mImu = imu;
         autoRangeEnabled = true;
+        autoRangeDisable = new Debouncer(3);
     }
 
     @Override
