@@ -24,9 +24,9 @@ public abstract class AutoNearNoTurn extends HydrAuto {
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch1 = FlipPose(-20, 28, 45);
         Vector2d PPGPos = FlipCoordinate(-12, 48);
-        Vector2d PGPPos = FlipCoordinate(12, 48);
+        Vector2d PGPPos = FlipCoordinate(12, 50);
         Vector2d GPPPos = FlipCoordinate(36, 48);
-        Pose2d Gate = FlipPose(-4, 53, 90);
+        Pose2d Gate = FlipPose(-4, 54, 90);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos));
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos));
