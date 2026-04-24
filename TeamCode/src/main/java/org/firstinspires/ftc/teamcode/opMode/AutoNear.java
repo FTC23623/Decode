@@ -34,6 +34,7 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
         Pose2d GateFeed = FlipPose(9, 60, 130);
+        Pose2d GatePickup = FlipPose(13, 60, 130);
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(mBeginPose.position, Launch1.position);
@@ -84,7 +85,10 @@ public abstract class AutoNear extends HydrAuto {
                 //.setTangent(FlipTangent(-90))
                 .setTangent(togatefeedtangent)
                 .splineToLinearHeading(GateFeed, togatefeedtangent)
-                .waitSeconds(0.5)
+                .waitSeconds(0.1)
+                .setTangent(FlipTangent(0))
+                .splineToLinearHeading(GatePickup, FlipTangent(0))
+                .waitSeconds(0.4)
                 .setTangent(fromgatefeedtangent)
                 .splineToLinearHeading(Launch1, fromgatefeedtangent)
                 .build();

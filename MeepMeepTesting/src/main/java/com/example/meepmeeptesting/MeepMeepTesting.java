@@ -233,6 +233,7 @@ public class MeepMeepTesting {
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
         Pose2d GateFeed = FlipPose(9, 60, 130, flip);
+        Pose2d GatePickup = FlipPose(13, 60, 130, flip);
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(beginPose.position, Launch1.position, flip);
@@ -285,7 +286,10 @@ public class MeepMeepTesting {
                 //.setTangent(FlipTangent(-90, flip))
                 .setTangent(togatefeedtangent)
                 .splineToLinearHeading(GateFeed, togatefeedtangent)
-                .waitSeconds(0.5)
+                .waitSeconds(0.1)
+                .setTangent(FlipTangent(0, flip))
+                .splineToLinearHeading(GatePickup, FlipTangent(0, flip))
+                .waitSeconds(0.4)
                 .setTangent(fromgatefeedtangent)
                 .splineToLinearHeading(Launch1, fromgatefeedtangent)
                 .waitSeconds(launchTimeS)
