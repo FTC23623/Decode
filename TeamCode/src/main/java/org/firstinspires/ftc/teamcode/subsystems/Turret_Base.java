@@ -60,7 +60,7 @@ public abstract class Turret_Base implements Subsystem {
     public static double turretVisionLockVelThresh = 6; // Degrees/s
     public static double turretVisionSetPointVelThresh = 10; // Degrees/s
     public LowPassFilter FiltVisionSP;
-    private static double visionFiltGain = 0.5;
+    private static double visionFiltGain = 0.4;
 
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder) {
@@ -201,8 +201,8 @@ public abstract class Turret_Base implements Subsystem {
                     FiltVisionSP.update(servoFbPosition, visionFiltGain); //Seed the Filter with the current position
                 }
                 FiltVisionSP.update(visionSetpoint,visionFiltGain);
-                mOp.mTelemetry.addData("FiltVisionSP", FiltVisionSP);
-                //visionSetpoint = FiltVisionSP.getValue(); //ToDo: evaluate filter performance before using.
+                mOp.mTelemetry.addData("FiltVisionSP", FiltVisionSP.getValue());
+                visionSetpoint = FiltVisionSP.getValue(); //ToDo: evaluate filter performance before using.
                 SetAngleController(visionSetpoint, vision_P, vision_I, vision_D, vision_F);
                 visionUsedLast = true;
             }

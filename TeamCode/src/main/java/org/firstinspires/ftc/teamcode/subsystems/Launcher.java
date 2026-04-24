@@ -143,7 +143,10 @@ public class Launcher implements Subsystem {
         mOp.mTelemetry.addData("tgtRPM", targetRPMtune);
         //mOp.mTelemetry.addData("launchLoad", RunLaunchServo);
         //mOp.mTelemetry.addData("launchLoadSet", LaunchServoRun);
-    }
+        VisionResult vision = mOp.mVision.GetResult();
+        if (vision != null)
+            mOp.mTelemetry.addData("Distance - Vision", TurretKinematics.CalcDistanceToTag(vision, mOp));
+        }
 
     @Override
     public void HandleUserInput() {
