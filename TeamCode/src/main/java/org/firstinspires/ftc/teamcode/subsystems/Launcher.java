@@ -193,7 +193,7 @@ public class Launcher implements Subsystem {
             if (dist > 95) {
                 // TODO: move these to constants file
                 dist = Math.max(dist, 120);
-                targetRPMtune = (dist - 120) * 20 + 3025;
+                targetRPMtune = (dist - 120) * 20 + 2975;
                 //mOp.mTelemetry.addData("Distance", dist);
             } else if (dist > 0) {
                 targetRPMtune = dist * 7.5 + 1975;
