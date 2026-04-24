@@ -110,6 +110,9 @@ public abstract class AutoFar extends HydrAuto {
         }
 
         int lzPickups = 5 - mSpikeCount;
+        if (mSpikeCount > 0) {
+            --lzPickups;
+        }
         for (int i = 0; i < lzPickups; ++i) {
             ret = new SequentialAction(
                 ret,

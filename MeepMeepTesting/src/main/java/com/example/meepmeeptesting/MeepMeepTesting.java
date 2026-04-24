@@ -198,6 +198,9 @@ public class MeepMeepTesting {
             );
         }
         int lzPickups = 5 - spikeCount;
+        if (spikeCount > 0) {
+            --lzPickups;
+        }
         for (int i = 0; i < lzPickups; ++i) {
             ret = new SequentialAction(
                     ret,
