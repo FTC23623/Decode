@@ -22,7 +22,7 @@ public abstract class AutoNear extends HydrAuto {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch1 = FlipPose(-12, 20, 45);
+        Pose2d Launch1 = FlipPose(-14, 20, 45);
         Vector2d PPGPos = FlipCoordinate(-12, 48);
         Vector2d PGPPos = FlipCoordinate(12, 50);
         Vector2d GPPPos = FlipCoordinate(36, 48);
@@ -33,12 +33,12 @@ public abstract class AutoNear extends HydrAuto {
         Pose2d PPGSlowdownPose = Waypoint(Launch1, PPG, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
-        Pose2d GateFeed = FlipPose(12, 56, 135);
+        Pose2d GateFeed = FlipPose(9, 60, 130);
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(mBeginPose.position, Launch1.position);
         double fromgatetangent = AutoTangent(Gate.position, Launch1.position);
-        double togatetangent = AutoTangent(Launch1.position, Gate.position);
+        double togatefeedtangent = AutoTangent(Launch1.position, GateFeed.position);
         double fromgatefeedtangent = AutoTangent(GateFeed.position, Launch1.position);
 
         // Action to fetch artifacts from first spike and launch
@@ -78,12 +78,13 @@ public abstract class AutoNear extends HydrAuto {
                 .build();
 
         Action gateFeed = mDrive.actionBuilder(Launch1)
-                .setTangent(FlipTangent(0))
-                .splineToLinearHeading(Gate, FlipTangent(90))
+                //.setTangent(FlipTangent(0))
+                //.splineToLinearHeading(Gate, FlipTangent(90))
                 .afterTime(0, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                .setTangent(FlipTangent(-90))
-                .splineToLinearHeading(GateFeed, FlipTangent(45))
-                //.waitSeconds(0.5)
+                //.setTangent(FlipTangent(-90))
+                .setTangent(togatefeedtangent)
+                .splineToLinearHeading(GateFeed, togatefeedtangent)
+                .waitSeconds(0.5)
                 .setTangent(fromgatefeedtangent)
                 .splineToLinearHeading(Launch1, fromgatefeedtangent)
                 .build();

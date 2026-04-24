@@ -221,7 +221,7 @@ public class MeepMeepTesting {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch1 = FlipPose(-12, 20, 45, flip);
+        Pose2d Launch1 = FlipPose(-14, 20, 45, flip);
         Vector2d PPGPos = FlipCoordinate(-12, 48, flip);
         Vector2d PGPPos = FlipCoordinate(12, 50, flip);
         Vector2d GPPPos = FlipCoordinate(36, 48, flip);
@@ -232,12 +232,12 @@ public class MeepMeepTesting {
         Pose2d PPGSlowdownPose = Waypoint(Launch1, PPG, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
-        Pose2d GateFeed = FlipPose(12, 56, 135, flip);
+        Pose2d GateFeed = FlipPose(9, 60, 130, flip);
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(beginPose.position, Launch1.position, flip);
         double fromgatetangent = AutoTangent(Gate.position, Launch1.position, flip);
-        double togatetangent = AutoTangent(Launch1.position, Gate.position, flip);
+        double togatefeedtangent = AutoTangent(Launch1.position, GateFeed.position, flip);
         double fromgatefeedtangent = AutoTangent(GateFeed.position, Launch1.position, flip);
 
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
@@ -280,11 +280,12 @@ public class MeepMeepTesting {
                 .build();
 
         Action gateFeed = myBot.getDrive().actionBuilder(Launch1)
-                .setTangent(FlipTangent(0, flip))
-                .splineToLinearHeading(Gate, FlipTangent(90, flip))
-                .setTangent(FlipTangent(-90, flip))
-                .splineToLinearHeading(GateFeed, FlipTangent(45, flip))
-                //.waitSeconds(0.5)
+                //.setTangent(FlipTangent(0, flip))
+                //.splineToLinearHeading(Gate, FlipTangent(90, flip))
+                //.setTangent(FlipTangent(-90, flip))
+                .setTangent(togatefeedtangent)
+                .splineToLinearHeading(GateFeed, togatefeedtangent)
+                .waitSeconds(0.5)
                 .setTangent(fromgatefeedtangent)
                 .splineToLinearHeading(Launch1, fromgatefeedtangent)
                 .waitSeconds(launchTimeS)
