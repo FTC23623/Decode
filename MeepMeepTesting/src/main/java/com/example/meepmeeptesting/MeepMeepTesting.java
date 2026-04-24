@@ -18,7 +18,7 @@ import java.awt.event.ActionListener;
 
 public class MeepMeepTesting {
 
-    private static final double launchTimeS = 1.3;
+    private static final double launchTimeS = 1.15;
 
     public static void main(String[] args) {
         // Create a dropdown menu for selecting the auto
@@ -199,7 +199,7 @@ public class MeepMeepTesting {
         }
         int lzPickups = 5 - spikeCount;
         if (spikeCount > 0) {
-            --lzPickups;
+            //--lzPickups;
         }
         for (int i = 0; i < lzPickups; ++i) {
             ret = new SequentialAction(
