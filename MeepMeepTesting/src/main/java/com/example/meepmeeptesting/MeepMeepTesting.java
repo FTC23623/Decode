@@ -26,7 +26,7 @@ public class MeepMeepTesting {
         JComboBox<String> autoSelector = new JComboBox<>(autos);
 
         // Create a dropdown for selecting the spike count
-        Integer[] spikeCounts = { 4, 3, 2, 1, 0 };
+        Integer[] spikeCounts = { 3, 2, 1, 0 };
         JComboBox<Integer> spikeSelector = new JComboBox<>(spikeCounts);
 
         // Create a button to run the selected auto
@@ -232,10 +232,13 @@ public class MeepMeepTesting {
         Pose2d PPGSlowdownPose = Waypoint(Launch1, PPG, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
+        Pose2d GateFeed = FlipPose(12, 56, 135, flip);
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(beginPose.position, Launch1.position, flip);
-        double gatetangent = AutoTangent(Gate.position, Launch1.position, flip);
+        double fromgatetangent = AutoTangent(Gate.position, Launch1.position, flip);
+        double togatetangent = AutoTangent(Launch1.position, Gate.position, flip);
+        double fromgatefeedtangent = AutoTangent(GateFeed.position, Launch1.position, flip);
 
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .setTangent(preloadtangent)
@@ -250,8 +253,8 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(0, flip))
                 .splineToLinearHeading(Gate, FlipTangent(90, flip))
                 .waitSeconds(0.5)
-                .setTangent(gatetangent)
-                .splineToLinearHeading(Launch1, gatetangent)
+                .setTangent(fromgatetangent)
+                .splineToLinearHeading(Launch1, fromgatetangent)
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -262,8 +265,8 @@ public class MeepMeepTesting {
                 .setTangent(FlipTangent(180, flip))
                 .splineToLinearHeading(Gate, FlipTangent(90, flip))
                 .waitSeconds(0.5)
-                .setTangent(gatetangent)
-                .splineToSplineHeading(Launch1, gatetangent)
+                .setTangent(fromgatetangent)
+                .splineToSplineHeading(Launch1, fromgatetangent)
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -273,6 +276,17 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(GPPPos, Launch1.position, flip))
                 .splineToSplineHeading(Launch1, AutoTangent(GPPPos, Launch1.position, flip))
+                .waitSeconds(launchTimeS)
+                .build();
+
+        Action gateFeed = myBot.getDrive().actionBuilder(Launch1)
+                .setTangent(togatetangent)
+                .splineToSplineHeading(Gate, togatetangent)
+                .setTangent(FlipTangent(-90, flip))
+                .splineToLinearHeading(GateFeed, FlipTangent(45, flip))
+                .waitSeconds(0.5)
+                .setTangent(fromgatefeedtangent)
+                .splineToLinearHeading(Launch1, fromgatefeedtangent)
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -291,6 +305,11 @@ public class MeepMeepTesting {
             ret = new SequentialAction(
                 ret,
                 fetchGPP
+            );
+        } else {
+            ret = new SequentialAction(
+                ret,
+                gateFeed
             );
         }
         ret = new SequentialAction(
