@@ -23,8 +23,6 @@ public class Intake implements Subsystem {
     private final DcMotorEx transferMotor;
     private boolean intakeIn;
     private boolean intakeOut;
-    private double intakeOutSpeed;
-    private double intakeInSpeed;
     private boolean transferForward;
     private boolean transferReverse;
     private final ArrayList<ArtifactSensor> artifactSensors;
@@ -38,11 +36,11 @@ public class Intake implements Subsystem {
         mOp = opmode;
         intakeMotor = mOp.mHardwareMap.get(DcMotorEx.class, "intakeMotor");
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setVelocity(0);
         transferMotor = mOp.mHardwareMap.get(DcMotorEx.class, "transferMotor");
         transferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        transferMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        transferMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         transferMotor.setVelocity(0);
         intakeIn = false;
         intakeOut = false;
@@ -69,9 +67,7 @@ public class Intake implements Subsystem {
         double right = mOp.mOperatorGamepad.right_trigger;
         double left = mOp.mOperatorGamepad.left_trigger;
         intakeIn = right > Constants.trgBtnThresh;
-        intakeInSpeed = Constants.intakeMotorMaxIn * right;
         intakeOut = left > Constants.trgBtnThresh;
-        intakeOutSpeed = Constants.intakeMotorMaxOut * left;
         transferForward = mOp.mOperatorGamepad.right_bumper || mOp.mOperatorGamepad.square;
         transferReverse = mOp.mOperatorGamepad.left_bumper;
         /*disableAutoReject.In(mOp.mDriverGamepad.triangle);
@@ -117,9 +113,9 @@ public class Intake implements Subsystem {
      */
     @Override
     public void Process() {
-        // run the intake
-        //mOp.mTelemetry.addData("intakeInUser", intakeIn);
-        boolean intakeInSave = intakeIn;
+        // don't overwrite the inputs in this process
+        boolean intakeInLocal = intakeIn;
+        boolean intakeOutLocal = intakeOut;
         if (sensorRejectEnabled) {
             if (TransferFilled()) {
                 // the transfer just filled, we need to reject remaining artifacts
@@ -133,69 +129,43 @@ public class Intake implements Subsystem {
                 // stop rejection now
                 rejecting = false;
             }
+            // override intake out
             if (rejecting) {
-                // always want this when rejecting
-                intakeOut = true;
-                if (rejectionTimer.milliseconds() < Constants.IntakeReversalTimeMs) {
-                    intakeOutSpeed = 0;
-                } else {
-                    intakeOutSpeed = Constants.intakeMotorMaxOut;
-                }
+                // when rejecting, give the motor a chance to turn around
+                intakeOutLocal = rejectionTimer.milliseconds() >= Constants.IntakeReversalTimeMs;
+            } else if (transferFull) {
+                // when not rejecting, run the intake out if the transfer is full and intake in is set
+                intakeOutLocal = intakeIn;
             }
+            // override intake in
             if (transferFull) {
-                intakeIn = false;
-                intakeOut = intakeInSave;
+                // never intake when transfer is full
+                intakeInLocal = false;
             }
         }
         //mOp.mTelemetry.addData("intakeIn", intakeIn);
         mOp.mTelemetry.addData("rejecting", rejecting);
         mOp.mTelemetry.addData("transferFull", transferFull);
-        double intakesetrpm;
-        if (intakeIn) {
-            intakesetrpm = intakeInSpeed;
-        } else if (intakeOut) {
-            intakesetrpm = intakeOutSpeed;
-
-        } else {
-            intakesetrpm = 0;
-        }
-        // run the transfer
-        double transfersetrpm;
-        if (transferForward) {
-            transfersetrpm = Constants.TransfertoLaunchPower;
-        } else if (intakeInSave) {
-            transfersetrpm = Constants.TransferFromIntakePower;
-        } else if (transferReverse) {
-            transfersetrpm = Constants.TransferToIntakePower;
-        } else {
-            transfersetrpm = 0;
-        }
         mOp.mTelemetry.addData("AutoReject", sensorRejectEnabled);
 
-        double ticksPerSecond = transferMotor.getVelocity();
-        // convert to rpm
-        double ticksPerMin = 60 * ticksPerSecond;
-        // rpm
-        double transferrpm = ticksPerMin / Constants.TransferMotorTickperRev;
-
-
-         ticksPerSecond = intakeMotor.getVelocity();
-        // convert to rpm
-         ticksPerMin = 60 * ticksPerSecond;
-        // rpm
-        double intakerpm = ticksPerMin / Constants.IntakeMotorTickperRev;
-
-        mOp.mTelemetry.addData("transferrpm", transferrpm);
-
-        mOp.mTelemetry.addData("intakerpm", intakerpm);
-
-        ticksPerMin = transfersetrpm * Constants.TransferMotorTickperRev;
-        ticksPerSecond = ticksPerMin / 60;
-        transferMotor.setVelocity(ticksPerSecond);
-        ticksPerMin = intakesetrpm * Constants.IntakeMotorTickperRev;
-        ticksPerSecond = ticksPerMin / 60;
-        intakeMotor.setVelocity(ticksPerSecond);
-
+        // run the intake
+        if (intakeOutLocal) {
+            intakeMotor.setPower(Constants.intakeMotorMaxOut);
+        } else if (intakeInLocal) {
+            intakeMotor.setPower(Constants.intakeMotorMaxIn);
+        } else {
+            intakeMotor.setPower(0);
+        }
+        // run the transfer
+        if (transferForward) {
+            transferMotor.setPower(Constants.TransfertoLaunchPower);
+        } else if (intakeIn) {
+            transferMotor.setPower(Constants.TransferFromIntakePower);
+        } else if (transferReverse) {
+            transferMotor.setPower(Constants.TransferToIntakePower);
+        } else {
+            transferMotor.setPower(0);
+        }
     }
 
     private boolean TransferFilled() {

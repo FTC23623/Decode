@@ -17,8 +17,8 @@ public final class Constants {
     public static final double motorRpmIntervalMs = 50;
     public static final double linearLaunchMotTicksPerRev = 28;
     public static final double nsToMs = 1.0e-6;
-    public static final double intakeMotorMaxIn = -1600000;
-    public static final double intakeMotorMaxOut = 800000;
+    public static final double intakeMotorMaxIn = -1;
+    public static final double intakeMotorMaxOut = 0.5;
     public static final double LauncherTopRPMTele = 3025; //distance 135 - 3200, distance 120 - 2925, distance 125 - 3025
     public static final double LauncherTopRPMAuto = 2825;
     public static final double LauncherMedRPMThreshold = 2600;
@@ -30,9 +30,9 @@ public final class Constants {
     public static final double LauncherLowRPMAuto = 2175;
     public static final double LauncherIdleRPM = 500;
     public static final double LaunchServoRun = 1;
-    public static  double TransfertoLaunchPower = 1600000; //ToDo: Find Value that works
-    public static  double TransferFromIntakePower = 1600000;
-    public static final double TransferToIntakePower = -500000;
+    public static  double TransfertoLaunchPower = 1;
+    public static  double TransferFromIntakePower = 1;
+    public static final double TransferToIntakePower = -0.5;
     public static final double TransferMotorTickperRev = 145.1; // 103.8 for 1620rpm motor 145.1 for 1160rpm
     public static final double IntakeMotorTickperRev = 145.1 / 1.5; // from gobilda for 1150rpm Motor / (24/16) belt ratio (Speed of Intake Shaft)
     //Turret Constants
@@ -67,7 +67,7 @@ public final class Constants {
     public static double LaunchWheelRpmDeadband = 50;
     public static double LauncherAutoLaunchTimeMs = 850;
     public static int LauncherSpeedChangeWaitTimeMs = 6000;
-    public static int IntakeRejectionTimeMs = 3000;
+    public static int IntakeRejectionTimeMs = 1000;
     public static int IntakeReversalTimeMs = 50;
     public static int ArtifactDetectionTimeMs = 100;
     public static double driveMotorSlewRate = 0.2;
