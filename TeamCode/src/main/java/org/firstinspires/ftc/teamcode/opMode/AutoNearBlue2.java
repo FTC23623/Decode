@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.types.VisionMode;
 
-@Disabled
 @Autonomous(name = "BlueNear2", preselectTeleOp = "TeleBlue", group = "Blue")
 public class AutoNearBlue2 extends AutoNear {
     public AutoNearBlue2() {

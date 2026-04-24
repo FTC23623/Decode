@@ -44,8 +44,6 @@ public class Intake implements Subsystem {
         transferMotor.setVelocity(0);
         intakeIn = false;
         intakeOut = false;
-        intakeOutSpeed = Constants.intakeMotorMaxOut;
-        intakeInSpeed = Constants.intakeMotorMaxIn;
         transferForward = false;
         transferReverse = false;
         this.sensorRejectEnabled = true;
