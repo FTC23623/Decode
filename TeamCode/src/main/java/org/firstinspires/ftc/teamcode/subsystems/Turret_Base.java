@@ -53,7 +53,7 @@ public abstract class Turret_Base implements Subsystem {
     private double odometrySetpoint = 0.0;
     public HydraPIDFController TurretAngleController;
     public static double default_P = 0.98, default_I = 0, default_D = 0, default_F = 0;
-    public static double vision_P = 0.94, vision_I = 0.3, vision_D = 0, vision_F = 0;
+    public static double vision_P = 0.94, vision_I = 0.4, vision_D = 0, vision_F = 0.4;
     public static double odometry_P = 0.98, odometry_I = 0, odometry_D = 0, odometry_F = 0;
     public static double turretAngleCntlrILimit = 3;
     private boolean visionUsedLast = false;
