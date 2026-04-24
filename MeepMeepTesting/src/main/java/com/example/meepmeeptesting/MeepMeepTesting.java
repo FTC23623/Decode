@@ -151,7 +151,7 @@ public class MeepMeepTesting {
         //Pose2d Launch1 = FlipPose(55, 15, 90, flip);
         Vector2d GPPPos = FlipCoordinate(36, 48, flip);
         Vector2d PGPPos = FlipCoordinate(12, 48, flip);
-        Vector2d Launch2Pos = FlipCoordinate(55, 15, flip);
+        Vector2d Launch2Pos = FlipCoordinate(59, 21, flip);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos, flip));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos, flip));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90, flip));

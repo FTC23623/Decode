@@ -25,7 +25,7 @@ public abstract class AutoFar extends HydrAuto {
         //Pose2d Launch1 = FlipPose(55, 15, 90);
         Vector2d GPPPos = FlipCoordinate(36, 48);
         Vector2d PGPPos = FlipCoordinate(12, 48);
-        Vector2d Launch2Pos = FlipCoordinate(55, 15);
+        Vector2d Launch2Pos = FlipCoordinate(59, 21);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch2Pos, GPPPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch2Pos, PGPPos));
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
