@@ -22,7 +22,7 @@ public abstract class AutoNear extends HydrAuto {
 
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
-        Pose2d Launch1 = FlipPose(-20, 28, 45);
+        Pose2d Launch1 = FlipPose(-12, 20, 45);
         Vector2d PPGPos = FlipCoordinate(-12, 48);
         Vector2d PGPPos = FlipCoordinate(12, 50);
         Vector2d GPPPos = FlipCoordinate(36, 48);
@@ -87,7 +87,7 @@ public abstract class AutoNear extends HydrAuto {
                 mIntake.GetRejectDisableAction(true),
                 new ParallelAction(
                     launchPreload,
-                    mTurret.GetSetAction(FlipTurret(-90)),
+                    mTurret.GetSetAction(FlipTurret(-80)),
                     mIntake.GetAction(IntakeActions.IntakePushToLauncher),
                     mLauncher.GetAction(LauncherActions.LauncherRunSlow)
                 ),
