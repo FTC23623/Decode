@@ -225,9 +225,10 @@ public class MeepMeepTesting {
         Vector2d PPGPos = FlipCoordinate(-12, 48, flip);
         Vector2d PGPPos = FlipCoordinate(12, 50, flip);
         Vector2d GPPPos = FlipCoordinate(36, 48, flip);
-        Pose2d Gate = FlipPose(2, 55, 90, flip);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos, flip));
+        Pose2d PPGGate = FlipPose(-2, 55, 90, flip);
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos, flip));
+        Pose2d PGPGate = FlipPose(2, 55, 90, flip);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos, flip));
         Pose2d PPGSlowdownPose = Waypoint(Launch1, PPG, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
@@ -237,9 +238,9 @@ public class MeepMeepTesting {
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(beginPose.position, Launch1.position, flip);
-        double fromgatetangent = AutoTangent(Gate.position, Launch1.position, flip);
+        double fromPpgGateTangent = AutoTangent(PPGGate.position, Launch1.position, flip);
         double togatefeedtangent = AutoTangent(Launch1.position, GateFeed.position, flip);
-        double fromgatefeedtangent = AutoTangent(GateFeed.position, Launch1.position, flip);
+        double ppgtangent = AutoTangent(PPG.position, Launch1.position, flip);
 
         Action launchPreload = myBot.getDrive().actionBuilder(beginPose)
                 .setTangent(preloadtangent)
@@ -251,11 +252,20 @@ public class MeepMeepTesting {
                 .setTangent(PPG.heading)
                 .splineToSplineHeading(PPGSlowdownPose, PPG.heading)
                 .splineToSplineHeading(PPG, PPG.heading, new TranslationalVelConstraint(slowdownspeed))
+                .build();
+
+        Action gatePPG = myBot.getDrive().actionBuilder(PPG)
                 .setTangent(FlipTangent(0, flip))
-                .splineToLinearHeading(Gate, FlipTangent(90, flip))
+                .splineToLinearHeading(PPGGate, FlipTangent(90, flip))
                 .waitSeconds(0.5)
-                .setTangent(fromgatetangent)
-                .splineToLinearHeading(Launch1, fromgatetangent)
+                .setTangent(fromPpgGateTangent)
+                .splineToLinearHeading(Launch1, fromPpgGateTangent)
+                .waitSeconds(launchTimeS)
+                .build();
+
+        Action launchPPG = myBot.getDrive().actionBuilder(PPG)
+                .setTangent(ppgtangent)
+                .splineToLinearHeading(Launch1, ppgtangent)
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -263,11 +273,11 @@ public class MeepMeepTesting {
                 .setTangent(PGP.heading)
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
-                .setTangent(FlipTangent(180, flip))
-                .splineToLinearHeading(Gate, FlipTangent(90, flip))
+                .setTangent(FlipTangent(-100, flip))
+                .splineToLinearHeading(PGPGate, FlipTangent(90, flip))
                 .waitSeconds(0.5)
-                .setTangent(fromgatetangent)
-                .splineToSplineHeading(Launch1, fromgatetangent)
+                .setTangent(FlipTangent(-45, flip))
+                .splineToLinearHeading(Launch1, FlipTangent(-135, flip))
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -281,17 +291,14 @@ public class MeepMeepTesting {
                 .build();
 
         Action gateFeed = myBot.getDrive().actionBuilder(Launch1)
-                //.setTangent(FlipTangent(0, flip))
-                //.splineToLinearHeading(Gate, FlipTangent(90, flip))
-                //.setTangent(FlipTangent(-90, flip))
-                .setTangent(togatefeedtangent)
+                .setTangent(FlipTangent(30, flip))
                 .splineToLinearHeading(GateFeed, togatefeedtangent)
                 .waitSeconds(0.1)
                 .setTangent(FlipTangent(0, flip))
                 .splineToLinearHeading(GatePickup, FlipTangent(0, flip))
                 .waitSeconds(0.4)
-                .setTangent(fromgatefeedtangent)
-                .splineToLinearHeading(Launch1, fromgatefeedtangent)
+                .setTangent(FlipTangent(-90, flip))
+                .splineToLinearHeading(Launch1, FlipTangent(-135, flip))
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -308,6 +315,7 @@ public class MeepMeepTesting {
             ret = new SequentialAction(
                 ret,
                 fetchPPG,
+                gatePPG,
                 fetchPGP,
                 fetchGPP
             );
@@ -316,7 +324,8 @@ public class MeepMeepTesting {
                 ret,
                 fetchPGP,
                 gateFeed,
-                fetchPPG
+                fetchPPG,
+                launchPPG
             );
         }
         ret = new SequentialAction(

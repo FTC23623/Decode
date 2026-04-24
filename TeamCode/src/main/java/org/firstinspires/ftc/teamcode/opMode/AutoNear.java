@@ -26,9 +26,10 @@ public abstract class AutoNear extends HydrAuto {
         Vector2d PPGPos = FlipCoordinate(-12, 48);
         Vector2d PGPPos = FlipCoordinate(12, 50);
         Vector2d GPPPos = FlipCoordinate(36, 48);
-        Pose2d Gate = FlipPose(2, 55, 90);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos));
+        Pose2d PPGGate = FlipPose(-2, 55, 90);
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos));
+        Pose2d PGPGate = FlipPose(2, 55, 90);
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos));
         Pose2d PPGSlowdownPose = Waypoint(Launch1, PPG, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
@@ -38,9 +39,9 @@ public abstract class AutoNear extends HydrAuto {
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(mBeginPose.position, Launch1.position);
-        double fromgatetangent = AutoTangent(Gate.position, Launch1.position);
+        double fromPpgGateTangent = AutoTangent(PPGGate.position, Launch1.position);
         double togatefeedtangent = AutoTangent(Launch1.position, GateFeed.position);
-        double fromgatefeedtangent = AutoTangent(GateFeed.position, Launch1.position);
+        double ppgtangent = AutoTangent(PPG.position, Launch1.position);
 
         // Action to fetch artifacts from first spike and launch
         Action launchPreload = mDrive.actionBuilder(mBeginPose)
@@ -52,22 +53,30 @@ public abstract class AutoNear extends HydrAuto {
                 .setTangent(PPG.heading)
                 .splineToSplineHeading(PPGSlowdownPose, PPG.heading)
                 .splineToSplineHeading(PPG, PPG.heading, new TranslationalVelConstraint(slowdownspeed))
+                .build();
+
+        Action gatePPG = mDrive.actionBuilder(PPG)
                 .setTangent(FlipTangent(0))
-                .splineToLinearHeading(Gate, FlipTangent(90))
+                .splineToLinearHeading(PPGGate, FlipTangent(90))
                 .waitSeconds(0.5)
-                .setTangent(fromgatetangent)
-                .splineToLinearHeading(Launch1, fromgatetangent)
+                .setTangent(fromPpgGateTangent)
+                .splineToLinearHeading(Launch1, fromPpgGateTangent)
+                .build();
+
+        Action launchPPG = mDrive.actionBuilder(PPG)
+                .setTangent(ppgtangent)
+                .splineToLinearHeading(Launch1, ppgtangent)
                 .build();
 
         Action fetchPGP = mDrive.actionBuilder(Launch1)
                 .setTangent(PGP.heading)
                 .splineToSplineHeading(PGPSlowdownPose, PGP.heading)
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
-                .setTangent(FlipTangent(180))
-                .splineToLinearHeading(Gate, FlipTangent(90))
+                .setTangent(FlipTangent(-100))
+                .splineToLinearHeading(PGPGate, FlipTangent(90))
                 .waitSeconds(0.5)
-                .setTangent(fromgatetangent)
-                .splineToSplineHeading(Launch1, fromgatetangent)
+                .setTangent(FlipTangent(-45))
+                .splineToLinearHeading(Launch1, FlipTangent(-135))
                 .build();
 
         Action fetchGPP = mDrive.actionBuilder(Launch1)
@@ -79,18 +88,15 @@ public abstract class AutoNear extends HydrAuto {
                 .build();
 
         Action gateFeed = mDrive.actionBuilder(Launch1)
-                //.setTangent(FlipTangent(0))
-                //.splineToLinearHeading(Gate, FlipTangent(90))
                 .afterTime(0, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
-                //.setTangent(FlipTangent(-90))
-                .setTangent(togatefeedtangent)
+                .setTangent(FlipTangent(30))
                 .splineToLinearHeading(GateFeed, togatefeedtangent)
                 .waitSeconds(0.1)
                 .setTangent(FlipTangent(0))
                 .splineToLinearHeading(GatePickup, FlipTangent(0))
                 .waitSeconds(0.4)
-                .setTangent(fromgatefeedtangent)
-                .splineToLinearHeading(Launch1, fromgatefeedtangent)
+                .setTangent(FlipTangent(-90))
+                .splineToLinearHeading(Launch1, FlipTangent(-135))
                 .build();
 
         Action park = mDrive.actionBuilder(Launch1)
@@ -118,7 +124,9 @@ public abstract class AutoNear extends HydrAuto {
         if (mSpikeCount > 2) {
             ret = new SequentialAction(
                 ret,
-                LaunchProcess(fetchPPG),
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
+                fetchPPG,
+                LaunchProcess(gatePPG),
                 LaunchProcess(fetchPGP),
                 LaunchProcess(fetchGPP)
             );
@@ -134,7 +142,9 @@ public abstract class AutoNear extends HydrAuto {
                         mIntake.GetAction(IntakeActions.IntakePushToLauncher)
                 ),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                LaunchProcess(fetchPPG)
+                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
+                fetchPPG,
+                LaunchProcess(launchPPG)
             );
         }
         ret = new SequentialAction(
