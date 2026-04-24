@@ -225,7 +225,7 @@ public class MeepMeepTesting {
         Vector2d PPGPos = FlipCoordinate(-12, 48, flip);
         Vector2d PGPPos = FlipCoordinate(12, 50, flip);
         Vector2d GPPPos = FlipCoordinate(36, 48, flip);
-        Pose2d Gate = FlipPose(-4, 54, 90, flip);
+        Pose2d Gate = FlipPose(2, 54, 90, flip);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos, flip));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos, flip));
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos, flip));
@@ -280,8 +280,8 @@ public class MeepMeepTesting {
                 .build();
 
         Action gateFeed = myBot.getDrive().actionBuilder(Launch1)
-                .setTangent(togatetangent)
-                .splineToSplineHeading(Gate, togatetangent)
+                .setTangent(FlipTangent(0, flip))
+                .splineToLinearHeading(Gate, FlipTangent(90, flip))
                 .setTangent(FlipTangent(-90, flip))
                 .splineToLinearHeading(GateFeed, FlipTangent(45, flip))
                 .waitSeconds(0.5)
@@ -297,19 +297,21 @@ public class MeepMeepTesting {
 
         // This logic mirrors the construction in your AutoFar.java
         SequentialAction ret =  new SequentialAction(
-                launchPreload,
-                fetchPPG,
-                fetchPGP
+                launchPreload
         );
         if (spikeCount > 2) {
             ret = new SequentialAction(
                 ret,
+                fetchPPG,
+                fetchPGP,
                 fetchGPP
             );
         } else {
             ret = new SequentialAction(
                 ret,
-                gateFeed
+                fetchPGP,
+                gateFeed,
+                fetchPPG
             );
         }
         ret = new SequentialAction(

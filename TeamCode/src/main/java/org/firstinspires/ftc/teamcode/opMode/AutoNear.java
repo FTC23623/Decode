@@ -26,17 +26,20 @@ public abstract class AutoNear extends HydrAuto {
         Vector2d PPGPos = FlipCoordinate(-12, 48);
         Vector2d PGPPos = FlipCoordinate(12, 50);
         Vector2d GPPPos = FlipCoordinate(36, 48);
-        Pose2d Gate = FlipPose(-4, 54, 90);
+        Pose2d Gate = FlipPose(2, 54, 90);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos));
         Pose2d PGP = new Pose2d(PGPPos, AutoTangent(Launch1.position, PGPPos));
         Pose2d GPP = new Pose2d(GPPPos, AutoTangent(Launch1.position, GPPPos));
         Pose2d PPGSlowdownPose = Waypoint(Launch1, PPG, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch1, PGP, 0.75);
         Pose2d GPPSlowdownPose = Waypoint(Launch1, GPP, 0.75);
+        Pose2d GateFeed = FlipPose(12, 56, 135);
 
         double slowdownspeed = 20;
         double preloadtangent = AutoTangent(mBeginPose.position, Launch1.position);
-        double gatetangent = AutoTangent(Gate.position, Launch1.position);
+        double fromgatetangent = AutoTangent(Gate.position, Launch1.position);
+        double togatetangent = AutoTangent(Launch1.position, Gate.position);
+        double fromgatefeedtangent = AutoTangent(GateFeed.position, Launch1.position);
 
         // Action to fetch artifacts from first spike and launch
         Action launchPreload = mDrive.actionBuilder(mBeginPose)
@@ -51,8 +54,8 @@ public abstract class AutoNear extends HydrAuto {
                 .setTangent(FlipTangent(0))
                 .splineToLinearHeading(Gate, FlipTangent(90))
                 .waitSeconds(0.5)
-                .setTangent(gatetangent)
-                .splineToLinearHeading(Launch1, gatetangent)
+                .setTangent(fromgatetangent)
+                .splineToLinearHeading(Launch1, fromgatetangent)
                 .build();
 
         Action fetchPGP = mDrive.actionBuilder(Launch1)
@@ -62,8 +65,8 @@ public abstract class AutoNear extends HydrAuto {
                 .setTangent(FlipTangent(180))
                 .splineToLinearHeading(Gate, FlipTangent(90))
                 .waitSeconds(0.5)
-                .setTangent(gatetangent)
-                .splineToSplineHeading(Launch1, gatetangent)
+                .setTangent(fromgatetangent)
+                .splineToSplineHeading(Launch1, fromgatetangent)
                 .build();
 
         Action fetchGPP = mDrive.actionBuilder(Launch1)
@@ -72,6 +75,17 @@ public abstract class AutoNear extends HydrAuto {
                 .splineToSplineHeading(GPP, GPP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(GPPPos, Launch1.position))
                 .splineToSplineHeading(Launch1, AutoTangent(GPPPos, Launch1.position))
+                .build();
+
+        Action gateFeed = mDrive.actionBuilder(Launch1)
+                .setTangent(FlipTangent(0))
+                .splineToLinearHeading(Gate, FlipTangent(90))
+                .afterTime(0, mIntake.GetAction(IntakeActions.IntakeLoadArtifacts))
+                .setTangent(FlipTangent(-90))
+                .splineToLinearHeading(GateFeed, FlipTangent(45))
+                .waitSeconds(0.5)
+                .setTangent(fromgatefeedtangent)
+                .splineToLinearHeading(Launch1, fromgatefeedtangent)
                 .build();
 
         Action park = mDrive.actionBuilder(Launch1)
@@ -94,38 +108,28 @@ public abstract class AutoNear extends HydrAuto {
                 mTurret.GetDisableAction(false),
                 mTurret.GetLockAction(),
                 mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                mIntake.GetRejectDisableAction(false)
+            );
+        if (mSpikeCount > 2) {
+            ret = new SequentialAction(
+                ret,
+                LaunchProcess(fetchPPG),
+                LaunchProcess(fetchPGP),
+                LaunchProcess(fetchGPP)
+            );
+        } else {
+            ret = new SequentialAction(
+                ret,
+                LaunchProcess(fetchPGP),
                 mTurret.GetDisableAction(true),
-                mIntake.GetRejectDisableAction(false),
-                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                fetchPPG,
-                mTurret.GetDisableAction(false),
-                new ParallelAction(
-                    mTurret.GetLockAction(),
-                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
-                ),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch),
-                mTurret.GetDisableAction(true),
-                mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                fetchPGP,
+                gateFeed,
                 mTurret.GetDisableAction(false),
                 new ParallelAction(
                         mTurret.GetLockAction(),
                         mIntake.GetAction(IntakeActions.IntakePushToLauncher)
                 ),
-                mLauncher.GetAction(LauncherActions.LauncherLaunch)
-        );
-        if (mSpikeCount > 2) {
-            ret = new SequentialAction(
-                    ret,
-                    mTurret.GetDisableAction(true),
-                    mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
-                    fetchGPP,
-                    mTurret.GetDisableAction(false),
-                    new ParallelAction(
-                            mTurret.GetLockAction(),
-                            mIntake.GetAction(IntakeActions.IntakePushToLauncher)
-                    ),
-                    mLauncher.GetAction(LauncherActions.LauncherLaunch)
+                mLauncher.GetAction(LauncherActions.LauncherLaunch),
+                LaunchProcess(fetchPPG)
             );
         }
         ret = new SequentialAction(
@@ -133,5 +137,19 @@ public abstract class AutoNear extends HydrAuto {
                 park
         );
         return ret;
+    }
+
+    SequentialAction LaunchProcess(Action drive) {
+        return new SequentialAction(
+            mTurret.GetDisableAction(true),
+            mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
+            drive,
+            mTurret.GetDisableAction(false),
+            new ParallelAction(
+                    mTurret.GetLockAction(),
+                    mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+            ),
+            mLauncher.GetAction(LauncherActions.LauncherLaunch)
+        );
     }
 }
