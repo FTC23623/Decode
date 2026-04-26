@@ -48,7 +48,7 @@ public class Launcher implements Subsystem {
     public static double pidF = 0.000242;
     private final double pidfFar = 0.000219;
     private final double pidfMed = 0.000219;
-    private final double pidfNear = 0.000223;
+    private final double pidfNear = 0.000225;
     private final PIDFController pid;
     private long lastTime;
     public static int samplesToAverage = 0;
