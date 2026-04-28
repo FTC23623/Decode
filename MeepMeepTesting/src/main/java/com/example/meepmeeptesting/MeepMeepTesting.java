@@ -157,6 +157,7 @@ public class MeepMeepTesting {
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90, flip));
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
+        Pose2d Park = FlipPose(Launch2.position.x, 34, 90, flip);
 
         Action launchPreloads = myBot.getDrive().actionBuilder(beginPose)
                 .waitSeconds(3)
@@ -178,6 +179,11 @@ public class MeepMeepTesting {
                 .setTangent(AutoTangent(PGPPos, Launch2Pos, flip))
                 .splineToSplineHeading(Launch2, AutoTangent(PGPPos, Launch2Pos, flip))
                 .waitSeconds(launchTimeS)
+                .build();
+
+        Action parkAction = myBot.getDrive().actionBuilder(Launch2)
+                .setTangent(FlipTangent(90, flip))
+                .splineToLinearHeading(Park, FlipTangent(90, flip))
                 .build();
 
         int lzcount = 0;
@@ -210,7 +216,7 @@ public class MeepMeepTesting {
 
         ret = new SequentialAction(
                 ret,
-                LoadingZoneSequence(myBot, Launch2, false, flip, Launch2, true, 0)
+                parkAction
         );
 
         return ret;

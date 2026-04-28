@@ -31,6 +31,7 @@ public abstract class AutoFar extends HydrAuto {
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
+        Pose2d Park = FlipPose(Launch2.position.x, 34, 90);
 
         double slowdownspeed = 20;
         int lzcount = 0;
@@ -51,6 +52,11 @@ public abstract class AutoFar extends HydrAuto {
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos))
                 .splineToSplineHeading(Launch2, AutoTangent(PGPPos, Launch2Pos))
+                .build();
+
+        Action parkAction = mDrive.actionBuilder(Launch2)
+                .setTangent(FlipTangent(90))
+                .splineToLinearHeading(Park, FlipTangent(90))
                 .build();
 
         // Launch preloads
@@ -122,7 +128,8 @@ public abstract class AutoFar extends HydrAuto {
 
         ret = new SequentialAction(
             ret,
-            LoadingZoneSequence(Launch2, false, Launch2, true, 0)
+            parkAction,
+            mIntake.GetAction(IntakeActions.IntakeStop)
         );
         return ret;
     }
