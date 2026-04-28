@@ -134,6 +134,10 @@ public abstract class HydrAuto extends OpMode_Base {
             telemetry.update();
             idle();
         }
+        // if the auto ends early, wait here until the opmode stops
+        while (opModeIsActive()) {
+            idle();
+        }
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
