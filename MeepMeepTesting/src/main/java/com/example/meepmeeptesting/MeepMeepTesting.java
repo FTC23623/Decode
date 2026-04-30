@@ -97,14 +97,10 @@ public class MeepMeepTesting {
         Pose2d Slowdown_Pose;
         if (straight) {
             double x = StartPos.position.x;
-            if (count > 0) {
-                if ((count & 1) != 0) {
-                    x -= 6;
-                } else {
-                    x -= 12;
-                }
+            if (count > 1) {
+                x -= (count - 1) * 6;
             }
-            LoadingZone = FlipPose(StartPos.position.x,56,90, flip);
+            LoadingZone = FlipPose(x,56,90, flip);
             Slowdown_Pose = FlipPose(LoadingZone.position.x, 49, 90, flip);
         }
         else {
