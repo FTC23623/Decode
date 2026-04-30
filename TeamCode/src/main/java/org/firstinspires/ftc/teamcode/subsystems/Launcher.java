@@ -190,9 +190,12 @@ public class Launcher implements Subsystem {
             mOp.mTelemetry.addData("Distance - Vision", dist);
         }
         if (autoRangeEnabled) {
+            if (dist > Constants.MaxLaunchDistanceInches) {
+                dist = Constants.MaxLaunchDistanceInches;
+            }
             if (dist > 95) {
                 // TODO: move these to constants file
-                dist = Math.max(dist, 120);
+                //dist = Math.max(dist, 120);
                 targetRPMtune = (dist - 120) * 20 + 2945;
                 //mOp.mTelemetry.addData("Distance", dist);
             } else if (dist > 0) {
@@ -227,7 +230,11 @@ public class Launcher implements Subsystem {
     }
 
     public boolean AtSpeed() {
-        return Math.abs(lastRpmMeasure.get(0) - targetRPMtune) < Constants.LaunchWheelRpmDeadband;
+        double measured = lastRpmMeasure.get(0);
+        if (measured > targetRPMtune) {
+            return (measured - targetRPMtune) < Constants.LaunchWheelRpmDeadbandTop;
+        }
+        return (targetRPMtune - measured) < Constants.LaunchWheelRpmDeadbandBottom;
     }
 
     public void SetSpeed(double speed) {
