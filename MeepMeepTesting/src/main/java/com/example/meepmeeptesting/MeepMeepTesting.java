@@ -228,7 +228,7 @@ public class MeepMeepTesting {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch1 = FlipPose(-14, 20, 45, flip);
-        Vector2d PPGPos = FlipCoordinate(-12, 48, flip);
+        Vector2d PPGPos = FlipCoordinate(-12, 51, flip);
         Vector2d PGPPos = FlipCoordinate(12, 50, flip);
         Vector2d GPPPos = FlipCoordinate(36, 48, flip);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos, flip));
@@ -261,7 +261,7 @@ public class MeepMeepTesting {
                 .build();
 
         Action gatePPG = myBot.getDrive().actionBuilder(PPG)
-                .setTangent(FlipTangent(0, flip))
+                .setTangent(FlipTangent(-80, flip))
                 .splineToLinearHeading(PPGGate, FlipTangent(90, flip))
                 .waitSeconds(0.5)
                 .setTangent(fromPpgGateTangent)

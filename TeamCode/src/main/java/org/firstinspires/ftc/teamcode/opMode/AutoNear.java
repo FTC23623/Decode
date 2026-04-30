@@ -23,7 +23,7 @@ public abstract class AutoNear extends HydrAuto {
         // All poses defined for autos on the red side
         // FlipPose and FlipTangent auto adjust for blue
         Pose2d Launch1 = FlipPose(-14, 20, 45);
-        Vector2d PPGPos = FlipCoordinate(-12, 48);
+        Vector2d PPGPos = FlipCoordinate(-12, 51);
         Vector2d PGPPos = FlipCoordinate(12, 50);
         Vector2d GPPPos = FlipCoordinate(36, 48);
         Pose2d PPG = new Pose2d(PPGPos, AutoTangent(Launch1.position, PPGPos));
@@ -56,7 +56,7 @@ public abstract class AutoNear extends HydrAuto {
                 .build();
 
         Action gatePPG = mDrive.actionBuilder(PPG)
-                .setTangent(FlipTangent(0))
+                .setTangent(FlipTangent(-80))
                 .splineToLinearHeading(PPGGate, FlipTangent(90))
                 .waitSeconds(0.5)
                 .setTangent(fromPpgGateTangent)
