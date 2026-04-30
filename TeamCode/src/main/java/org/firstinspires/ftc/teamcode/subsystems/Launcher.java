@@ -64,6 +64,8 @@ public class Launcher implements Subsystem {
     private final Imu mImu;
     private final Debouncer autoRangeDisable;
     private boolean autoRangeEnabled;
+    public static double farLaunchSlope = 17;
+    public static double farLaunchIntercept = 3015;
 
     public Launcher(HydraOpMode Opmode, Turret_Base turret, Imu imu, double targetRPM) {
         mOp = Opmode;
@@ -196,7 +198,7 @@ public class Launcher implements Subsystem {
             if (dist > 95) {
                 // TODO: move these to constants file
                 //dist = Math.max(dist, 120);
-                targetRPMtune = (dist - 120) * 20 + 2945;
+                targetRPMtune = (dist - 120) * farLaunchSlope + farLaunchIntercept;
                 //mOp.mTelemetry.addData("Distance", dist);
             } else if (dist > 0) {
                 targetRPMtune = dist * 7.5 + 1975;
