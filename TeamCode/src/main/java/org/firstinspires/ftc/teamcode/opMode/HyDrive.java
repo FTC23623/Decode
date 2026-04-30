@@ -128,6 +128,9 @@ public abstract class HyDrive extends OpMode_Base {
       telemetry.update();
       idle();
     }
+    if (mImu != null) {
+      OpmodeHeading.SetOffset(mImu.GetPose());
+    }
   }
 
   private double DriverHeadingFromRobotPose(Pose2d pose) {
