@@ -31,7 +31,7 @@ public abstract class AutoFarStop extends HydrAuto {
         Pose2d Launch2 = new Pose2d(Launch2Pos, FlipTangent(90));
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
-        Pose2d Park = FlipPose(Launch2.position.x, 34, 90);
+        Pose2d Park = FlipPose(36, 12, 90);
 
         double slowdownspeed = 20;
         int lzcount = 0;
@@ -55,8 +55,8 @@ public abstract class AutoFarStop extends HydrAuto {
                 .build();
 
         Action parkAction = mDrive.actionBuilder(Launch2)
-                .setTangent(FlipTangent(90))
-                .splineToLinearHeading(Park, FlipTangent(90))
+                .setTangent(FlipTangent(180))
+                .splineToLinearHeading(Park, FlipTangent(180))
                 .build();
 
         // Launch preloads
