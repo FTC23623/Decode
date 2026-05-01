@@ -212,7 +212,7 @@ public class HydraPIDFController {
 
         double kStatic;
         if (atSetPoint()) {
-            kStatic = kF;
+            kStatic = 0;
         } else {
             kStatic = kF * Math.signum(errorVal_p);
         }
