@@ -12,9 +12,9 @@ public class LaunchMotor {
     private final DcMotorEx motor;
     private final double ticksPerRev;
     private final SampleAverage mAvgRpm;
-    public final LaunchDatalogger mLogger;
+    public LaunchDatalogger mLogger = null;
 
-    public LaunchMotor(String name, HydraOpMode opMode, DcMotorEx mot, DcMotorSimple.Direction motorDir, double motTicksPerRev, int samplesToAvg){
+    public LaunchMotor(String name, HydraOpMode opMode, DcMotorEx mot, DcMotorSimple.Direction motorDir, double motTicksPerRev, int samplesToAvg, boolean loggerEnabled){
         mName = name;
         mOp = opMode;
         motor = mot;
@@ -25,7 +25,9 @@ public class LaunchMotor {
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ticksPerRev = motTicksPerRev;
         mAvgRpm = new SampleAverage(samplesToAvg);
-        mLogger = new LaunchDatalogger(mName + "-launch");
+        if (loggerEnabled) {
+            mLogger = new LaunchDatalogger(mName + "-launch");
+        }
     }
 
     public double GetRPM() {
@@ -39,16 +41,20 @@ public class LaunchMotor {
         double avgRpm = mAvgRpm.GetAverage();
         // telemetry and datalogging
         //double current = motor.getCurrent(CurrentUnit.MILLIAMPS);
-        mLogger.rpm.set(rpm);
-        //mLogger.current.set(current);
+        if (mLogger != null) {
+            mLogger.rpm.set(rpm);
+            //mLogger.current.set(current);
+        }
         // return rpm
         return avgRpm;
     }
 
     public void SetPower(double power) {
         motor.setPower(power);
-        mLogger.power.set(power);
-        mLogger.writeLine();
+        if (mLogger != null) {
+            mLogger.power.set(power);
+            mLogger.writeLine();
+        }
     }
 
     public double GetCurrent() {

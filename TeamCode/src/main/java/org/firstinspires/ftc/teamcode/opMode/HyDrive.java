@@ -1,4 +1,7 @@
 package org.firstinspires.ftc.teamcode.opMode;
+import static org.firstinspires.ftc.teamcode.types.VisionMode.VisionMode_BlueGoal;
+import static org.firstinspires.ftc.teamcode.types.VisionMode.VisionMode_RedGoal;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -67,7 +70,15 @@ public abstract class HyDrive extends OpMode_Base {
     mImu = new Imu_Pinpoint(mOpMode, pinpointStart, mVisionTarget);
     mDrive = new Drive_Manual(mOpMode, mImu);
     mIntake = new Intake(mOpMode);
-    mTurret = new Turret(mOpMode, mImu, mVisionTarget, TurretTrackMode.OdoAndVision, true);
+    double targetingOffset;
+    if (mVisionTarget == VisionMode_BlueGoal) {
+      targetingOffset = 0;
+    } else if (mVisionTarget == VisionMode_RedGoal) {
+      targetingOffset = 0;
+    } else {
+      targetingOffset = 0;
+    }
+    mTurret = new Turret(mOpMode, mImu, mVisionTarget, TurretTrackMode.OdoAndVision, true, targetingOffset);
     mVision = new LimelightVision(mOpMode);
     mLauncher = new Launcher(mOpMode, mTurret, mImu, 0);
     mSysMon = new SystemMonitor(mOpMode);

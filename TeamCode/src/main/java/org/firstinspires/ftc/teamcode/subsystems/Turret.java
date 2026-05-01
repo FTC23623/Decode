@@ -19,8 +19,8 @@ public class Turret extends Turret_Base {
     private final ElapsedTime InitTimer;
     private boolean started = false;
 
-    public Turret(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder) {
-        super(opMode, imu, target, trackingMode, flipEncoder);
+    public Turret(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder, double targetingOffsetDegrees) {
+        super(opMode, imu, target, trackingMode, flipEncoder, targetingOffsetDegrees);
         //TurretServo = mOp.mHardwareMap.get(ServoEx.class,"TurretServo");
         TurretServo = new ServoEx(mOp.mHardwareMap,"TurretServo");
     //    TurretServo.setDirection(Servo.Direction.REVERSE);

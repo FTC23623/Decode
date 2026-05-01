@@ -14,6 +14,7 @@ import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.util.MathUtils;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.datalogger.TurretDatalogger;
 import org.firstinspires.ftc.teamcode.objects.Debouncer;
 import org.firstinspires.ftc.teamcode.objects.HydraOpMode;
 import org.firstinspires.ftc.teamcode.objects.HydraPIDFController;
@@ -61,9 +62,10 @@ public abstract class Turret_Base implements Subsystem {
     public static double turretVisionSetPointVelThresh = 10; // Degrees/s
     public LowPassFilter FiltVisionSP;
     private static double visionFiltGain = 0.4;
+    public static double targetingOffsetDegrees = 0;
+    protected final TurretDatalogger turretLog;
 
-
-    public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder) {
+    public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder, double targetingOffsetDegrees) {
         mOp = opMode;
         voltageSensor = mOp.mHardwareMap.get(VoltageSensor.class, "Control Hub");
         // Adjust target location for alliance
@@ -100,6 +102,8 @@ public abstract class Turret_Base implements Subsystem {
         TurretAngleController.setTolerance(0.5);
         TurretAngleController.setIntegrationBounds(-turretAngleCntlrILimit,turretAngleCntlrILimit);
         FiltVisionSP = new LowPassFilter(visionFiltGain);
+        this.targetingOffsetDegrees = targetingOffsetDegrees;
+        turretLog = new TurretDatalogger("Turret");
     }
 
     @Override
@@ -159,6 +163,7 @@ public abstract class Turret_Base implements Subsystem {
         // Attempt to get continuous vision and Odometry setpoints
         if (vision != null) {
             visionSetpoint = servoFbPosition + vision.GetXOffset();
+            visionSetpoint += targetingOffsetDegrees;
             // visionSetpoint = Prev_servoFbPosition + vision.GetXOffset(); // May need to use previous position due to Vision lag
             //mOp.mTelemetry.addData("VisionOffset", vision.GetXOffset());
             mOp.mTelemetry.addData("VisionSetpoint", visionSetpoint);
@@ -170,6 +175,7 @@ public abstract class Turret_Base implements Subsystem {
             double robotHeading = Math.toDegrees(currentPose.heading.toDouble()) - 180;
             // calculate the angle of the turret to point at the goal
             odometrySetpoint = MathUtils.normalizeDegrees(robotHeading - angleToGoal, false); // removed Clamp so we can see what the odometery really wants
+            odometrySetpoint += targetingOffsetDegrees;
             mOp.mTelemetry.addData("OdometrySetpoint", odometrySetpoint);
         }
         //mOp.mTelemetry.addData("AutoSetAngle", autoSetAngle);
@@ -253,6 +259,11 @@ public abstract class Turret_Base implements Subsystem {
         mOp.mTelemetry.addData("VisionLocked", visionLocked);
         mOp.mTelemetry.addData("AutoTrack", trackMode);
         //double Prev_servoFbPosition = servoFbPosition;
+        turretLog.visionSetPoint.set(visionSetpoint);
+        turretLog.odoSetPoint.set(odometrySetpoint);
+        turretLog.fb.set(servoFbPosition);
+        turretLog.lock.set(visionLocked);
+        turretLog.pid.set(turretAdjustment);
     }
 
     public boolean Locked() {

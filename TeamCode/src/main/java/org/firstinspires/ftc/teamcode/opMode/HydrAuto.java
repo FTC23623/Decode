@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opMode;
 
+import static org.firstinspires.ftc.teamcode.types.VisionMode.VisionMode_BlueGoal;
 import static org.firstinspires.ftc.teamcode.types.VisionMode.VisionMode_Obelisk;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -69,7 +70,7 @@ public abstract class HydrAuto extends OpMode_Base {
         mIntake = new Intake(mOpMode);
         mDrive = new MecanumDrive(hardwareMap, mBeginPose);
         mSystems = new ArrayList<>();
-        mTurret = new Turret(mOpMode, null , mVisionTarget, TurretTrackMode.VisionOnly, false);
+        mTurret = new Turret(mOpMode, null , mVisionTarget, TurretTrackMode.VisionOnly, false, 0);
         mVision = new LimelightVision(mOpMode);
         Imu pp = null;
         if (mDrive.localizer instanceof PinpointLocalizer) {
