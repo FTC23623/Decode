@@ -224,7 +224,9 @@ public class Launcher implements Subsystem {
             pid.setSetPoint(targetRPMtune);
             pid.clearTotalError();
             for (LaunchMotor motor : motors) {
-                motor.mLogger.rpmTgt.set(targetRPMtune);
+                if (motor.mLogger != null){
+                    motor.mLogger.rpmTgt.set(targetRPMtune);
+                }
             }
         }
         //mOp.mTelemetry.addData("pidF", pidF);

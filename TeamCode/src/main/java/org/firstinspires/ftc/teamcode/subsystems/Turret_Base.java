@@ -62,7 +62,7 @@ public abstract class Turret_Base implements Subsystem {
     public static double turretVisionSetPointVelThresh = 10; // Degrees/s
     public LowPassFilter FiltVisionSP;
     private static double visionFiltGain = 0.4;
-    public static double targetingOffsetDegrees = 0;
+    protected double targetingOffsetDegrees = 0;
     protected final TurretDatalogger turretLog;
 
     public Turret_Base(HydraOpMode opMode, Imu imu, VisionMode target, TurretTrackMode trackingMode, boolean flipEncoder, double targetingOffsetDegrees) {

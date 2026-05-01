@@ -72,7 +72,7 @@ public abstract class HyDrive extends OpMode_Base {
     mIntake = new Intake(mOpMode);
     double targetingOffset;
     if (mVisionTarget == VisionMode_BlueGoal) {
-      targetingOffset = 0;
+      targetingOffset = -2;
     } else if (mVisionTarget == VisionMode_RedGoal) {
       targetingOffset = 0;
     } else {
