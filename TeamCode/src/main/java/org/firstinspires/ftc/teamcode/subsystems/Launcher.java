@@ -65,7 +65,7 @@ public class Launcher implements Subsystem {
     private final Debouncer autoRangeDisable;
     private boolean autoRangeEnabled;
     public static double farLaunchSlope = 20;
-    public static double farLaunchIntercept = 2945;
+    public static double farLaunchIntercept = 2960;
 
     public Launcher(HydraOpMode Opmode, Turret_Base turret, Imu imu, double targetRPM) {
         mOp = Opmode;
