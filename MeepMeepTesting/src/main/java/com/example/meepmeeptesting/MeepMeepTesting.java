@@ -157,6 +157,7 @@ public class MeepMeepTesting {
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
         Pose2d Park = FlipPose(Launch2.position.x, 34, 90, flip);
+        Pose2d SecretTunnel = FlipPose(28,60,180, flip);
 
         Action launchPreloads = myBot.getDrive().actionBuilder(beginPose)
                 .waitSeconds(3)
@@ -177,6 +178,15 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(25))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos, flip))
                 .splineToSplineHeading(Launch2, AutoTangent(PGPPos, Launch2Pos, flip))
+                .waitSeconds(launchTimeS)
+                .build();
+
+
+        Action Secret = myBot.getDrive().actionBuilder(Launch2)
+                .setTangent(FlipTangent(90,flip))
+                .splineToLinearHeading(SecretTunnel,FlipTangent(180,flip))
+                .setTangent(FlipTangent(0,flip))
+                .splineToLinearHeading(Launch2,FlipTangent(-90,flip))
                 .waitSeconds(launchTimeS)
                 .build();
 
@@ -205,6 +215,9 @@ public class MeepMeepTesting {
         int lzPickups = 5 - spikeCount;
         if (spikeCount > 0) {
             --lzPickups;
+            if (spikeCount == 1) {
+                --lzPickups;
+            }
         }
         for (int i = 0; i < lzPickups; ++i) {
             ret = new SequentialAction(
@@ -212,7 +225,12 @@ public class MeepMeepTesting {
                     LoadingZoneSequence(myBot, Launch2, true, flip, Launch2, true, lzcount++)
             );
         }
-
+        if (spikeCount == 1) {
+            ret = new SequentialAction(
+                    ret,
+                    Secret
+            );
+        }
         ret = new SequentialAction(
                 ret,
                 parkAction

@@ -32,6 +32,7 @@ public abstract class AutoFar extends HydrAuto {
         Pose2d GPPSlowdownPose = Waypoint(Launch2, GPP, 0.75);
         Pose2d PGPSlowdownPose = Waypoint(Launch2, PGP, 0.75);
         Pose2d Park = FlipPose(Launch2.position.x, 34, 90);
+        Pose2d SecretTunnel = FlipPose(28,60,180);
 
         double slowdownspeed = 20;
         int lzcount = 0;
@@ -52,6 +53,13 @@ public abstract class AutoFar extends HydrAuto {
                 .splineToSplineHeading(PGP, PGP.heading, new TranslationalVelConstraint(slowdownspeed))
                 .setTangent(AutoTangent(PGPPos, Launch2Pos))
                 .splineToSplineHeading(Launch2, AutoTangent(PGPPos, Launch2Pos))
+                .build();
+
+        Action Secret = mDrive.actionBuilder(Launch2)
+                .setTangent(FlipTangent(90))
+                .splineToLinearHeading(SecretTunnel,FlipTangent(180))
+                .setTangent(FlipTangent(0))
+                .splineToLinearHeading(Launch2,FlipTangent(-90))
                 .build();
 
         Action parkAction = mDrive.actionBuilder(Launch2)
@@ -118,11 +126,32 @@ public abstract class AutoFar extends HydrAuto {
         int lzPickups = 5 - mSpikeCount;
         if (mSpikeCount > 0) {
             --lzPickups;
+            if (mSpikeCount == 1) {
+                --lzPickups;
+            }
         }
         for (int i = 0; i < lzPickups; ++i) {
             ret = new SequentialAction(
                 ret,
                 LoadingZoneSequence(Launch2, true, Launch2, true, lzcount++)
+            );
+        }
+
+        if (mSpikeCount == 1) {
+            ret = new SequentialAction(
+                    ret,
+                    mTurret.GetDisableAction(true),
+                    new ParallelAction(
+                            mIntake.GetAction(IntakeActions.IntakeLoadArtifacts),
+                            Secret,
+                            mTurret.GetSetAction(FlipTurret(-109))
+                    ),
+                    mTurret.GetDisableAction(false),
+                    new ParallelAction(
+                            mTurret.GetLockAction(),
+                            mIntake.GetAction(IntakeActions.IntakePushToLauncher)
+                    ),
+                    mLauncher.GetAction(LauncherActions.LauncherLaunch)
             );
         }
 
